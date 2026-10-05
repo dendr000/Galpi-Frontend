@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './EditorPage.module.css';
+import { findMatchesIn } from './findMatches';
 
 const EditorSearch = ({ editorRef, rawText, setRawText }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,22 +28,6 @@ const EditorSearch = ({ editorRef, rawText, setRawText }) => {
     document.addEventListener('keydown', handleKeyDown, true);
     return () => document.removeEventListener('keydown', handleKeyDown, true);
   }, [isOpen, editorRef]);
-
-  // 텍스트 안에서 검색어가 나오는 모든 위치를 찾는 순수 함수 — state/ref를 안 건드리므로
-  // "바꾸기" 직후처럼 아직 rawText state에는 반영 안 됐지만 이미 알고 있는 새 문자열에도
-  // 곧바로 재사용할 수 있다(React 리렌더를 기다리는 stale closure 문제를 피한다).
-  const findMatchesIn = (text, query) => {
-    if (!query) return [];
-    const lowerText = text.toLowerCase();
-    const lowerQuery = query.toLowerCase();
-    let startIndex = 0;
-    const found = [];
-    while ((startIndex = lowerText.indexOf(lowerQuery, startIndex)) > -1) {
-      found.push({ start: startIndex, end: startIndex + query.length });
-      startIndex += query.length;
-    }
-    return found;
-  };
 
   // 검색어(findText)가 바뀔 때만 자동으로 첫 매치로 이동+포커스한다 — rawText 변화(=타이핑
   // 한 글자 한 글자)마다 이걸 돌리면 사용자가 다른 곳에 타이핑 중에도 계속 에디터로 포커스가
