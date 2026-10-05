@@ -18,7 +18,12 @@
   --hc-font-display: 'Gothic A1', sans-serif;
   --hc-font-mono: 'IBM Plex Mono', 'Nanum Gothic Coding', monospace;
 }
-/* 이 테마는 항상 형광등 켜진 복도 하나로 고정 — 라이트/다크 토글과 무관하게 동일하게 보인다 */
+/* 다크 모드에서는 같은 복도의 형광등이 나간 상태 — 누런 벽지 톤은 유지하되 명암만 뒤집는다 */
+[data-theme="dark"] [data-genre-theme="horror-corridor"], [data-theme="dark"][data-footer-theme="horror-corridor"] {
+  --hc-bg1: #2a2510; --hc-bg2: #1c1809; --hc-bg3: #100d05;
+  --hc-ink: #e8dfc0; --hc-ink-soft: #a89f70;
+  --hc-panel: rgba(10,8,5,0.4); --hc-panel-line: rgba(220,205,140,0.2);
+}
 
 [data-genre-theme="horror-corridor"] {
   position: relative;

@@ -1,7 +1,10 @@
 /* 파일 위치: src/pages/WorkDetail/themes/hunter-hologram.css */
 /* 헌터/이능력물 방향 B — 라이트 홀로그램. 대낮에 유리판 너머로 보는 AR 인터페이스 느낌.
-   hunter-gate.css(방향 A, 항상 어두움)와 짝을 이루는 "항상 밝은" 변형이다.
-   [data-genre-theme="hunter-hologram"] 속성 선택자만으로 단독 동작한다. */
+   hunter-gate.css(방향 A, 항상 어두움)와 짝을 이루는 "밝은" 변형이다.
+   [data-genre-theme="hunter-hologram"] 속성 선택자만으로 단독 동작한다.
+   다크 모드에서는 어두운 방에서 보는 홀로그램으로 — 사실 이쪽이 더 "홀로그램답다"(허공에
+   뜬 빛나는 UI는 원래 어두운 배경에서 도드라진다). 유리 패널·격자·스캔라인 연출은 그대로
+   두고 명암만 뒤집는다. */
 
 [data-genre-theme="hunter-hologram"], [data-footer-theme="hunter-hologram"] {
   --hh2-bg1: #eef1fb; --hh2-bg2: #f7f8fd; --hh2-bg3: #ffffff;
@@ -12,8 +15,12 @@
   --hh2-font-label: 'Rajdhani', 'Gothic A1', sans-serif;
   --hh2-font-mono: 'IBM Plex Mono', 'Nanum Gothic Coding', monospace;
 }
-/* 이 테마는 항상 밝은 세계관 하나로 고정 — 라이트/다크 토글과 무관하게 동일하게 보인다
-   (hunter-gate.css가 항상 어두운 것과 대칭) */
+[data-theme="dark"] [data-genre-theme="hunter-hologram"], [data-theme="dark"][data-footer-theme="hunter-hologram"] {
+  --hh2-bg1: #0a0e1f; --hh2-bg2: #060814; --hh2-bg3: #030509;
+  --hh2-ink: #e4e9ff; --hh2-ink-soft: #8993c4;
+  --hh2-blue: #6f93ff; --hh2-amber: #e0a94a; --hh2-mint: #3fe0c0;
+  --hh2-panel: rgba(20,24,45,0.55); --hh2-panel-line: rgba(111,147,255,0.35);
+}
 
 [data-genre-theme="hunter-hologram"] {
   position: relative;

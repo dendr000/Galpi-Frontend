@@ -4,18 +4,28 @@
    보관실)와 짝을 이루는 "밝고 태연한" 변형이다.
    [data-genre-theme="horror-store"] 속성 선택자만으로 단독 동작한다.
    주의: hunter-hologram.css와 같은 이유로 커버 이미지 위 제목 색은 안 건드린다 — 사진 아래
-   어두운 오버레이 위에 얹히는 흰 글자라 여기서 짙은 색으로 덮어쓰면 안 보이게 된다. */
+   어두운 오버레이 위에 얹히는 흰 글자라 여기서 짙은 색으로 덮어쓰면 안 보이게 된다.
+   다크 모드에서는 명암만 뒤집는다 — 가게 밖은 캄캄한 자정, 형광등 불빛은 패널 안에만
+   남는다. 반투명 유리 패널(--hb-glass-*)도 흰색에서 어두운 톤으로 같이 뒤집는다. */
 
 [data-genre-theme="horror-store"], [data-footer-theme="horror-store"] {
   --hb-bg1: #dde2c9; --hb-bg2: #d7dcc3;
   --hb-ink: #2e3324; --hb-ink-soft: #5a6248; --hb-warn: #c0392b;
   --hb-panel: rgba(255,255,255,0.45); --hb-panel-line: rgba(60,60,40,0.18);
+  --hb-glass-1: rgba(255,255,255,.4); --hb-glass-2: rgba(255,255,255,.35); --hb-glass-3: rgba(255,255,255,.3);
+  --hb-rec: rgba(40,40,30,.5);
   --hb-font-display: 'Gaegu', sans-serif;
   --hb-font-label: 'Rajdhani', 'Gothic A1', sans-serif;
   --hb-font-mono: 'IBM Plex Mono', 'Nanum Gothic Coding', monospace;
 }
-/* 이 테마는 항상 밝은 형광등 아래 하나로 고정 — 라이트/다크 토글과 무관하게 동일하게 보인다
-   (horror-archive.css가 항상 어두운 것과 대칭) */
+/* 다크 모드에서는 정말로 '자정'답게 — 창밖은 어두워지고 형광등 불빛만 패널 안쪽에 남는다 */
+[data-theme="dark"] [data-genre-theme="horror-store"], [data-theme="dark"][data-footer-theme="horror-store"] {
+  --hb-bg1: #171c12; --hb-bg2: #10130d;
+  --hb-ink: #dde5c8; --hb-ink-soft: #9aa584; --hb-warn: #e0574a;
+  --hb-panel: rgba(20,24,15,0.5); --hb-panel-line: rgba(200,220,170,0.18);
+  --hb-glass-1: rgba(10,14,8,.4); --hb-glass-2: rgba(10,14,8,.35); --hb-glass-3: rgba(10,14,8,.3);
+  --hb-rec: rgba(220,225,200,.45);
+}
 
 [data-genre-theme="horror-store"] {
   position: relative;
@@ -33,7 +43,7 @@
 @keyframes hbFluor { 0%,100% { opacity: 1; } 3% { opacity: .4; } 4% { opacity: 1; } 5% { opacity: .55; } 6% { opacity: 1; } 71% { opacity: 1; } 72% { opacity: .3; } 73% { opacity: 1; } }
 [data-genre-theme="horror-store"]::after {
   content: "CAM 03 · ● REC"; position: absolute; top: 10px; right: 16px; z-index: 3; pointer-events: none;
-  font-family: var(--hb-font-mono); font-size: 11px; color: rgba(40,40,30,.5); letter-spacing: .02em;
+  font-family: var(--hb-font-mono); font-size: 11px; color: var(--hb-rec); letter-spacing: .02em;
 }
 [data-genre-theme="horror-store"] > * { position: relative; z-index: 1; }
 
@@ -60,7 +70,7 @@
 [data-genre-theme="horror-store"] .gt-category > :first-child { background: transparent !important; color: var(--hb-ink) !important; }
 [data-genre-theme="horror-store"] .gt-section-select { background: var(--hb-panel) !important; border-color: var(--hb-panel-line) !important; color: var(--hb-ink) !important; }
 [data-genre-theme="horror-store"] .gt-tag {
-  background: rgba(255,255,255,.4) !important; border: 1px solid var(--hb-panel-line) !important; color: var(--hb-ink) !important;
+  background: var(--hb-glass-1) !important; border: 1px solid var(--hb-panel-line) !important; color: var(--hb-ink) !important;
   font-family: var(--hb-font-label) !important; font-weight: 700;
   border-radius: 3px !important;
 }
@@ -92,7 +102,7 @@
 [data-footer-theme="horror-store"] .gt-footer { background: var(--hb-panel) !important; border-top: 1px solid var(--hb-panel-line) !important; }
 [data-footer-theme="horror-store"] .gt-footer-btn:hover { color: var(--hb-warn) !important; }
 [data-genre-theme="horror-store"] .gt-infobox-image { border-bottom-color: var(--hb-panel-line) !important; }
-[data-genre-theme="horror-store"] .gt-infobox-table th, [data-genre-theme="horror-store"] .gt-table th { background: rgba(255,255,255,.35) !important; color: var(--hb-ink-soft) !important; border-color: var(--hb-panel-line) !important; font-family: var(--hb-font-mono); font-weight: 500 !important; }
+[data-genre-theme="horror-store"] .gt-infobox-table th, [data-genre-theme="horror-store"] .gt-table th { background: var(--hb-glass-2) !important; color: var(--hb-ink-soft) !important; border-color: var(--hb-panel-line) !important; font-family: var(--hb-font-mono); font-weight: 500 !important; }
 [data-genre-theme="horror-store"] .gt-infobox-table td, [data-genre-theme="horror-store"] .gt-table td { color: var(--hb-ink) !important; border-color: var(--hb-panel-line) !important; font-family: var(--hb-font-label); }
 [data-genre-theme="horror-store"] .gt-infobox-desc { background: var(--hb-panel) !important; color: var(--hb-ink-soft) !important; border-top-color: var(--hb-panel-line) !important; }
 [data-genre-theme="horror-store"] .gt-btn-edit { border-color: var(--hb-ink) !important; color: var(--hb-ink) !important; background: transparent !important; }
@@ -126,8 +136,8 @@
 [data-genre-theme="horror-store"] .gt-macro-accent-dot { fill: var(--hb-warn) !important; }
 [data-genre-theme="horror-store"] .gt-macro-accent-stroke { stroke: var(--hb-warn) !important; }
 [data-genre-theme="horror-store"] .gt-macro-inksoft-stroke { stroke: var(--hb-ink-soft) !important; }
-[data-genre-theme="horror-store"] .gt-macro-subheader { background: rgba(255,255,255,.3) !important; }
-[data-genre-theme="horror-store"] .gt-macro-track { background: rgba(255,255,255,.4) !important; }
+[data-genre-theme="horror-store"] .gt-macro-subheader { background: var(--hb-glass-3) !important; }
+[data-genre-theme="horror-store"] .gt-macro-track { background: var(--hb-glass-1) !important; }
 [data-genre-theme="horror-store"] .tl-dot { border-color: var(--hb-bg2) !important; }
 
 [data-genre-theme="horror-store"] .galpi-ext-quote {
