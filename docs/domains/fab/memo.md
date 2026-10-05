@@ -1,4 +1,4 @@
-<!-- Galpi/Galpi-React/docs/domains/fab/memo.md -->
+<!-- Galpi/Galpi-Frontend/docs/domains/fab/memo.md -->
 [전체 보기](../../DirectoryTree.md)  
 
 ```bash

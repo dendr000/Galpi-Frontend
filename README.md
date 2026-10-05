@@ -2,12 +2,12 @@
 
 창작자를 위한 **위키형 세계관 노트**. 작품 · 캐릭터 · 설정 문서를 위키처럼 엮고, 소설/웹툰 원고를 쓰는 동안 필요한 도구(상용구, 한자 사전, 플로팅 메모)를 한 화면에서 바로 쓸 수 있게 만든 개인 창작 지원 툴입니다.
 
-이 저장소(`Galpi-React`)는 프론트엔드입니다. 전체 시스템은 형제 저장소 3개로 나뉘어 있습니다.
+이 저장소(`Galpi-Frontend`)는 프론트엔드입니다. 전체 시스템은 형제 저장소 3개로 나뉘어 있습니다.
 
 | 저장소 | 역할 | 공개 여부 |
 |---|---|---|
-| **Galpi-React** (이 저장소) | React 프론트엔드 — 위키 UI, 에디터, 장르 테마 | Public |
-| Galpi-Backend | Spring Boot REST API + DB(MySQL / H2) | Private |
+| **Galpi-Frontend** (이 저장소) | React 프론트엔드 — 위키 UI, 에디터, 장르 테마 | Public |
+| Galpi-Backend | Spring Boot REST API + DB(MySQL / H2) | Public |
 | Galpi-Exe | Electron으로 위 둘을 감싼 데스크톱 실행 파일 | Private |
 
 세 저장소가 어떻게 맞물리는지는 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)에 정리했습니다.

@@ -1,4 +1,4 @@
-# Galpi-React 문서
+# Galpi-Frontend 문서
 
 [프로젝트 개요는 루트 README](../README.md)를 먼저 보세요. 여기는 더 깊은 내용을 다룹니다.
 
@@ -6,7 +6,7 @@
 
 | 문서 | 내용 |
 |---|---|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Galpi-React / Galpi-Backend / Galpi-Exe 세 저장소가 맞물리는 전체 구조, 개발(MySQL) vs 데스크톱(H2) 프로파일, 빌드 파이프라인 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Galpi-Frontend / Galpi-Backend / Galpi-Exe 세 저장소가 맞물리는 전체 구조, 개발(MySQL) vs 데스크톱(H2) 프로파일, 빌드 파이프라인 |
 | [USAGE.md](./USAGE.md) | 실행 방법과 기능별 사용법 (로그인, 작품/캐릭터 관리, 플로팅 메모 등) |
 | [SYNTAX.md](./SYNTAX.md) | 작품 페이지 본문에 쓰는 위키 서식 · 매크로 문법 전체 레퍼런스 |
 

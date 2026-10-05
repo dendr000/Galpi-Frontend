@@ -2,12 +2,12 @@
 
 [← 문서 목록으로](./README.md)
 
-Galpi는 하나의 저장소가 아니라, 역할이 분리된 형제 저장소 3개로 구성됩니다. 이 문서는 `Galpi-React`(이 저장소)만으로는 보이지 않는, 백엔드 · 데스크톱 패키징까지 포함한 전체 그림을 정리합니다.
+Galpi는 하나의 저장소가 아니라, 역할이 분리된 형제 저장소 3개로 구성됩니다. 이 문서는 `Galpi-Frontend`(이 저장소)만으로는 보이지 않는, 백엔드 · 데스크톱 패키징까지 포함한 전체 그림을 정리합니다.
 
 ```
 Galpi/                      (부모 폴더, 각각 독립된 git 저장소)
- ├─ Galpi-React/             프론트엔드 — 이 저장소 (Public)
- ├─ Galpi-Backend/            Spring Boot REST API + DB (Private)
+ ├─ Galpi-Frontend/           프론트엔드 — 이 저장소 (Public)
+ ├─ Galpi-Backend/            Spring Boot REST API + DB (Public)
  └─ Galpi-Exe/                Electron 데스크톱 패키징 (Private)
 ```
 
@@ -15,7 +15,7 @@ Galpi/                      (부모 폴더, 각각 독립된 git 저장소)
 
 ## 저장소별 역할
 
-### Galpi-React (프론트엔드)
+### Galpi-Frontend (프론트엔드)
 
 React 19 + Vite SPA. 위키 UI, 에디터, 마크다운 매크로 렌더러, 장르 테마 CSS를 담당합니다. 백엔드와는 REST API(`/api/**`)로만 통신하고, 이미지 · 폰트는 `/img/**`, `/fonts/**`로 정적 서빙됩니다.
 
@@ -49,7 +49,7 @@ Electron main.js
 세 저장소가 최종적으로 하나의 exe로 합쳐지는 과정입니다.
 
 ```
-1. Galpi-React   : npm run build
+1. Galpi-Frontend   : npm run build
                     → 산출물이 Galpi-Backend/src/main/resources/static 으로 직접 출력됨
                        (vite.config.js의 outDir 설정, baseURL이 '/'라 코드 변경 불필요)
 
