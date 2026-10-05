@@ -12,6 +12,12 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    // 테스트(vitest): 기본은 node 환경(순수 로직). DOM이 필요한 테스트 파일만 맨 위에
+    // `// @vitest-environment jsdom` 주석으로 jsdom을 켠다.
+    test: {
+      environment: 'node',
+      include: ['src/**/*.test.{js,jsx}'],
+    },
     build: {
       // exe(Electron) 패키징용 — 빌드 산출물을 Galpi-Backend가 바로 서빙할 수 있게
       // 정적 리소스 폴더로 직접 낸다. baseURL이 '/'라 백엔드가 서빙만 하면 코드 변경 없음.
