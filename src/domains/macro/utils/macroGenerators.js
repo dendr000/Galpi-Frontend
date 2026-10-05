@@ -1,6 +1,7 @@
 // 파일 위치: src/domains/macro/utils/macroGenerators.js
 // 기능 요약: 마크다운 예약어를 감지하여 시각화 HTML/SVG 위젯을 문자열로 즉시 조립하는 순수 렌더링 함수 모음
 // 버전: v2.3.1 (createRelationGraphHtml 누락 함수 복구 통합본)
+import { sanitizeFilenameTitle } from '../../../utils/filenameSanitizer';
 
 const parseRankValue = (valStr) => {
   if (!valStr) return 0;
@@ -101,7 +102,10 @@ export const createChatHtml = (type, name, expr, msg) => {
   const color = isRight ? '#ffffff' : 'var(--text-primary)';
   const workTitle = typeof window !== 'undefined' && window.currentWorkData?.title ? window.currentWorkData.title : '작품명';
   
-  const imgName = expr ? `${workTitle}_${name.trim()}_${expr.trim()}.png` : `${workTitle}_${name.trim()}.png`;
+  const safeWorkTitle = sanitizeFilenameTitle(workTitle);
+  const safeName = sanitizeFilenameTitle(name.trim());
+  const safeExpr = expr ? sanitizeFilenameTitle(expr.trim()) : '';
+  const imgName = expr ? `${safeWorkTitle}_${safeName}_${safeExpr}.png` : `${safeWorkTitle}_${safeName}.png`;
   const avatarHtml = `<div style="width:42px; height:42px; border-radius:50%; background-color:var(--table-bg-alt); background-image:url('/img/character/${imgName}'); background-size:cover; background-position:center; border:2px solid var(--border-color); flex-shrink:0; box-shadow:0 2px 5px rgba(0,0,0,0.1);"></div>`;
 
   const bubbleClass = isRight ? 'gt-macro-accent-bg' : 'gt-macro-box';

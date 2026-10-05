@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownRenderer from '../../domains/macro/MarkdownRenderer';
 import { IconEye } from '../../components/common/icons/DomainIcons';
+import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 
 const BulkSidebar = ({ isPreviewOpen, activeRow, labels, workTitle, workMeta }) => {
   const [variantIdx, setVariantIdx] = useState(0);
@@ -36,8 +37,8 @@ const BulkSidebar = ({ isPreviewOpen, activeRow, labels, workTitle, workMeta }) 
   const suffix = fullVariants[variantIdx] ? "_" + fullVariants[variantIdx] : "";
   
   const isNew = String(activeRow.id).startsWith("new_");
-  const imgSrc = (title !== "이름 없음" && !isNew) 
-    ? `/img/character/${encodeURIComponent(workTitle + "_" + title + suffix)}.${cExt.replace(/^\./, '')}` 
+  const imgSrc = (title !== "이름 없음" && !isNew)
+    ? `/img/character/${encodeURIComponent(sanitizeFilenameTitle(workTitle) + "_" + sanitizeFilenameTitle(title) + suffix)}.${cExt.replace(/^\./, '')}`
     : "";
 
   const handleImageClick = (e) => {

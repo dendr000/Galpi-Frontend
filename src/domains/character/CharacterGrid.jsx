@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { IconImage, IconPlus } from '../../components/common/icons/DomainIcons';
+import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -99,9 +100,10 @@ const CharacterGrid = ({
                 {charList.map(c => {
                   const vIdx = cardVariants[c.id] || 0;
                   const suffix = fullVariants[vIdx] ? `_${fullVariants[vIdx]}` : "";
-                  const workTitle = work?.title || "작품";
-                  const cardImgSrc = `/img/character/${encodeURIComponent(workTitle + "_" + c.name + suffix + "." + charExt)}`;
-                  const cardBaseImgSrc = `/img/character/${encodeURIComponent(workTitle + "_" + c.name + "." + charExt)}`;
+                  const workTitle = sanitizeFilenameTitle(work?.title || "작품");
+                  const safeName = sanitizeFilenameTitle(c.name);
+                  const cardImgSrc = `/img/character/${encodeURIComponent(workTitle + "_" + safeName + suffix + "." + charExt)}`;
+                  const cardBaseImgSrc = `/img/character/${encodeURIComponent(workTitle + "_" + safeName + "." + charExt)}`;
 
                   // ★ 인포박스와 cardVariants를 공유하므로, 업로드된 적 없는 바리에이션 이미지가
                   // 저장돼 있으면 카드도 똑같이 빈칸으로 방치되던 버그 — 기본 이미지로 되돌리고

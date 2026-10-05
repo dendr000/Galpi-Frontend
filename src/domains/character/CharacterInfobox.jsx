@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axiosCore';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
+import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 
 const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps }) => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
     setExistingVariants(null);
     Promise.all(toCheck.map(v => new Promise(resolve => {
       const probe = new Image();
-      const name = `${workTitle}_${char.name}_${v}.${charExt.replace(/^\./, '')}`;
+      const name = `${sanitizeFilenameTitle(workTitle)}_${sanitizeFilenameTitle(char.name)}_${v}.${charExt.replace(/^\./, '')}`;
       probe.onload = () => resolve(v);
       probe.onerror = () => resolve(null);
       probe.src = `/img/character/${encodeURIComponent(name)}`;
@@ -140,9 +141,11 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
 
   const currentVariant = fullVariants[variantIdx];
   const suffix = currentVariant ? `_${currentVariant}` : "";
-  const imgName = `${workTitle}_${char.name}${suffix}.${charExt.replace(/^\./, '')}`;
+  const safeWorkTitle = sanitizeFilenameTitle(workTitle);
+  const safeCharName = sanitizeFilenameTitle(char.name);
+  const imgName = `${safeWorkTitle}_${safeCharName}${suffix}.${charExt.replace(/^\./, '')}`;
   const imgSrc = `/img/character/${encodeURIComponent(imgName)}`;
-  const baseImgSrc = `/img/character/${encodeURIComponent(`${workTitle}_${char.name}.${charExt.replace(/^\./, '')}`)}`;
+  const baseImgSrc = `/img/character/${encodeURIComponent(`${safeWorkTitle}_${safeCharName}.${charExt.replace(/^\./, '')}`)}`;
 
   // ★ 쉬프트+클릭으로 순환한 바리에이션(예: "전투") 이미지 파일이 실제로는 업로드된 적 없어서
   // 404가 나면, 그냥 빈칸(하얀 화면)으로 방치되던 버그 — 그 상태가 cardVariants에 그대로

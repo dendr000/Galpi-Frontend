@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { useHeroSlider } from './hooks/useHeroSlider';
 import { IconPen, IconTag } from '../../components/common/icons/DomainIcons';
+import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 
 const HeroSlider = ({ works }) => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const HeroSlider = ({ works }) => {
           const m = w.metaInfo?.meta || {};
           let coverUrl = "";
           if (m.coverExt) {
-            coverUrl = `/img/cover/${encodeURIComponent(w.title + "." + m.coverExt.trim().replace(/^\./, ''))}`;
+            coverUrl = `/img/cover/${encodeURIComponent(sanitizeFilenameTitle(w.title) + "." + m.coverExt.trim().replace(/^\./, ''))}`;
           } else if (m.cover) {
             coverUrl = `/img/cover/${encodeURIComponent(m.cover.replace('cover/', ''))}`;
           }
