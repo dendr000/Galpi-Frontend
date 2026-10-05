@@ -2,21 +2,12 @@
 // 기능 요약: 캐릭터 일괄 스튜디오 전역 상태 관리 및 시스템 예약어 필터링 강화
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axiosCore';
+import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
+import { getNextSortOrderBase } from './sortOrder';
 
 const DEFAULT_COLS = ["부제목", "나이", "성별", "종족", "관계"];
-
-// ★ 새로 추가되는 행마다 _sortOrderNum이 전부 미설정 기본값(999)로 똑같이 들어가서, 저장할 때
-// handleSaveAll이 여러 명을 Promise.allSettled로 동시에 POST하면 서버 응답(그래서 DB id 부여)이
-// 붙여넣은 순서와 무관하게 뒤섞이고, 작품 페이지는 sortOrder가 같으면 결국 그 뒤섞인 순서로
-// 보여주는 버그가 있었다. 붙여넣은/추가한 순서를 sortOrder 값 자체에 미리 못박아 두면 저장
-// 완료 순서가 어떻든 항상 의도한 순서대로 정렬된다.
-const getNextSortOrderBase = (currentRows) => {
-  let max = 999;
-  currentRows.forEach(r => { if (typeof r._sortOrderNum === 'number' && r._sortOrderNum > max) max = r._sortOrderNum; });
-  return max;
-};
 
 // ★ 물리적으로 화면에 입력칸으로 노출되면 안 되는 시스템 내부 예약어(블랙리스트) 명단 정의
 const SYSTEM_PROPS = ["작품명", "제작자", "age", "gender", "species", "sortOrder", "themeColor", "cardImgX", "cardImgY", "cardImgScale", "pageBody"];
@@ -37,6 +28,7 @@ const normalizeCellValue = (key, val) => {
 };
 
 export const useBulkStudioData = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const urlWorkId = searchParams.get('workId');
   const [isAutoLoaded, setIsAutoLoaded] = useState(false);
@@ -64,6 +56,13 @@ export const useBulkStudioData = () => {
   const [pasteModal, setPasteModal] = useState({ isOpen: false });
 
   const lastCheckedRowIdx = useRef(null);
+
+  // ★ 폼 스위칭(_switchTarget/_isHidden) 같은, Bulk Studio가 모르는 "_"로 시작하는 내부
+  // 속성을 일괄 저장 때 그대로 보존하기 위한 원본 dynamicProperties 캐시. loadCharacters가
+  // 불러올 때마다 캐릭터 id별로 채워두고, handleSaveAll이 새 dp를 만들 때 여기서 "_" 속성만
+  // 되살려 합친다 — Bulk Studio 표는 애초에 "_" 속성을 컬럼으로도, 행 데이터로도 들고 있지
+  // 않아서(loadCharacters의 컬럼 필터 참고) 그냥 두면 저장할 때마다 통째로 사라졌었다.
+  const originalDpRef = useRef({});
 
   useEffect(() => {
     const handleGlobalKey = (e) => {
@@ -123,9 +122,11 @@ export const useBulkStudioData = () => {
       colArray.unshift("부제목");
       setColumns(colArray);
 
+      originalDpRef.current = {};
       const formattedRows = chars.map(c => {
         let dp = {}; try { dp = JSON.parse(c.dynamicProperties || c._rawDynamic || "{}"); } catch(e){}
-        const rowData = { 
+        originalDpRef.current[c.id] = dp;
+        const rowData = {
           id: c.id, name: c.name || '', _checked: false, pageBodyRaw: dp.pageBody?.rawText || '',
           themeColor: c.themeColor || dp.themeColor || '#3b5bdb',
           cardImgX: dp.cardImgX !== undefined ? dp.cardImgX : (c.cardImgX !== undefined ? c.cardImgX : 50),
@@ -304,7 +305,9 @@ export const useBulkStudioData = () => {
         const merged = { ...target };
         Object.entries(parsed).forEach(([label, val]) => {
           if (label === '이름' || val === '') return;
-          if (label === '본문') merged.pageBodyRaw = val;
+          // 붙여넣기 텍스트는 한 줄 = 한 행이라 본문에 실제 줄바꿈을 넣을 수 없다 —
+          // 그 대신 리터럴 "\n"(백슬래시+n 두 글자)을 쓰면 여기서 진짜 줄바꿈으로 바꿔준다.
+          if (label === '본문') merged.pageBodyRaw = val.replace(/\\n/g, '\n');
           else merged[label] = val;
         });
         return merged;
@@ -354,7 +357,8 @@ export const useBulkStudioData = () => {
 
     const applyFields = (target, gr) => {
       const merged = { ...target };
-      const body = (gr['본문'] || '').trim();
+      // 표 붙여넣기 모드의 칸(input)도 실제 줄바꿈은 못 담으니, 텍스트 모드와 같은 "\n" 이스케이프를 쓴다.
+      const body = (gr['본문'] || '').trim().replace(/\\n/g, '\n');
       if (body !== '') merged.pageBodyRaw = body;
       gridColumns.forEach(c => {
         const raw = normalizeCellValue(c, (gr[c] || '').trim());
@@ -517,7 +521,7 @@ export const useBulkStudioData = () => {
         작품명: workTitle,
         제작자: creator
       };
-      const payload = { workId: parseInt(selectedWorkId), name: row.name.trim(), imageCode: `${workTitle}_${row.name.trim()}.${cExt.replace(/^\./, '')}` };
+      const payload = { workId: parseInt(selectedWorkId), name: row.name.trim(), imageCode: `${sanitizeFilenameTitle(workTitle)}_${sanitizeFilenameTitle(row.name.trim())}.${cExt.replace(/^\./, '')}` };
 
       columns.forEach(col => {
         if (row[col]?.trim() !== "") {
@@ -528,6 +532,14 @@ export const useBulkStudioData = () => {
           if (col === "종족") payload.species = formattedVal;
         }
       });
+      // ★ 폼 스위칭(_switchTarget/_isHidden) 등 Bulk Studio가 다루지 않는 "_" 내부 속성은
+      // 위에서 새로 만든 dp에 없으니, 불러올 때 캐시해둔 원본에서 그대로 되살려 합친다.
+      const originalDp = originalDpRef.current[row.id];
+      if (originalDp) {
+        Object.keys(originalDp).forEach(k => {
+          if (k.startsWith('_') && !(k in dp)) dp[k] = originalDp[k];
+        });
+      }
       payload.dynamicProperties = JSON.stringify(dp);
       return String(row.id).startsWith('new_') ? api.post('/api/characters', payload) : api.put(`/api/characters/${row.id}`, payload);
     }));
@@ -541,8 +553,23 @@ export const useBulkStudioData = () => {
       return;
     }
 
+    // ★ 불러올 때는 있었는데(originalDpRef에 캐시됨) 지금 rows엔 없는 인물은 스튜디오에서
+    // ✖(removeRow)로 뺀 것이다. removeRow는 화면(local state)에서만 지우고 서버엔 아무것도
+    // 안 보내므로, 여기서 실제로 삭제 API를 호출해주지 않으면 저장 후 작품 페이지로 돌아갔을 때
+    // 서버에 그대로 남아있던 그 인물이 다시 나타난다.
+    const currentIds = new Set(rows.map(r => String(r.id)));
+    const removedIds = Object.keys(originalDpRef.current).filter(id => !currentIds.has(id));
+    if (removedIds.length > 0) {
+      const deleteResults = await Promise.allSettled(removedIds.map(id => api.delete(`/api/characters/${id}`)));
+      const deleteFailedCount = deleteResults.filter(r => r.status === 'rejected').length;
+      if (deleteFailedCount > 0) {
+        alert(`저장은 됐지만, 스튜디오에서 삭제한 인물 중 ${deleteFailedCount}명은 서버에서 지우지 못했습니다.`);
+        return;
+      }
+    }
+
     alert("성공적으로 일괄 저장되었습니다.");
-    window.location.href = `/work/${selectedWorkId}`;
+    navigate(`/work/${selectedWorkId}`);
   };
 
   return {

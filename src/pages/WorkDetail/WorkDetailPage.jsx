@@ -28,6 +28,7 @@ import './themes/horror-corridor.css';
 import { resolveGenreTheme } from '../../domains/work/genreTheme';
 import GenreCursor from '../../components/common/GenreCursor';
 import { extractMeta } from '../../utils/markdownParser';
+import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import MarkdownRenderer from '../../domains/macro/MarkdownRenderer';
 import { IconPen } from '../../components/common/icons/DomainIcons';
 import FloatingLeftTree from '../../domains/work/FloatingLeftTree';
@@ -47,6 +48,7 @@ import BatchImageModal from '../../domains/character/BatchImageModal';
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
+import { getGroupSortOrder } from '../../domains/character/characterOrder';
 
 const WorkDetailPage = () => {
   console.log("[WorkDetailPage] 조립형 레이아웃 뷰 가동 개시");
@@ -106,7 +108,7 @@ const WorkDetailPage = () => {
   const charExt = parsedDesc.meta.charExt || "png";
   const imgVariants = parsedDesc.meta.imgVariants || []; 
   const fullVariants = ["", ...imgVariants.filter(v => v.trim() !== "")]; 
-  const coverUrl = `/img/cover/${encodeURIComponent(data.work.title + "." + (coverExt || 'png'))}`;
+  const coverUrl = `/img/cover/${encodeURIComponent(sanitizeFilenameTitle(data.work.title) + "." + (coverExt || 'png'))}`;
 
   const activePage = data.pageId ? data.wikiPages.find(p => String(p.id) === String(data.pageId)) : null;
   const activeChar = data.characters.find(c => c.id === data.activeCharId);
@@ -162,7 +164,7 @@ const WorkDetailPage = () => {
           // 여러 명을 한꺼번에 저장할 때 동시에 날아간 POST 요청들의 완료 순서(=DB id 부여 순서)
           // 그대로 뒤죽박죽 표시되는 버그였다. 실제 저장되는 필드는 dynamicProperties 안의
           // dp.sortOrder이므로 그걸 읽어야 한다.
-          return dp._groupSortOrders?.[k] ?? dp.sortOrder ?? 999;
+          return getGroupSortOrder(dp, k);
         } catch(e) {
           console.warn(`[WorkDetailPage] 정렬 순서 파싱 에러 발생: ${char.name}`, e);
           return base.sortOrder ?? 999; 

@@ -2,6 +2,7 @@
 // 기능 요약: 엑셀형 워크스페이스 상단에 위치하여 작품 선택, 행/열 추가, 탭 모드 전환, 정렬, 찾아바꾸기, 일괄 덮어쓰기 기능을 제공하는 컴포넌트
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IconArchive, IconCheck, IconClipboard } from '../../components/common/icons/DomainIcons';
 
 const BulkToolbar = ({
@@ -9,6 +10,7 @@ const BulkToolbar = ({
   tabMode, setTabMode, sortTable, applyBatchValue, setFindReplaceModal, setPasteModal,
   labels, setLabels, isPreviewOpen, setIsPreviewOpen
 }) => {
+  const navigate = useNavigate();
   const [addCount, setAddCount] = useState(1);
   const [batchCol, setBatchCol] = useState('');
   const [batchVal, setBatchVal] = useState('');
@@ -42,7 +44,7 @@ const BulkToolbar = ({
             <option value="">-- 작품 선택 --</option>
             {works.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
           </select>
-          <button className="wiki-btn" style={{ padding: '8px 15px', background: 'var(--surface-color)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }} onClick={() => window.location.href = `/work/${selectedWorkId || ''}`}>◀ 돌아가기</button>
+          <button className="wiki-btn" style={{ padding: '8px 15px', background: 'var(--surface-color)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }} onClick={() => navigate(selectedWorkId ? `/work/${selectedWorkId}` : '/')}>◀ 돌아가기</button>
         </div>
       </div>
 
