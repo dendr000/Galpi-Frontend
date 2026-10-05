@@ -25,6 +25,11 @@
      스크롤 컨테이닝 블록으로 만들어버려서 스크롤해도 인포박스가 따라 내려오지 않게 만든다.
      clip-path는 시각적으로만 잘라내고 스크롤 컨테이닝 블록을 만들지 않아 sticky를 방해하지 않는다. */
   clip-path: inset(0 round 6px);
+  /* clip-path는 그림만 자를 뿐 스크롤 영역은 못 막는다 — 아래 ::before(바닥 격자)가 scale(2.4)로
+     컨테이너보다 양옆으로 840px씩 넓게 그려지는데, 이 변형된 박스가 문서의 가로 스크롤 영역을
+     그만큼(오른쪽으로 약 750px) 늘려서 작품 페이지에 오른쪽 스크롤이 생겼다. overflow-x:clip은
+     overflow:hidden과 달리 스크롤 컨테이너를 만들지 않으므로 sticky 인포박스에 영향이 없다. */
+  overflow-x: clip;
 }
 [data-genre-theme="cyberpunk-neon"]::before {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
