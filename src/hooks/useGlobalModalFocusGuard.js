@@ -30,6 +30,14 @@ const looksLikeFullScreenModal = (el) => {
   if (!(el instanceof HTMLElement)) return false;
   const cs = window.getComputedStyle(el);
   if (cs.position !== 'fixed') return false;
+  // ★ 장르 테마의 커서/클릭 이펙트/화면 플래시(예: 도심 히어로 테마의 gt-flash-urban)는
+  // 전부 position:fixed + inset:0(또는 뷰포트를 덮는 크기) + 높은 z-index를 쓰지만,
+  // 클릭이 아래 콘텐츠로 그대로 통과해야 하니 반드시 pointer-events:none을 건다.
+  // 진짜 모달(ModalOverlay, BulkModals 등)은 클릭을 받아야 하므로 이 값을 쓰지 않는다 —
+  // 이 하나로 "장식용 풀스크린 이펙트"와 "진짜 모달"을 구분한다. 이게 없으면 클릭 시
+  // document.body에 잠깐 붙었다 사라지는 이펙트 레이어를 모달로 오인해, 방금 포커스한
+  // 입력칸(작품 본문, 메모 등)에서 포커스를 계속 뺏어가 타이핑이 전혀 안 먹는 버그가 났다.
+  if (cs.pointerEvents === 'none') return false;
   const z = parseInt(cs.zIndex, 10);
   if (Number.isNaN(z) || z < MIN_Z_INDEX) return false;
   return el.offsetWidth >= MIN_SIZE && el.offsetHeight >= MIN_SIZE;
