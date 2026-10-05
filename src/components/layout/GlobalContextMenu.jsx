@@ -12,6 +12,7 @@ const isRecentExcluded = (id) => {
 const GlobalContextMenu = () => {
   const [menu, setMenu] = useState({ isOpen: false, x: 0, y: 0, selectedText: '', recentWorkId: null, recentWorkTitle: '' });
   const [isSavePrevented, setIsSavePrevented] = useState(() => localStorage.getItem('galpi-prevent-save') !== 'false');
+  const [deleteDialog, setDeleteDialog] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -108,29 +109,65 @@ const GlobalContextMenu = () => {
   const isWorkDetailPage = !!workPathMatch;
   const currentWorkId = workPathMatch ? workPathMatch[1] : null;
 
-  const handleSecretDeleteWork = async () => {
+  const deleteKeyword = import.meta.env.VITE_DELETE_KEYWORD || 'delete';
+
+  // window.prompt()는 Electron(exe)이 지원하지 않아 호출해도 아무 일도 안 일어난다 — 그래서
+  // 확인 문구 입력은 앱 안의 모달로 받는다.
+  const handleSecretDeleteWork = () => {
     if (!currentWorkId) return;
     setMenu(prev => ({ ...prev, isOpen: false }));
+    setDeleteDialog({ workId: currentWorkId, input: '', error: '', busy: false });
+  };
 
-    const deleteKeyword = import.meta.env.VITE_DELETE_KEYWORD || 'delete';
-    const userInput = prompt(`⚠️ 시크릿 파괴 경고: 현재 작품을 시스템에서 완전히 파기하시겠습니까?\n등장인물 정보는 보존되며 작품 원장만 타겟이 됩니다. 삭제를 승인하시려면 '${deleteKeyword}'를 정밀하게 입력하세요.`);
-
-    if (userInput === deleteKeyword) {
-      try {
-        console.log(`[GlobalContextMenu] 작품 ID: ${currentWorkId} 원장 파괴 통신 개시.`);
-        await api.delete(`/api/works/${currentWorkId}`);
-        alert("작품 데이터가 안전하게 파기되었습니다.");
-        navigate('/');
-      } catch (err) {
-        console.error("[GlobalContextMenu] 작품 파괴 중 통신 예외 발생:", err);
-        alert("원장 삭제 중 통신 거부가 감지되었습니다 백엔드를 확인하십시오.");
-      }
-    } else if (userInput !== null) {
-      alert("입력한 암호가 정확하지 않습니다. 삭제 프로세스를 긴급 중단합니다.");
+  const confirmDeleteWork = async () => {
+    if (!deleteDialog || deleteDialog.busy) return;
+    if (deleteDialog.input !== deleteKeyword) {
+      setDeleteDialog(prev => ({ ...prev, error: '입력한 문구가 정확하지 않습니다. 삭제하지 않았습니다.' }));
+      return;
+    }
+    setDeleteDialog(prev => ({ ...prev, busy: true, error: '' }));
+    try {
+      console.log(`[GlobalContextMenu] 작품 ID: ${deleteDialog.workId} 원장 파괴 통신 개시.`);
+      await api.delete(`/api/works/${deleteDialog.workId}`);
+      setDeleteDialog(null);
+      alert("작품 데이터가 안전하게 파기되었습니다.");
+      navigate('/');
+    } catch (err) {
+      console.error("[GlobalContextMenu] 작품 파괴 중 통신 예외 발생:", err);
+      setDeleteDialog(prev => ({ ...prev, busy: false, error: '삭제 요청이 거부되었습니다. 백엔드를 확인하세요.' }));
     }
   };
 
-  if (!menu.isOpen) return null;
+  const deleteDialogEl = deleteDialog && (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onKeyDown={(e) => { if (e.key === 'Escape') setDeleteDialog(null); }}
+    >
+      <div style={{ background: 'var(--surface-color)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '24px', width: 'min(460px, 90vw)', boxShadow: '0 10px 40px rgba(0,0,0,0.35)' }}>
+        <div style={{ fontSize: '16px', fontWeight: 900, color: '#e53e3e', marginBottom: '10px' }}>⚠️ 현재 작품 영구 삭제</div>
+        <div style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-secondary)', marginBottom: '14px' }}>
+          이 작품을 시스템에서 완전히 삭제합니다. <b style={{ color: '#e53e3e' }}>소속 등장인물도 함께 삭제</b>되며 되돌릴 수 없습니다.<br />
+          삭제하려면 아래 칸에 <b style={{ color: 'var(--text-primary)' }}>{deleteKeyword}</b> 를 입력하세요.
+        </div>
+        <input
+          autoFocus
+          type="text"
+          value={deleteDialog.input}
+          onChange={(e) => setDeleteDialog(prev => ({ ...prev, input: e.target.value, error: '' }))}
+          onKeyDown={(e) => { if (e.key === 'Enter') confirmDeleteWork(); }}
+          placeholder={deleteKeyword}
+          style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color, var(--surface-color))', color: 'var(--text-primary)', fontSize: '14px', outline: 'none' }}
+        />
+        <div style={{ minHeight: '20px', marginTop: '8px', fontSize: '12.5px', color: '#e53e3e', fontWeight: 700 }}>{deleteDialog.error}</div>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '6px' }}>
+          <button onClick={() => setDeleteDialog(null)} disabled={deleteDialog.busy} style={{ padding: '9px 18px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer' }}>취소</button>
+          <button onClick={confirmDeleteWork} disabled={deleteDialog.busy} style={{ padding: '9px 18px', borderRadius: '6px', border: 'none', background: '#e53e3e', color: '#fff', fontWeight: 900, cursor: 'pointer', opacity: deleteDialog.busy ? 0.6 : 1 }}>{deleteDialog.busy ? '삭제 중...' : '영구 삭제'}</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!menu.isOpen) return deleteDialogEl || null;
 
   const isCategoryPage = location.pathname.includes('/category');
 
@@ -174,15 +211,20 @@ const GlobalContextMenu = () => {
       {isCategoryPage && (
         <>
           <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }}></div>
-          <div className="context-item" style={{ color: '#e53e3e', background: 'rgba(229,62,62,0.05)', fontWeight: 900 }} onClick={() => {
-            const hiddenCats = JSON.parse(localStorage.getItem('galpi-hidden-categories') || '[]');
-            if (hiddenCats.length === 0) {
+          <div className="context-item" style={{ color: '#e53e3e', background: 'rgba(229,62,62,0.05)', fontWeight: 900 }} onClick={async () => {
+            setMenu(prev => ({...prev, isOpen: false}));
+            // 숨김 분류의 원본은 DB다(localStorage엔 아무도 안 쓴다). 조회가 실패하면 "없다"고 단정하지
+            // 않고 금고 화면을 그냥 열어서 그쪽이 직접 목록을 불러오게 한다.
+            let hiddenCats = null;
+            try {
+              const { data } = await api.get('/api/hidden-categories');
+              if (Array.isArray(data)) hiddenCats = data;
+            } catch { /* 아래에서 금고를 그대로 연다 */ }
+            if (hiddenCats && hiddenCats.length === 0) {
               alert("현재 메인 화면에서 숨김 처리된 분류가 없습니다.");
-              setMenu(prev => ({...prev, isOpen: false}));
               return;
             }
             window.dispatchEvent(new Event('galpi-trigger-secret-mode'));
-            setMenu(prev => ({...prev, isOpen: false}));
           }}>
             🕵️ 비밀 금고 열람 (필터링)
           </div>

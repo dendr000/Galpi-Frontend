@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../../api/axiosCore';
 import { extractMeta } from '../../../utils/markdownParser';
+import { filterHiddenWorks } from '../utils/filterHiddenWorks';
 
 export const useHomeFetch = () => {
   const [works, setWorks] = useState([]);
@@ -14,9 +15,13 @@ export const useHomeFetch = () => {
       console.log("[useHomeFetch] 메인 대시보드 데이터 통신 개시");
       setIsLoading(true);
       try {
-        const [worksRes, charsRes] = await Promise.all([
+        // 숨김 분류는 DB(/api/hidden-categories)가 원본이다 — 분류 화면의 숨기기 버튼이 거기에만
+        // 쓰는데, 예전엔 여기서 아무도 안 쓰는 localStorage만 읽어서 숨긴 분류가 홈에 그대로 보였다.
+        // 이 요청만 실패해도 홈 목록은 떠야 하니 빈 목록으로 대체한다.
+        const [worksRes, charsRes, hiddenRes] = await Promise.all([
           api.get('/api/works'),
-          api.get('/api/characters')
+          api.get('/api/characters'),
+          api.get('/api/hidden-categories').catch(() => ({ data: [] }))
         ]);
 
         const rawWorks = worksRes.data;
@@ -24,30 +29,14 @@ export const useHomeFetch = () => {
 
         console.log(`[useHomeFetch] 서버 통신 완료 - 작품 수: ${rawWorks.length}, 캐릭터 수: ${charsData.length}`);
 
-        const hiddenCats = JSON.parse(localStorage.getItem('galpi-hidden-categories') || '[]');
-        const cleanHiddenCats = hiddenCats.map(cat => cat.replace(/[\s#*[\]]/g, '').toLowerCase());
+        const hiddenCats = Array.isArray(hiddenRes.data) ? hiddenRes.data : [];
 
-        const processedWorks = rawWorks.map(w => {
+        const withMeta = rawWorks.map(w => {
           const parsed = extractMeta(w.description);
           return { ...w, metaInfo: parsed };
-        }).filter(w => {
-          if (cleanHiddenCats.length === 0) return true;
-          let tags = [];
-          if (w.genre) tags.push(...w.genre.split(','));
-
-          const meta = w.metaInfo?.meta || {};
-          ['장르', '태그', '분류'].forEach(k => {
-            if (meta[k]) tags.push(...String(meta[k]).split(','));
-          });
-
-          const isHidden = tags.some(t => {
-            const cleanT = t.replace(/[\s#*[\]]/g, '').toLowerCase();
-            return cleanHiddenCats.includes(cleanT);
-          });
-
-          if (isHidden) console.log(`[useHomeFetch] 🛑 검열 엔진 감지: 숨김 태그 포함 작품 차단됨 - ${w.title}`);
-          return !isHidden;
         });
+        const processedWorks = filterHiddenWorks(withMeta, hiddenCats);
+        console.log(`[useHomeFetch] 🛑 검열 엔진: 숨김 태그 포함 작품 ${withMeta.length - processedWorks.length}개 차단됨`);
 
         setWorks(processedWorks);
         setCharacters(charsData);
