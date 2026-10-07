@@ -18,6 +18,14 @@ const BoilerplateModal = ({ showToast }) => {
   const bpData = useBoilerplateData(showToast);
   const searchHooks = useBoilerplateSearch(bpData.bpList);
 
+  // 닫는 모든 경로(X 버튼, 바깥 클릭)가 이 함수를 지나므로 여기서 활성 폴더를 '전체'로 되돌린다
+  // (설정이 켜져 있을 때만). 컴포넌트가 사라질 때 정리(cleanup) 하는 방식은 StrictMode 개발
+  // 모드에서 열자마자 한 번 더 실행돼서 쓰지 않음.
+  const handleClose = () => {
+    bpData.resetFolderOnClose();
+    closeModal();
+  };
+
   useEffect(() => {
     const draftHtml = localStorage.getItem('galpi-draft-bp');
     const isEmptyRequest = localStorage.getItem('galpi-draft-bp-empty');
@@ -35,7 +43,7 @@ const BoilerplateModal = ({ showToast }) => {
   return (
     <ModalOverlay 
       title={<span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><IconZap size={16} /> 스마트 상용구 관리 원장</span>} 
-      onClose={closeModal} 
+      onClose={handleClose}
       width="600px"
     >
       <BoilerplateHeader bpData={bpData} clearSearch={searchHooks.clearSearch} />

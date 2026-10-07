@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import api from '../../../../api/axiosCore';
+import { RESET_ON_CLOSE_KEY, isResetOnCloseEnabled, resetActiveFolderIfEnabled } from '../utils/activeFolder';
 
 export const useBoilerplateData = (showToast) => {
   const [bpList, setBpList] = useState([]);
@@ -21,6 +22,9 @@ export const useBoilerplateData = (showToast) => {
 
   const [isBpAuto, setIsBpAuto] = useState(() => localStorage.getItem('galpi-bp-auto') !== 'false');
   const [isBpPreview, setIsBpPreview] = useState(() => localStorage.getItem('galpi-bp-preview') !== 'false');
+  // 모달을 닫을 때 활성 폴더를 '전체'로 자동 복귀시킬지(기본 켜짐) — 폴더를 정리하려고 골라 둔 채
+  // 닫아도 다른 폴더의 상용구가 에디터에서 안 먹히는 일이 없도록.
+  const [isBpResetOnClose, setIsBpResetOnClose] = useState(() => isResetOnCloseEnabled(localStorage));
 
   useEffect(() => {
     fetchBoilerplates();
@@ -52,6 +56,15 @@ export const useBoilerplateData = (showToast) => {
     setIsBpPreview(e.target.checked);
     localStorage.setItem('galpi-bp-preview', String(e.target.checked));
   };
+
+  const toggleBpResetOnClose = (e) => {
+    setIsBpResetOnClose(e.target.checked);
+    localStorage.setItem(RESET_ON_CLOSE_KEY, String(e.target.checked));
+  };
+
+  // 모달이 닫힐 때 BoilerplateModal 이 호출. 체크 직후에도 저장소 값을 직접 읽어서(React 상태가
+  // 아니라) 판단하므로 방금 바꾼 설정이 바로 반영된다.
+  const resetFolderOnClose = () => resetActiveFolderIfEnabled(localStorage);
 
   const handleAddFolder = () => {
     const name = prompt("새 폴더명을 입력하세요:");
@@ -212,6 +225,7 @@ export const useBoilerplateData = (showToast) => {
     handleAddFolder, handleEditFolder, handleDeleteFolder,
     bpInput, setBpInput, editingId, handleBpSave, handleBpEdit, handleBpCancelEdit, handleBpDelete,
     bpBulk, setBpBulk, isBpBulkMode, setIsBpBulkMode, handleBpBulk,
-    isBpAuto, isBpPreview, toggleBpAuto, toggleBpPreview
+    isBpAuto, isBpPreview, toggleBpAuto, toggleBpPreview,
+    isBpResetOnClose, toggleBpResetOnClose, resetFolderOnClose
   };
 };

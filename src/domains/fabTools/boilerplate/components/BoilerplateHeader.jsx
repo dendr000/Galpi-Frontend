@@ -28,10 +28,17 @@ const BoilerplateHeader = ({ bpData, clearSearch }) => {
       </div>
 
       {/* 환경설정 토글 영역 */}
-      <div style={{ display: 'flex', gap: '15px', marginBottom: '12px', padding: '10px', background: 'var(--table-bg-alt)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 15px', marginBottom: '12px', padding: '10px', background: 'var(--table-bg-alt)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}>
           <input type="checkbox" checked={bpData.isBpAuto} onChange={bpData.toggleBpAuto} style={{ accentColor: 'var(--primary-color)', width: '14px', height: '14px', cursor: 'pointer' }} />
           스페이스바 자동 치환 발동
+        </label>
+        <label
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}
+          title="폴더를 골라 정리한 뒤 이 창을 닫으면, 에디터에서 모든 폴더의 상용구를 다시 쓸 수 있게 '전체'로 되돌립니다. 끄면 고른 폴더가 그대로 유지됩니다."
+        >
+          <input type="checkbox" checked={bpData.isBpResetOnClose} onChange={bpData.toggleBpResetOnClose} style={{ accentColor: 'var(--primary-color)', width: '14px', height: '14px', cursor: 'pointer' }} />
+          닫으면 '전체'로 자동 복귀
         </label>
         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}>
           <input type="checkbox" checked={bpData.isBpPreview} onChange={bpData.toggleBpPreview} style={{ accentColor: 'var(--primary-color)', width: '14px', height: '14px', cursor: 'pointer' }} />

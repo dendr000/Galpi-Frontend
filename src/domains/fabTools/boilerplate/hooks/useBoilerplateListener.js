@@ -3,6 +3,7 @@
 // 버전: v2.4.0 (다중 리스너 고스트 팝업 제거 및 DB 타이틀 투명 공백 완벽 클렌징)
 
 import { useEffect } from 'react';
+import { getActiveFolder, selectActiveBoilerplates } from '../utils/activeFolder';
 
 const getCurrentLineText = (editor, isContentEditable) => {
   if (!isContentEditable) {
@@ -60,8 +61,7 @@ export const useBoilerplateListener = ({ globalBpList, bpCore, showToast }) => {
       currentLine = currentLine.replace(/[\u200B-\u200D\uFEFF\u2060]/g, '');
 
       if (currentLine.length >= 1) {
-        const activeCat = localStorage.getItem('galpi-bp-active-folder') || '전체';
-        const activeBps = globalBpList.filter(b => activeCat === '전체' || b.category === activeCat || b.category === '공통');
+        const activeBps = selectActiveBoilerplates(globalBpList, getActiveFolder(localStorage));
 
         let suggests = [];
         let keywordLen = 0;
@@ -167,9 +167,8 @@ export const useBoilerplateListener = ({ globalBpList, bpCore, showToast }) => {
 
         currentLine = currentLine.replace(/[\u200B-\u200D\uFEFF\u2060]/g, '').trimEnd();
 
-        const activeCat = localStorage.getItem('galpi-bp-active-folder') || '전체';
-        const activeBps = globalBpList.filter(b => activeCat === '전체' || b.category === activeCat || b.category === '공통');
-        
+        const activeBps = selectActiveBoilerplates(globalBpList, getActiveFolder(localStorage));
+
         const exactMatches = activeBps.filter(b => {
            const cleanTitle = b.title.replace(/[\u200B-\u200D\uFEFF\u2060]/g, '').toLowerCase();
            return currentLine.toLowerCase().endsWith(cleanTitle);
