@@ -233,7 +233,7 @@ describe('GlobalContextMenu - 검색에 숨김 분류 작품 포함 설정', () 
     openMenu();
     const items = screen.getAllByText(/./, { selector: '.context-item' }).map((e) => e.textContent);
     const ctrlS = items.findIndex((t) => t.includes('Ctrl+S'));
-    expect(items[ctrlS + 1]).toBe('검색에 숨김 분류 작품 포함 켜짐 (끄기)');
+    expect(items[ctrlS + 1]).toBe('숨김 작품 검색 켜짐');
   });
 
   it('누르면 꺼짐으로 저장되고 설정 변경 이벤트가 간다', () => {
@@ -241,7 +241,7 @@ describe('GlobalContextMenu - 검색에 숨김 분류 작품 포함 설정', () 
     window.addEventListener(SEARCH_SETTINGS_EVENT, handler);
     renderAt('/');
     openMenu();
-    fireEvent.click(screen.getByText('검색에 숨김 분류 작품 포함 켜짐 (끄기)'));
+    fireEvent.click(screen.getByText('숨김 작품 검색 켜짐'));
     expect(getIncludeHidden()).toBe(false);
     expect(handler).toHaveBeenCalledTimes(1);
     window.removeEventListener(SEARCH_SETTINGS_EVENT, handler);
@@ -251,14 +251,26 @@ describe('GlobalContextMenu - 검색에 숨김 분류 작품 포함 설정', () 
     setIncludeHidden(false);
     renderAt('/');
     openMenu();
-    fireEvent.click(screen.getByText('검색에 숨김 분류 작품 포함 꺼짐 (켜기)'));
+    fireEvent.click(screen.getByText('숨김 작품 검색 꺼짐'));
     expect(getIncludeHidden()).toBe(true);
   });
 
+  it('메뉴 항목은 줄바꿈되지 않는다(white-space: nowrap)', () => {
+    renderAt('/');
+    openMenu();
+    const css = document.querySelector('style')?.textContent || '';
+    expect(css).toMatch(/\.context-item\s*\{[^}]*white-space:\s*nowrap/);
+  });
+
+  it('문구는 짧게: 한 줄에 들어갈 길이(15자 이하)', () => {
+    renderAt('/');
+    openMenu();
+    expect(screen.getByText('숨김 작품 검색 켜짐').textContent.length).toBeLessThanOrEqual(15);
+  });
   it('누른 뒤 메뉴가 닫힌다', () => {
     renderAt('/');
     openMenu();
-    fireEvent.click(screen.getByText(/검색에 숨김 분류 작품 포함/));
-    expect(screen.queryByText(/검색에 숨김 분류 작품 포함/)).toBeNull();
+    fireEvent.click(screen.getByText(/숨김 작품 검색/));
+    expect(screen.queryByText(/숨김 작품 검색/)).toBeNull();
   });
 });

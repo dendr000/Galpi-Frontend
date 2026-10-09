@@ -219,7 +219,7 @@ const GlobalContextMenu = () => {
       </div>
 
       <div className="context-item" onClick={toggleIncludeHiddenInSearch}>
-        {includeHiddenInSearch ? '검색에 숨김 분류 작품 포함 켜짐 (끄기)' : '검색에 숨김 분류 작품 포함 꺼짐 (켜기)'}
+        {includeHiddenInSearch ? '숨김 작품 검색 켜짐' : '숨김 작품 검색 꺼짐'}
       </div>
 
       {isCategoryPage && (
@@ -255,7 +255,7 @@ const GlobalContextMenu = () => {
       )}
 
       <style>{`
-        .context-item { padding: 10px 16px; font-size: 13px; font-weight: bold; color: var(--text-primary); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .context-item { padding: 10px 16px; font-size: 13px; font-weight: bold; color: var(--text-primary); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
         .context-item:hover { background: var(--table-bg-alt); }
         .secret-delete-item:hover { background: rgba(229, 62, 62, 0.08) !important; }
       `}</style>
