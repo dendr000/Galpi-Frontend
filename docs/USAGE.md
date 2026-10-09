@@ -6,7 +6,7 @@
 
 ### 개발 환경 (웹)
 
-1. `Galpi-Backend`를 MySQL과 함께 기동 (기본 프로파일, 포트 8080)
+1. `Galpi-Backend`를 MySQL과 함께 기동 (기본 프로파일, 포트 18080)
 2. 이 저장소에서:
    ```bash
    npm install
