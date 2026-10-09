@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api/axiosCore';
 import { IconEyeOff } from '../common/icons/DomainIcons';
+import { getIncludeHidden, setIncludeHidden } from './search/searchSettings';
 
 const RECENT_EXCLUDED_KEY = 'galpi-recent-excluded';
 const isRecentExcluded = (id) => {
@@ -12,6 +13,7 @@ const isRecentExcluded = (id) => {
 const GlobalContextMenu = () => {
   const [menu, setMenu] = useState({ isOpen: false, x: 0, y: 0, selectedText: '', recentWorkId: null, recentWorkTitle: '' });
   const [isSavePrevented, setIsSavePrevented] = useState(() => localStorage.getItem('galpi-prevent-save') !== 'false');
+  const [includeHiddenInSearch, setIncludeHiddenInSearch] = useState(getIncludeHidden);
   const [deleteDialog, setDeleteDialog] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,6 +73,14 @@ const GlobalContextMenu = () => {
     const next = excluded.includes(id) ? excluded.filter(x => x !== id) : [...excluded, id];
     localStorage.setItem(RECENT_EXCLUDED_KEY, JSON.stringify(next));
     window.dispatchEvent(new Event('galpi-recent-excluded-changed'));
+    setMenu(prev => ({ ...prev, isOpen: false }));
+  };
+
+  // 헤더 검색 추천에 숨김 분류 작품을 넣을지 — 저장하고 이벤트로 열려 있는 검색창에 바로 알린다.
+  const toggleIncludeHiddenInSearch = () => {
+    const nextState = !includeHiddenInSearch;
+    setIncludeHiddenInSearch(nextState);
+    setIncludeHidden(nextState);
     setMenu(prev => ({ ...prev, isOpen: false }));
   };
 
@@ -206,6 +216,10 @@ const GlobalContextMenu = () => {
 
       <div className="context-item" onClick={toggleSavePrevention}>
         {isSavePrevented ? '⛔ Ctrl+S 무시 켜짐 (끄기)' : '⚠️ Ctrl+S 무시 꺼짐 (켜기)'}
+      </div>
+
+      <div className="context-item" onClick={toggleIncludeHiddenInSearch}>
+        {includeHiddenInSearch ? '검색에 숨김 분류 작품 포함 켜짐 (끄기)' : '검색에 숨김 분류 작품 포함 꺼짐 (켜기)'}
       </div>
 
       {isCategoryPage && (

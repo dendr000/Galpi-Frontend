@@ -9,6 +9,7 @@ vi.mock('../../api/axiosCore', () => ({
 
 import api from '../../api/axiosCore';
 import GlobalContextMenu from './GlobalContextMenu';
+import { getIncludeHidden, setIncludeHidden, SEARCH_SETTINGS_EVENT } from './search/searchSettings';
 
 const LocationProbe = () => <div data-testid="loc">{useLocation().pathname}</div>;
 
@@ -221,5 +222,43 @@ describe('GlobalContextMenu - 비밀 금고 열람', () => {
     renderAt('/');
     openMenu();
     expect(screen.queryByText(/비밀 금고 열람/)).toBeNull();
+  });
+});
+
+describe('GlobalContextMenu - 검색에 숨김 분류 작품 포함 설정', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('Ctrl+S 무시 항목 바로 아래에 있고 기본은 켜짐이다', () => {
+    renderAt('/');
+    openMenu();
+    const items = screen.getAllByText(/./, { selector: '.context-item' }).map((e) => e.textContent);
+    const ctrlS = items.findIndex((t) => t.includes('Ctrl+S'));
+    expect(items[ctrlS + 1]).toBe('검색에 숨김 분류 작품 포함 켜짐 (끄기)');
+  });
+
+  it('누르면 꺼짐으로 저장되고 설정 변경 이벤트가 간다', () => {
+    const handler = vi.fn();
+    window.addEventListener(SEARCH_SETTINGS_EVENT, handler);
+    renderAt('/');
+    openMenu();
+    fireEvent.click(screen.getByText('검색에 숨김 분류 작품 포함 켜짐 (끄기)'));
+    expect(getIncludeHidden()).toBe(false);
+    expect(handler).toHaveBeenCalledTimes(1);
+    window.removeEventListener(SEARCH_SETTINGS_EVENT, handler);
+  });
+
+  it('꺼져 있으면 꺼짐 문구가 보이고, 누르면 다시 켜진다', () => {
+    setIncludeHidden(false);
+    renderAt('/');
+    openMenu();
+    fireEvent.click(screen.getByText('검색에 숨김 분류 작품 포함 꺼짐 (켜기)'));
+    expect(getIncludeHidden()).toBe(true);
+  });
+
+  it('누른 뒤 메뉴가 닫힌다', () => {
+    renderAt('/');
+    openMenu();
+    fireEvent.click(screen.getByText(/검색에 숨김 분류 작품 포함/));
+    expect(screen.queryByText(/검색에 숨김 분류 작품 포함/)).toBeNull();
   });
 });

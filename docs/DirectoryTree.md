@@ -41,7 +41,11 @@ src/
  │   └── layout/
  │       ├── FabMenu.jsx                        # 우측 하단 유틸리티 도구들을 호출하는 플로팅 액션 버튼(FAB) 레이아웃
  │       ├── GlobalContextMenu.jsx              # 마우스 우클릭 기본 동작을 차단하고 커스텀 컨텍스트 메뉴를 표출하는 모듈
- │       └── Gnb.jsx                            # 최상단 상시 고정형 로고 및 통합 검색바 포함 글로벌 네비게이션 바
+ │       ├── Gnb.jsx                            # 최상단 상시 고정형 로고 및 글로벌 네비게이션 바
+ │       └── search/                            # 헤더 검색 추천
+ │           ├── HeaderSearch.jsx               # 검색창과 추천 목록(키보드/클릭 이동)
+ │           ├── searchSuggest.js               # 후보 만들기와 추천 순위 계산(순수 함수)
+ │           └── searchSettings.js              # 숨김 분류 작품 포함 여부 설정(localStorage + 이벤트)
  │
  ├── domains/                                   # [핵심 비즈니스 로직 및 기능별 묶음]
  │   ├── work/

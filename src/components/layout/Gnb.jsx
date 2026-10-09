@@ -1,58 +1,15 @@
 // 파일 위치: src/components/layout/Gnb.jsx
-import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { IconSearch, IconGear, IconPalette, IconMoon, IconPlus } from '../common/icons/DomainIcons';
+import { IconGear, IconPalette, IconMoon, IconPlus } from '../common/icons/DomainIcons';
 import api from '../../api/axiosCore';
 import { cycleWorkTheme, THEME_LABELS } from '../../domains/work/genreTheme';
-import { extractMeta } from '../../utils/markdownParser';
+import HeaderSearch from './search/HeaderSearch';
 
 // App.jsx에서 setIsSettingOpen 함수를 넘겨받습니다.
 const Gnb = ({ setIsSettingOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isWorkPage = /^\/work\/\d+/.test(location.pathname);
-
-  // 헤더 검색 — 현재 화면(홈의 태그/분류 필터 등)과 무관하게 항상 전체 작품을 대상으로
-  // 제목/약칭/장르를 찾아서, 엔터를 누르면 해당 작품 페이지로 바로 이동한다.
-  const [allWorks, setAllWorks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    api.get('/api/works').then(res => {
-      // ★ 숨김 분류 필터는 여기서 적용하지 않는다 — 홈 화면 목록만 정리해서 보여주는 용도지,
-      // 검색까지 막으라는 게 아니었다(요청: "분류 필터링되어 있어도 검색에는 되게"). 예전엔
-      // 여기서도 hiddenCats로 걸러내서, 숨겨둔 분류에 걸린 작품은 분명 있는데 검색해도 안
-      // 나오는 문제가 있었다 — 바로 위 주석("현재 화면과 무관하게 항상 전체 작품을 대상으로")
-      // 이 원래 의도였는데 실제 코드는 그 반대로 동작하고 있었다.
-      const processed = res.data.map(w => {
-        const parsed = extractMeta(w.description || '');
-        return { ...w, alias: parsed?.meta?.alias || '' };
-      });
-      setAllWorks(processed);
-    }).catch(() => {});
-  }, []);
-
-  const handleSearchKeyDown = (e) => {
-    if (e.key !== 'Enter') return;
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return;
-
-    // 1순위: 제목/약칭이 정확히 일치. 2순위: 제목/약칭/장르에 부분적으로 포함.
-    const exact = allWorks.find(w => w.title.toLowerCase() === q || (w.alias && w.alias.toLowerCase() === q));
-    const partial = allWorks.find(w =>
-      w.title.toLowerCase().includes(q) ||
-      (w.alias && w.alias.toLowerCase().includes(q)) ||
-      (w.genre && w.genre.toLowerCase().includes(q))
-    );
-    const match = exact || partial;
-
-    if (match) {
-      navigate(`/work/${match.id}`);
-      setSearchQuery('');
-    } else {
-      alert(`"${searchQuery.trim()}"와(과) 일치하는 작품을 찾지 못했습니다.`);
-    }
-  };
 
   const toggleDark = () => {
     const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -96,20 +53,8 @@ const Gnb = ({ setIsSettingOpen }) => {
         </h2>
       </div>
       
-      {/* 중앙 검색창 */}
-      <div style={{ flex: 1, maxWidth: '600px', margin: '0 20px', position: 'relative' }}>
-        <div style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5, display: 'flex', alignItems: 'center' }}>
-          <IconSearch size={16} />
-        </div>
-        <input
-          type="text"
-          placeholder="작품명, 장르, 약칭 검색 후 엔터..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          onKeyDown={handleSearchKeyDown}
-          style={{ width: '100%', padding: '10px 15px 10px 40px', borderRadius: '20px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', outline: 'none', fontSize: '14px', boxSizing: 'border-box' }}
-        />
-      </div>
+      {/* 중앙 검색창: 입력하면 관련 작품이 아래로 추천된다 */}
+      <HeaderSearch />
 
       {/* 우측 컨트롤 및 버튼 영역 (전면 SVG 벡터 아이콘 적용) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
