@@ -106,6 +106,7 @@ src/
      ├── Editor/
      │   ├── EditorPage.jsx                     # 통합 설정 에디터 작업 및 문서 작성 UI 렌더링 페이지
      │   ├── EditorPage.module.css              # 에디터 작업 페이지 전용 모듈 CSS 스타일시트
+     │   ├── creatorExt.js                      # 같은 제작자 작품들이 가장 많이 쓴 이미지 확장자 계산(순수 함수)
      │   ├── EditorSearch.jsx                   # 에디터 내부 실시간 링크 주입용 검색 컴포넌트
      │   └── useEditorData.js                   # 비동기 서버 통신, 데이터 직렬화/파싱, 메타데이터 보존 및 예약어 필터링 훅
      ├── Home/

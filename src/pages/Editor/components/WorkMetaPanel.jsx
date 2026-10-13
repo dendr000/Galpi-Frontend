@@ -1,11 +1,11 @@
 // 절대 경로: src/pages/Editor/components/WorkMetaPanel.jsx
 // 기능 요약: 작품 문서(work) 작성 시 필요한 상세 속성(제작자, 장르, 연재 상태, 이미지 변환 등)을 설정하는 UI 컴포넌트 v1.0.0
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../EditorPage.module.css';
 import { IconGear, IconShirt, IconX } from './EditorIcons';
 import api from '../../../api/axiosCore';
-import { extractMeta } from '../../../utils/markdown/metaUtils';
+import { pickMostUsedExt } from '../creatorExt';
 
 const WorkMetaPanel = ({ workMeta, setWorkMeta }) => {
   console.log("[WorkMetaPanel] 컴포넌트 렌더링 됨");
@@ -25,7 +25,9 @@ const WorkMetaPanel = ({ workMeta, setWorkMeta }) => {
   }, []);
 
   // 기능: 제작자 명의 입력 후 Tab으로 빠져나갈 때, 같은 제작자의 다른 작품들을 뒤져서
-  // 가장 많이 쓴 캐릭터 확장자를 자동으로 채워준다.
+  // 가장 많이 쓴 캐릭터 확장자와 대문(커버) 확장자를 자동으로 채워준다.
+  // 캐릭터 확장자는 항상 그 값으로 맞추고, 대문 확장자는 아직 "없음"일 때만 채운다
+  // (이미 골라 둔 대문 확장자를 Tab 한 번으로 덮어쓰지 않도록).
   const handleCreatorTab = async (e) => {
     if (e.key !== 'Tab') return;
     const creatorName = workMeta.creator.trim();
@@ -33,23 +35,16 @@ const WorkMetaPanel = ({ workMeta, setWorkMeta }) => {
 
     try {
       const { data: works } = await api.get('/api/works');
-      const counts = {};
-      works.forEach(w => {
-        if (w.creator?.trim() !== creatorName) return;
-        const ext = extractMeta(w.description).meta.charExt;
-        if (!ext) return;
-        counts[ext] = (counts[ext] || 0) + 1;
-      });
+      const bestChar = pickMostUsedExt(works, creatorName, 'charExt');
+      const bestCover = pickMostUsedExt(works, creatorName, 'coverExt');
+      if (!bestChar && !bestCover) return;
 
-      let bestExt = null, bestCount = 0;
-      for (const ext in counts) {
-        if (counts[ext] > bestCount) { bestExt = ext; bestCount = counts[ext]; }
-      }
-
-      if (bestExt) {
-        console.log(`[WorkMetaPanel] 제작자 "${creatorName}"의 최다 사용 캐릭터 확장자로 자동 적용: ${bestExt}`);
-        setWorkMeta(prev => ({ ...prev, charExt: bestExt }));
-      }
+      console.log(`[WorkMetaPanel] 제작자 "${creatorName}"의 최다 사용 확장자 - 캐릭터: ${bestChar || '-'}, 대문: ${bestCover || '-'}`);
+      setWorkMeta(prev => ({
+        ...prev,
+        ...(bestChar ? { charExt: bestChar } : {}),
+        ...(bestCover && !prev.coverExt ? { coverExt: bestCover } : {}),
+      }));
     } catch (err) {
       console.warn('[WorkMetaPanel] 제작자 기반 확장자 조회 실패:', err);
     }
