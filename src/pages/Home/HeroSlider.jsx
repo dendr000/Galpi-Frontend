@@ -1,16 +1,15 @@
 // 파일 위치: src/pages/Home/HeroSlider.jsx
 // 비즈니스 로직을 분리하고, SVG 아이콘과 Flex 레이아웃을 통해 디자인 정렬을 완벽하게 맞춘 순수 뷰(View) 컴포넌트로 재탄생했습니다.
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { useHeroSlider } from './hooks/useHeroSlider';
 import { IconPen, IconTag } from '../../components/common/icons/DomainIcons';
-import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
+import { getCoverUrl } from './heroSlides';
 
 const HeroSlider = ({ works }) => {
   const navigate = useNavigate();
-  const { slideWorks, currentIdx } = useHeroSlider(works);
+  const { slideWorks, trackSlides, position, animate } = useHeroSlider(works);
 
   if (slideWorks.length === 0) return null;
 
@@ -18,16 +17,11 @@ const HeroSlider = ({ works }) => {
     <div className={styles['hero-slider-wrapper']}>
       <div 
         className={styles['hero-slider-inner']} 
-        style={{ transform: `translateX(-${currentIdx * 100}%)` }}
+        style={{ transform: `translateX(-${position * 100}%)`, ...(animate ? {} : { transition: 'none' }) }}
       >
-        {slideWorks.map(w => {
+        {trackSlides.map((w, i) => {
           const m = w.metaInfo?.meta || {};
-          let coverUrl = "";
-          if (m.coverExt) {
-            coverUrl = `/img/cover/${encodeURIComponent(sanitizeFilenameTitle(w.title) + "." + m.coverExt.trim().replace(/^\./, ''))}`;
-          } else if (m.cover) {
-            coverUrl = `/img/cover/${encodeURIComponent(m.cover.replace('cover/', ''))}`;
-          }
+          const coverUrl = getCoverUrl(w);
 
           const cx = m.coverX !== undefined ? m.coverX : 50;
           const cy = m.coverY !== undefined ? m.coverY : 50;
@@ -39,7 +33,7 @@ const HeroSlider = ({ works }) => {
 
           return (
             <div 
-              key={w.id} 
+              key={i === slideWorks.length ? `${w.id}-loop` : w.id}
               className={styles['hero-slide']}
               style={{
                 backgroundImage: `url('${coverUrl}')`,

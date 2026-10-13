@@ -110,7 +110,14 @@ src/
      │   └── useEditorData.js                   # 비동기 서버 통신, 데이터 직렬화/파싱, 메타데이터 보존 및 예약어 필터링 훅
      ├── Home/
      │   ├── Home.module.css                    # 메인 대시보드 화면 전용 모듈 CSS 스타일시트
-     │   └── HomePage.jsx                       # 전체 작품 목록 스캔 및 메인 대시보드 페이지
+     │   ├── HomePage.jsx                       # 전체 작품 목록 스캔 및 메인 대시보드 페이지
+     │   ├── HeroSlider.jsx                     # 메인 상단 커버 배너(오른쪽으로만 계속 넘어가는 슬라이더)
+     │   ├── heroSlides.js                      # 슬라이드 대상 고르기, 셔플, 커버 이미지 주소 만들기(순수 함수)
+     │   ├── hooks/
+     │   │   ├── useHeroSlider.js               # 5초 타이머와 끝없이 이어지는 위치 계산
+     │   │   └── useHomeFetch.js                # 작품/캐릭터/숨김 분류 조회와 숨김 분류 필터
+     │   └── utils/
+     │       └── filterHiddenWorks.js           # 숨김 분류 작품 걸러내기(순수 함수)
      ├── MemoWorkspace/
      │   ├── MemoWorkspace.module.css           # 무한 캔버스 메모장 전용 모듈 CSS 스타일시트
      │   └── MemoWorkspacePage.jsx              # 통합 메모 캔버스 제어 및 관리 페이지
