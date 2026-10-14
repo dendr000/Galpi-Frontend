@@ -44,6 +44,8 @@ memo/
 │   │   └── useMemoTableCtrl.js            # table 하위 모듈들을 조립하여 메인 에디터로 주입하는 표 제어 허브(Hub) 훅
 │   │
 │   └── utils/                             # [순수 자바스크립트 유틸리티]
+│       ├── foldBoxHtml.js                 # 접기 박스(details) HTML 을 만드는 순수 함수 (툴바 버튼과 유저노트 자동 내용이 같이 사용)
+│       ├── newMemoTemplate.js             # 폴더에 따라 새 메모 본문에 미리 채울 내용을 정하는 순수 함수 ('유저노트' 폴더 규칙)
 │       └── memoTreeUtils.js               # 평면적 폴더 배열과 메모를 순회하여 슬래시(/) 기반 계층형 깊이(Depth) 트리를 빌드하는 파서
 │
 ├── fab/                                   # [우측 하단 플로팅 메모장(FAB) 전용 컴포넌트 및 로직]

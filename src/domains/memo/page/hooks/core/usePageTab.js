@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getNewMemoContent } from '../../../shared/utils/newMemoTemplate';
 
 export const usePageTab = ({ memos, setMemos, currentFolder }) => {
   const [mainTabs, setMainTabs] = useState([]);
@@ -16,9 +17,10 @@ export const usePageTab = ({ memos, setMemos, currentFolder }) => {
     let targetMemo = memo;
 
     if (!memo) {
+      const targetFolder = currentFolder === '전체 메모' ? '기타' : currentFolder;
       targetMemo = { 
-        id: newId, folder: currentFolder === '전체 메모' ? '기타' : currentFolder, 
-        title: "새로운 메모", content: "", updatedAt: Date.now(), isTrash: false 
+        id: newId, folder: targetFolder, 
+        title: "새로운 메모", content: getNewMemoContent(targetFolder), updatedAt: Date.now(), isTrash: false 
       };
       setMemos(prev => [targetMemo, ...prev]);
     }

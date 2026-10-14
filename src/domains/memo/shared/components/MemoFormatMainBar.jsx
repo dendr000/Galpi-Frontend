@@ -5,6 +5,7 @@ import {
   TableIcon, TodoIcon, FoldIcon, SearchIcon, TemplateIcon, TemplateSaveIcon,
   FontResetIcon, CrackIcon, BabyIcon, AutoSnippetIcon, DictAddIcon
 } from './MemoIcons';
+import { svgClose, buildFoldBoxHtml, BLANK_LINE_HTML } from '../utils/foldBoxHtml';
 
 const MemoFormatMainBar = ({
   executeCmd, insertFootnote, insertMarkdownLink, insertHtml,
@@ -31,8 +32,6 @@ const MemoFormatMainBar = ({
     setRecentFonts(JSON.parse(localStorage.getItem('galpi-recent-fonts') || '[]'));
   }, []);
 
-  const svgClose = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-  const svgPlay = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
 
   const checkHTML = `<div style="display:flex; align-items:center; gap:8px; margin:4px 0;" contenteditable="false"><button type="button" onclick="this.parentElement.remove()" style="background:transparent; color:#e53e3e; border:none; cursor:pointer; font-size:14px; padding:0; outline:none; display:flex; align-items:center; justify-content:center;" title="삭제">${svgClose}</button><input type="checkbox" style="cursor:pointer; width:16px; height:16px;"><span contenteditable="true" style="outline:none; flex:1; font-size:13px; min-width:50px;">할 일 입력...</span></div>`;
   
@@ -41,7 +40,7 @@ const MemoFormatMainBar = ({
   // word-break가 있어도 무시됨). max-width:100%만 두면 컨테이너 폭 안에서 자연스럽게 줄바꿈된다.
   const tableHTML = `<table style="max-width:100%; min-width:100%; border-collapse:collapse; text-align:center; font-size:13px; background:var(--surface-color); white-space:pre-wrap; word-break:break-word; margin: 15px 0;"><tbody><tr><th style="border:1px solid var(--border-color); padding:10px; background:var(--table-bg-alt); color:var(--primary-color); min-width:80px; resize:horizontal; overflow:hidden;">제목1</th><th style="border:1px solid var(--border-color); padding:10px; background:var(--table-bg-alt); color:var(--primary-color); min-width:80px; resize:horizontal; overflow:hidden;">제목2</th></tr><tr><td style="border:1px solid var(--border-color); padding:10px; min-width:80px; resize:horizontal; overflow:hidden;">내용1</td><td style="border:1px solid var(--border-color); padding:10px; min-width:80px; resize:horizontal; overflow:hidden;">내용2</td></tr></tbody></table><div><br></div>`;
   
-  const foldHTML = `<div style="position:relative; margin:15px 0; padding-top:28px;" contenteditable="false"><button type="button" onclick="this.parentElement.remove()" style="position:absolute; top:0; right:0; background:#e53e3e; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:11px; font-weight:bold; z-index:10; display:flex; align-items:center; gap:4px;">${svgClose} 박스 삭제</button><details open style="border: 1px solid var(--border-color); border-radius: 8px; background: var(--table-bg-alt); overflow: hidden; font-size:13px;"><summary onmousedown="if(event.target.closest('.fold-title')) return; event.preventDefault(); const d = this.closest('details'); d.open = !d.open;" onclick="if(!event.target.closest('.fold-title')) event.preventDefault();" style="padding: 10px 15px; font-weight: 900; cursor: pointer; color: var(--primary-color); outline: none; list-style:none; display:flex; align-items:center; gap:8px;"><span contenteditable="false" style="display:flex; align-items:center; justify-content:center; user-select:none; padding:2px; pointer-events:none;">${svgPlay}</span><span class="fold-title" contenteditable="true" data-placeholder="접기 박스 제목 (Tab을 눌러 내용으로)" style="outline:none; flex:1; min-width:50px; cursor:text;"></span></summary><div class="fold-content" contenteditable="true" data-placeholder="숨길 내용을 입력하세요..." style="padding: 15px; border-top: 1px dashed var(--border-color); line-height: 1.6; background: var(--surface-color); outline:none; min-height:50px;"></div></details></div><div><br></div>`;
+  const foldHTML = buildFoldBoxHtml() + BLANK_LINE_HTML;
 
   const iconBtnStyle = { padding: '4px 6px', background: 'var(--bg-color)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px', transition: '0.2s' };
 

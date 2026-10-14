@@ -4,6 +4,7 @@ import api from '../../../api/axiosCore';
 import { useModalStore } from '../../../store/useModalStore';
 import FabMemoSidebar from './components/FabMemoSidebar';
 import FabMemoEditor from './FabMemoEditor';
+import { getNewMemoContent } from '../shared/utils/newMemoTemplate';
 
 const FabMemoModal = ({ bpCore, globalBpList }) => {
   const { closeModal } = useModalStore();
@@ -83,7 +84,7 @@ const FabMemoModal = ({ bpCore, globalBpList }) => {
   const handleCreateMemo = useCallback(() => {
     const newId = `local_${Date.now()}`;
     const targetFolder = ["전체 메모", "최근 7일", "미분류"].includes(currentFolder) ? "기타" : currentFolder;
-    const newMemo = { id: newId, folder: targetFolder, title: "새로운 메모", content: "", updatedAt: Date.now(), sortOrder: -1 };
+    const newMemo = { id: newId, folder: targetFolder, title: "새로운 메모", content: getNewMemoContent(targetFolder), updatedAt: Date.now(), sortOrder: -1 };
 
     setMemoData(prev => {
       const updated = [newMemo, ...prev];
