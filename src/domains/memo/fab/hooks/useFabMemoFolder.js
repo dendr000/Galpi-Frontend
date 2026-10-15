@@ -1,5 +1,6 @@
 // 파일 위치: src/domains/memo/fab/hooks/useFabMemoFolder.js
 import api from '../../../../api/axiosCore';
+import { askText } from '../../../../utils/askText';
 
 export const useFabMemoFolder = ({ memoData, setMemoData, memoFolders, setMemoFolders, currentFolder, setCurrentFolder }) => {
   
@@ -49,7 +50,7 @@ export const useFabMemoFolder = ({ memoData, setMemoData, memoFolders, setMemoFo
       ? `[${parentPath}] 하위에 생성할 폴더명:`
       : "새로운 최상위 폴더 이름을 입력하세요:";
 
-    const name = prompt(promptMsg);
+    const name = await askText(promptMsg);
 
     if (name && name.trim()) {
       const newPath = parentPath ? `${parentPath}/${name.trim()}` : name.trim();
@@ -78,7 +79,7 @@ export const useFabMemoFolder = ({ memoData, setMemoData, memoFolders, setMemoFo
     const oldName = path.split('/').pop();
     const parentPath = path.substring(0, path.lastIndexOf('/'));
     
-    const newName = prompt("수정할 폴더 이름을 입력하세요:", oldName);
+    const newName = await askText("수정할 폴더 이름을 입력하세요:", oldName);
     
     if (newName && newName.trim() && newName.trim() !== oldName) {
       const finalPath = parentPath ? `${parentPath}/${newName.trim()}` : newName.trim();

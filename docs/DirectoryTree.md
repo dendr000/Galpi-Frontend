@@ -25,6 +25,7 @@ src/
  │   └── novel-viewer.css                       # 가독성 극대화를 위한 웹소설 뷰어 템플릿 전용 CSS 스타일시트
  │
  ├── utils/                                     # [순수 자바스크립트 유틸리티 함수]
+ │   ├── askText.js                             # 글자 한 줄을 묻는 공용 함수(앱 안 입력 모달 사용, window.prompt 대체)
  │   ├── backlinkRouter.js                      # 설정 텍스트 간 동적 참조 관계 구문 분석 기반 경로 역추적 라우팅 유틸
  │   └── markdownParser.js                      # 마크다운 구문 파싱 및 최상단 프론트매터(Meta) JSON 추출 파서 엔진
  │
@@ -37,7 +38,8 @@ src/
  │   ├── common/
  │   │   ├── BossBlindLayer.jsx                 # 보스키 트리거 감지 시 브라우저를 즉각 마스킹 처리하는 위장막 레이어
  │   │   ├── ModalOverlay.jsx                   # 팝업 모달창 활성화 시 뒷배경을 어둡게 처리하는 공통 UI 레이어 컴포넌트
- │   │   └── SettingModal.jsx                   # 사용자 뷰 설정 변경값을 스토어에 바인딩하는 시스템 환경설정 팝업
+ │   │   ├── SettingModal.jsx                   # 사용자 뷰 설정 변경값을 스토어에 바인딩하는 시스템 환경설정 팝업
+ │   │   └── TextPromptModal.jsx                # window.prompt 대신 쓰는 앱 안의 글자 입력 모달(Electron exe 는 prompt 미지원)
  │   └── layout/
  │       ├── FabMenu.jsx                        # 우측 하단 유틸리티 도구들을 호출하는 플로팅 액션 버튼(FAB) 레이아웃
  │       ├── GlobalContextMenu.jsx              # 마우스 우클릭 기본 동작을 차단하고 커스텀 컨텍스트 메뉴를 표출하는 모듈

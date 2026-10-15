@@ -14,6 +14,7 @@ import Gnb from './components/layout/Gnb';
 import BossBlindLayer from './components/common/BossBlindLayer';
 import SettingModal from './components/common/SettingModal';
 import SafeDeleteModal from './components/common/SafeDeleteModal';
+import TextPromptModal from './components/common/TextPromptModal';
 import FabMenu from './components/layout/FabMenu';
 import GlobalContextMenu from './components/layout/GlobalContextMenu';
 import Footer from './components/layout/footer/Footer';
@@ -83,6 +84,7 @@ function App() {
       {isStarryBackground && <StarryBackground />}
       <SettingModal isOpen={isSettingOpen} onClose={() => setIsSettingOpen(false)} />
       <SafeDeleteModal />
+      <TextPromptModal />
       <BossBlindLayer />
       <GlobalContextMenu /> 
       

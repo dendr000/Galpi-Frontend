@@ -2,14 +2,15 @@
 // (개별 메모 삭제, 상단 고정(Pin) 토글, 그리고 다중 선택 시 발동하는 일괄 이동/삭제 API 통신 로직을 신설했습니다.)
 
 import api from '../../../../../api/axiosCore';
+import { askText } from '../../../../../utils/askText';
 
 export const usePageFolder = ({ memos, setMemos, folders, setFolders, currentFolder, setCurrentFolder }) => {
   
-  const handleAddFolder = (parentPath = '') => {
+  const handleAddFolder = async (parentPath = '') => {
     const promptMsg = parentPath 
       ? `[${parentPath}] 하위에 생성할 폴더명:` 
       : "새로운 최상위 폴더 이름을 입력하세요:";
-    const name = prompt(promptMsg);
+    const name = await askText(promptMsg);
     
     if (name && name.trim()) {
       const newPath = parentPath ? `${parentPath}/${name.trim()}` : name.trim();
@@ -28,7 +29,7 @@ export const usePageFolder = ({ memos, setMemos, folders, setFolders, currentFol
     
     const oldName = path.split('/').pop();
     const parentPath = path.substring(0, path.lastIndexOf('/'));
-    const newName = prompt("수정할 폴더 이름을 입력하세요:", oldName);
+    const newName = await askText("수정할 폴더 이름을 입력하세요:", oldName);
     
     if (newName && newName.trim() && newName.trim() !== oldName) {
       const finalPath = parentPath ? `${parentPath}/${newName.trim()}` : newName.trim();
