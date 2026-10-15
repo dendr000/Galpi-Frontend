@@ -4,6 +4,7 @@
 import React, { useMemo, useRef, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import BulkTableRow from './BulkTableRow';
+import { askColumnPosition } from './columnMovePrompt';
 import { IconChevronLeft, IconChevronRight } from '../../components/common/icons/DomainIcons';
 
 const BulkTable = ({ 
@@ -95,12 +96,10 @@ const BulkTable = ({
                       <IconChevronLeft size={13} />
                     </button>
                     <span
-                      onClick={() => {
+                      onClick={async () => {
                         if (isFirst) return;
-                        const target = prompt(`"${col}"을(를) 몇 번째 속성으로 옮길까요? (현재 ${i + 1}번째, 2~${columns.length}번째 중)`, i + 1);
-                        if (target === null) return;
-                        const n = parseInt(target, 10);
-                        if (!isNaN(n)) changeColOrder(i, n);
+                        const n = await askColumnPosition(col, i, columns.length);
+                        if (n !== null) changeColOrder(i, n);
                       }}
                       title={isFirst ? '' : '클릭하면 몇 번째로 옮길지 바로 입력'}
                       style={{ fontWeight: 900, cursor: isFirst ? 'default' : 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}

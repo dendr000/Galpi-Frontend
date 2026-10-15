@@ -1,6 +1,7 @@
 // 파일 위치: src/domains/memo/shared/hooks/useMemoBookmark.js
 // 기능 요약: 에디터 내 텍스트 노드에 투명 발판과 함께 마커를 꽂아 넣고, 텔레포트 스크롤을 제어하는 단독 엔진입니다.
 import { useState, useCallback } from 'react';
+import { askText } from '../../../../utils/askText';
 
 export const useMemoBookmark = ({ editorRef, updateCharCount, saveMemo }) => {
   const [isBookmarkModalOpen, setIsBookmarkModalOpen] = useState(false);
@@ -20,15 +21,22 @@ export const useMemoBookmark = ({ editorRef, updateCharCount, saveMemo }) => {
   }, [editorRef]);
 
   // Ctrl+K 입력 시 책갈피 삽입
-  const insertBookmark = useCallback(() => {
+  const insertBookmark = useCallback(async () => {
     if (!editorRef.current) return;
     editorRef.current.focus();
 
     const selection = window.getSelection();
     if (!selection.rangeCount) return;
 
-    const name = prompt("새 책갈피 이름을 입력하세요:");
+    // 입력 창이 뜨면 커서(선택 영역)가 입력칸으로 옮겨가므로, 묻기 전에 삽입 위치를 기억해 두었다가 되돌린다.
+    const savedRange = selection.getRangeAt(0).cloneRange();
+    const name = await askText("새 책갈피 이름을 입력하세요:");
     if (!name || !name.trim()) return;
+
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    selection.removeAllRanges();
+    selection.addRange(savedRange);
 
     const safeName = name.trim().replace(/\s+/g, '_');
     const bmId = `bm_${safeName}_${Date.now()}`;

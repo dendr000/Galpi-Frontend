@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconArchive, IconCheck, IconClipboard } from '../../components/common/icons/DomainIcons';
+import { askText } from '../../utils/askText';
 
 const BulkToolbar = ({
   works, selectedWorkId, loadCharacters, addRow, addColumn, columns,
@@ -20,8 +21,8 @@ const BulkToolbar = ({
     setAddCount(1);
   };
 
-  const handleAddCol = () => {
-    const newCol = prompt("모든 캐릭터에 추가할 속성명 (예: 무기):");
+  const handleAddCol = async () => {
+    const newCol = await askText("모든 캐릭터에 추가할 속성명 (예: 무기):");
     addColumn(newCol);
   };
 

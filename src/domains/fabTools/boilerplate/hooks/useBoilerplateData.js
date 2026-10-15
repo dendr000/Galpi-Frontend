@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import api from '../../../../api/axiosCore';
+import { askText } from '../../../../utils/askText';
 import { RESET_ON_CLOSE_KEY, isResetOnCloseEnabled, resetActiveFolderIfEnabled } from '../utils/activeFolder';
 
 export const useBoilerplateData = (showToast) => {
@@ -66,8 +67,8 @@ export const useBoilerplateData = (showToast) => {
   // 아니라) 판단하므로 방금 바꾼 설정이 바로 반영된다.
   const resetFolderOnClose = () => resetActiveFolderIfEnabled(localStorage);
 
-  const handleAddFolder = () => {
-    const name = prompt("새 폴더명을 입력하세요:");
+  const handleAddFolder = async () => {
+    const name = await askText("새 폴더명을 입력하세요:");
     if (name && name.trim() && !bpFolders.includes(name.trim()) && name !== '전체') {
       const newFolders = [...bpFolders, name.trim()];
       setBpFolders(newFolders);
@@ -80,7 +81,7 @@ export const useBoilerplateData = (showToast) => {
     const target = activeFolder === '전체' ? '공통' : activeFolder;
     if (target === '공통') return alert("기본 폴더는 수정할 수 없습니다.");
     
-    const newName = prompt("수정할 이름을 입력하세요:", target);
+    const newName = await askText("수정할 이름을 입력하세요:", target);
     if (newName && newName.trim() && newName.trim() !== target) {
       const finalName = newName.trim();
       if (bpFolders.includes(finalName)) return alert("이미 존재하는 폴더명입니다.");

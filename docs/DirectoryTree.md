@@ -99,6 +99,7 @@ src/
      │   ├── BulkStudio.module.css              # 일괄 수정 데이터 스튜디오 전용 모듈 CSS 스타일시트
      │   ├── BulkStudioPage.jsx                 # 전체 등장인물의 다차원 원장 속성 데이터를 엑셀식 그리드로 수정하는 페이지
      │   ├── BulkTable.jsx                      # 가상화(Virtual) 렌더링 엔진과 자동완성 드롭다운이 융합된 데이터 그리드 코어
+     │   ├── columnMovePrompt.js                # 속성(열) 이름을 눌렀을 때 몇 번째로 옮길지 묻고 숫자로 돌려주는 함수
      │   ├── BulkTableRow.jsx                   # 재렌더링 부하 격리 및 고정(Sticky) 셀의 시각적 겹침 방지 처리용 단일 행 컴포넌트
      │   ├── BulkToolbar.jsx                    # 탭 스위칭, 속성 추가, 일괄 덮어쓰기 등 워크스페이스 상단 데이터 제어 툴바
      │   └── useBulkStudioData.js               # 디바운싱 검색 자동완성, 예약어 필터링, 단축키 이벤트를 관장하는 커스텀 훅
