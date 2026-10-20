@@ -168,7 +168,9 @@ export const createLogTabHtml = (activeTab, innerText) => {
   let tabsHtml = `<div style="display:flex; border-bottom: 2px solid ${active.border}; margin-bottom: 0; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">`;
   tabs.forEach(t => {
     const isActive = t.name === activeTab;
-    const chromeClass = isActive ? 'gt-macro-ink' : 'gt-macro-box gt-macro-ink-soft';
+    // 활성 탭은 연한 파스텔 배경 + 자기 강조색 글자다. 테마가 글자색을 덮어쓰는 gt-macro-ink 를 붙이면
+    // 어두운 테마의 밝은 글자색이 파스텔 배경 위에 얹혀 읽을 수 없게 되므로 붙이지 않는다.
+    const chromeClass = isActive ? '' : 'gt-macro-box gt-macro-ink-soft';
     tabsHtml += `
       <div class="${chromeClass}" style="padding: 6px 14px; font-size: 13px; font-weight: 900; cursor: default;
         border: 1px solid ${isActive ? active.border : 'var(--border-color)'};
