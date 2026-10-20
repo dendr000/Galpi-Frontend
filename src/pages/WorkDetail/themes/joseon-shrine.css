@@ -101,7 +101,7 @@
 [data-genre-theme="joseon-shrine"] .gt-infobox { background: var(--js-panel) !important; border-color: var(--js-panel-line) !important; box-shadow: 0 20px 50px -22px rgba(0,0,0,.35) !important; }
 [data-genre-theme="joseon-shrine"] .gt-infobox-title { font-family: var(--js-font-display) !important; font-weight: 700; background: var(--js-red) !important; }
 [data-footer-theme="joseon-shrine"] .gt-footer { background: var(--js-panel) !important; border-top: 1px solid var(--js-red) !important; }
-[data-footer-theme="joseon-shrine"] .gt-footer-btn:hover { color: var(--js-red) !important; }
+[data-footer-theme="joseon-shrine"] .gt-footer-btn:hover { color: var(--js-gold) !important; }
 [data-genre-theme="joseon-shrine"] .gt-infobox-image { border-bottom-color: var(--js-panel-line) !important; filter: saturate(.85); }
 [data-genre-theme="joseon-shrine"] .gt-infobox-table th, [data-genre-theme="joseon-shrine"] .gt-table th { background: rgba(255,255,255,.05) !important; color: var(--js-ink-soft) !important; border-color: var(--js-panel-line) !important; font-family: var(--js-font-mono); font-weight: 500 !important; }
 [data-genre-theme="joseon-shrine"] .gt-infobox-table td, [data-genre-theme="joseon-shrine"] .gt-table td { color: var(--js-ink) !important; border-color: var(--js-panel-line) !important; font-family: var(--js-font-label); }

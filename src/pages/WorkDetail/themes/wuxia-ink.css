@@ -142,6 +142,7 @@
 [data-genre-theme="wuxia-ink"] .gt-macro-ink-soft { color: var(--wi-ink-soft) !important; fill: var(--wi-ink-soft) !important; stroke: var(--wi-ink-soft) !important; font-family: var(--wi-font-mono); }
 [data-genre-theme="wuxia-ink"] .gt-macro-accent { color: var(--wi-seal) !important; fill: var(--wi-seal) !important; stroke: var(--wi-seal) !important; border-color: var(--wi-seal) !important; }
 [data-genre-theme="wuxia-ink"] .gt-macro-accent-bg { background: var(--wi-seal) !important; color: #f3efe1 !important; }
+[data-theme="dark"] [data-genre-theme="wuxia-ink"] .gt-macro-accent-bg { color: var(--wi-paper) !important; }
 [data-genre-theme="wuxia-ink"] .gt-macro-accent-dot { fill: var(--wi-seal) !important; }
 [data-genre-theme="wuxia-ink"] .gt-macro-accent-stroke { stroke: var(--wi-seal) !important; }
 [data-genre-theme="wuxia-ink"] .gt-macro-inksoft-stroke { stroke: var(--wi-ink-soft) !important; }

@@ -142,6 +142,7 @@
 [data-genre-theme="hunter-hologram"] .gt-macro-ink-soft { color: var(--hh2-ink-soft) !important; fill: var(--hh2-ink-soft) !important; stroke: var(--hh2-ink-soft) !important; font-family: var(--hh2-font-mono); }
 [data-genre-theme="hunter-hologram"] .gt-macro-accent { color: var(--hh2-blue) !important; fill: var(--hh2-blue) !important; stroke: var(--hh2-blue) !important; border-color: var(--hh2-blue) !important; }
 [data-genre-theme="hunter-hologram"] .gt-macro-accent-bg { background: var(--hh2-blue) !important; color: #ffffff !important; }
+[data-theme="dark"] [data-genre-theme="hunter-hologram"] .gt-macro-accent-bg { color: var(--hh2-bg3) !important; }
 [data-genre-theme="hunter-hologram"] .gt-macro-accent-dot { fill: var(--hh2-blue) !important; }
 [data-genre-theme="hunter-hologram"] .gt-macro-accent-stroke { stroke: var(--hh2-blue) !important; }
 [data-genre-theme="hunter-hologram"] .gt-macro-inksoft-stroke { stroke: var(--hh2-ink-soft) !important; }
