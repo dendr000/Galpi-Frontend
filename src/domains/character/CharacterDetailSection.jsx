@@ -5,7 +5,7 @@
 import React from 'react';
 import MarkdownRenderer from '../../domains/macro/MarkdownRenderer';
 
-const CharacterDetailSection = ({ activeChar, charSectionNum, styles }) => {
+const CharacterDetailSection = ({ activeChar, charSectionNum, styles, onBacklink }) => {
   if (!activeChar) return null;
   console.log(`[CharacterDetailSection] 캐릭터 마크다운 상세 정보 렌더링. 타겟 캐릭터: ${activeChar.name}`);
   
@@ -23,7 +23,7 @@ const CharacterDetailSection = ({ activeChar, charSectionNum, styles }) => {
           {charSectionNum + 1}. [{activeChar.name}] 상세 정보
         </h2>
       </div>
-      <MarkdownRenderer rawText={rawText} startH1={charSectionNum + 2} />
+      <MarkdownRenderer rawText={rawText} startH1={charSectionNum + 2} onNodeClick={onBacklink} />
     </section>
   );
 };

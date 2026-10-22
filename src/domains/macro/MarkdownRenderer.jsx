@@ -73,7 +73,7 @@ const MarkdownRenderer = ({ rawText, onNodeClick, startH1 = 1 }) => {
         dangerouslySetInnerHTML={{ __html: renderedHtml }} 
         onClick={(e) => {
           if (e.target.classList.contains('wiki-backlink') && onNodeClick) {
-            onNodeClick(e.target.innerText);
+            onNodeClick(e.target.textContent);
           }
         }}
       />

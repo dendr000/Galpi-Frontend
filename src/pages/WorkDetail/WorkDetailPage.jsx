@@ -49,6 +49,7 @@ import BatchImageModal from '../../domains/character/BatchImageModal';
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
 import { getGroupSortOrder } from '../../domains/character/characterOrder';
+import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
 
 const WorkDetailPage = () => {
   console.log("[WorkDetailPage] 조립형 레이아웃 뷰 가동 개시");
@@ -58,6 +59,12 @@ const WorkDetailPage = () => {
 
   // 커스텀 드래그 인터랙션 제어 훅 바인딩
   const { handleCharDragStart, handleCharDragOver, handleCharDragEnd } = useCharacterDrag(data.characters, data.setCharacters, data.groupCriteria);
+
+  // 본문의 [[이름]] 파란 링크: 같은 작품 캐릭터면 선택+스크롤, 다른 작품 제목이면 그 작품으로 이동
+  const handleBacklink = useWorkBacklink({
+    characters: data.characters, formSwaps: data.formSwaps, workId: data.workId,
+    setActiveCharId: data.setActiveCharId, navigate: data.navigate,
+  });
 
   // GNB 팔레트 버튼이 테마를 순환시키면(별도 API 호출) 여기서도 즉시 반영되도록 이벤트를 듣는다
   useEffect(() => {
@@ -243,7 +250,7 @@ const WorkDetailPage = () => {
                     }}>삭제</button>
                   </div>
                 </div>
-                <MarkdownRenderer rawText={activePage.content} />
+                <MarkdownRenderer rawText={activePage.content} onNodeClick={handleBacklink} />
               </section>
             ) : (
               <>
@@ -253,7 +260,7 @@ const WorkDetailPage = () => {
                   </div>
                   <div style={{ marginBottom: '20px' }}>
                     <p style={{ margin: '0 0 12px 0', lineHeight: 1.6, color: 'var(--text-secondary)' }}>제작자: <strong>{data.work.creator || '미상'}</strong> | 상태: <strong>[{data.work.status || '진행 중'}]</strong></p>
-                    {parsedDesc.meta.overview && <MarkdownRenderer rawText={parsedDesc.meta.overview} />}
+                    {parsedDesc.meta.overview && <MarkdownRenderer rawText={parsedDesc.meta.overview} onNodeClick={handleBacklink} />}
                   </div>
                 </section>
 
@@ -262,7 +269,7 @@ const WorkDetailPage = () => {
                     <h2 id="sec-worldview" className={`${styles.sectionHeaderTitle} gt-section-title auto-toc-target`}>2. 설정</h2>
                     <button className="wiki-btn gt-btn-edit" style={{ padding: '4px 10px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }} onClick={() => data.navigate(`/edit?type=work&action=edit&id=${data.work.id}`)}><IconPen size={13} /> 편집</button>
                   </div>
-                  <MarkdownRenderer rawText={parsedDesc.clean} startH1={3} />
+                  <MarkdownRenderer rawText={parsedDesc.clean} startH1={3} onNodeClick={handleBacklink} />
                 </section>
               </>
             )}
@@ -297,7 +304,7 @@ const WorkDetailPage = () => {
 
             {/* 현재 활성화된 캐릭터의 상세 프로필 설정 문서 출력 */}
             {!activePage && activeChar && (
-              <CharacterDetailSection activeChar={activeChar} charSectionNum={data.charSectionNum} styles={styles} />
+              <CharacterDetailSection activeChar={activeChar} charSectionNum={data.charSectionNum} styles={styles} onBacklink={handleBacklink} />
             )}
 
             {/* 캐릭터 하단 스크롤 트랙용 퀵 네비게이터 바 조립 */}

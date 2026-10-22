@@ -51,12 +51,14 @@ src/
  │
  ├── domains/                                   # [핵심 비즈니스 로직 및 기능별 묶음]
  │   ├── work/
+ │   │   ├── backlink.js                        # 본문 [[이름]] 링크가 가리키는 같은 작품 캐릭터/다른 작품을 찾는 순수 로직
  │   │   ├── FloatingLeftTree.jsx               # 하위 위키 문서들의 부모-자식 계층 구조를 시각화하는 플로팅 사이드 트리
  │   │   ├── FloatingToc.jsx                    # 실시간 DOM 헤딩을 추적하여 부드러운 스크롤 이동을 지원하는 플로팅 목차
  │   │   ├── InlineCategoryForm.jsx             # 장르 태그 배지를 실시간 비동기로 즉시 추가하는 인라인 전용 입력 폼
  │   │   ├── SubPageList.jsx                    # 현재 경로에 배속된 자식 문서들을 노션 스타일 그리드로 표출하는 모듈
  │   │   ├── WorkCategoryBar.jsx                # 지정된 분류 태그들을 호버 링크로 정렬 및 삭제 관리하는 도메인 바
  │   │   ├── WorkCover.jsx                      # 작품 상세 상단 타이틀 이미지를 휠 확대 및 드래그 위치 제어하는 배너
+ │   │   ├── useWorkBacklink.js                 # [[이름]] 링크 클릭 시 캐릭터 선택+스크롤 또는 작품 이동을 처리하는 커스텀 훅
  │   │   └── useWorkDetailData.js               # 작품 상세 화면의 데이터 로드, 목차 스캔, 상태 관리를 전담하는 커스텀 훅
  │   ├── character/
  │   │   ├── BatchImageModal.jsx                # 모든 등장인물의 썸네일 세로 정렬 및 확대 배율을 동시 조작하는 일괄 모달
