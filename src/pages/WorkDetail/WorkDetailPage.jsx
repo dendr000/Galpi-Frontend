@@ -48,12 +48,12 @@ import BatchImageModal from '../../domains/character/BatchImageModal';
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
-import { getGroupSortOrder } from '../../domains/character/characterOrder';
 import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
 import { useSelectCharFromUrl } from '../../domains/work/useSelectCharFromUrl';
 import { getAffiliationMembers } from '../../domains/work/organization';
 import { useCharacterSort } from '../../domains/character/useCharacterSort';
 import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
+import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray } from '../../domains/character/characterGroups';
 import { useClassifiedMask } from '../../domains/character/useClassifiedMask';
 import { collectFilterGroups, filterChars, toggleFilterValue } from '../../domains/character/characterFilter';
 import PageMemberList from '../../domains/character/PageMemberList';
@@ -149,84 +149,19 @@ const WorkDetailPage = () => {
   const activeChar = data.characters.find(c => c.id === data.activeCharId);
   const genreTheme = resolveGenreTheme(data.work.genre, parsedDesc.meta.themeOverride);
 
-  console.log("[WorkDetailPage] 캐릭터 은닉 처리 및 폼 체인지 파싱 시작");
-  // 은닉 처리 및 폼 체인지 적용 (이중 파싱 방어 로직 추가)
-  const baseChars = data.characters.filter(c => {
-    try { 
-      let dp = JSON.parse(c.dynamicProperties || c._rawDynamic || "{}"); 
-      if (typeof dp === 'string') dp = JSON.parse(dp); 
-      return !dp._isHidden; 
-    } catch(e) { 
-      console.warn(`[WorkDetailPage] 은닉 속성 파싱 에러 발생: ${c.name}`, e);
-      return true; 
-    }
-  });
-
-  const displayChars = baseChars.map(base => {
-    console.log(`[WorkDetailPage] 캐릭터 폼 스왑 확인 진행: ${base.name}`);
-    const activeFormId = data.formSwaps[base.id];
-    if (activeFormId && activeFormId !== base.id) {
-       const alt = data.characters.find(c => c.id === activeFormId);
-       if (alt) return { ...alt, _baseCharId: base.id }; 
-    }
-    return { ...base, _baseCharId: base.id };
-  });
+  // 숨김 캐릭터 제외와 폼 스왑 반영(본체/서브폼 전환)
+  const { baseChars, displayChars } = getVisibleCharacters(data.characters, data.formSwaps);
 
   // 칩 필터: 칩은 화면에 보이는 캐릭터 전체 기준으로 만들고, 그리드에는 선택에 맞는 캐릭터만 넘긴다
   const filterGroups = collectFilterGroups(displayChars);
   const visibleChars = filterChars(displayChars, filterSelection);
 
-  // 캐릭터 갤러리 정렬용 그룹 명칭 및 트리 추출 연산
-  const groupedChars = {};
-  visibleChars.forEach(c => {
-    const rawVal = c[data.groupCriteria] || "미분류";
-    const tags = String(rawVal).split(',').map(s => s.trim()).filter(Boolean);
-    let validTags = tags.filter(t => !t.startsWith('*'));
-    if (validTags.length === 0) validTags = ["미분류"]; 
-    validTags.forEach(tag => {
-      if (!groupedChars[tag]) groupedChars[tag] = [];
-      if (!groupedChars[tag].some(exist => exist.id === c.id)) groupedChars[tag].push(c);
-    });
-  });
-
-  Object.keys(groupedChars).forEach(k => {
-    console.log(`[WorkDetailPage] 그룹 정렬 연산 수행. 대상 그룹: ${k}`);
-    groupedChars[k].sort((a, b) => {
-      const getBaseSort = (char) => {
-        const base = data.characters.find(bc => bc.id === char._baseCharId) || char;
-        try {
-          let dp = JSON.parse(base.dynamicProperties || base._rawDynamic || "{}");
-          if (typeof dp === 'string') dp = JSON.parse(dp);
-          // ★ base.sortOrder는 캐릭터 객체에 존재한 적이 없는 필드라 항상 undefined였다(백엔드
-          // Character 엔티티에 sortOrder 컬럼 자체가 없음) — 그래서 드래그로 이 그룹 전용 순서를
-          // 따로 정해둔 적 없는 캐릭터는 전부 999로 묶여 정렬이 사실상 무동작이었고, 붙여넣기로
-          // 여러 명을 한꺼번에 저장할 때 동시에 날아간 POST 요청들의 완료 순서(=DB id 부여 순서)
-          // 그대로 뒤죽박죽 표시되는 버그였다. 실제 저장되는 필드는 dynamicProperties 안의
-          // dp.sortOrder이므로 그걸 읽어야 한다.
-          return getGroupSortOrder(dp, k);
-        } catch(e) {
-          console.warn(`[WorkDetailPage] 정렬 순서 파싱 에러 발생: ${char.name}`, e);
-          return base.sortOrder ?? 999; 
-        }
-      };
-      return getBaseSort(a) - getBaseSort(b);
-    });
-    // 속성 정렬을 골랐으면 수동 순서 위에 속성값 순서를 덮어쓴다(같은 값끼리는 수동 순서 유지)
-    if (sortKey) groupedChars[k] = sortCharsByProperty(groupedChars[k], sortKey, sortDir);
+  // 분류 기준별 그룹 묶기와 그룹 안 정렬(수동 순서 위에 속성 정렬을 덮어씀)
+  const { groupedChars, sortedGroupNames } = buildCharacterGroups({
+    chars: visibleChars, allCharacters: data.characters, groupCriteria: data.groupCriteria,
+    groupOrderArray: getGroupOrderArray(parsedDesc.meta, data.groupCriteria), sortKey, sortDir,
   });
   const sortKeys = collectSortKeys(baseChars);
-
-  // "관계" 기준으로 볼 때 작품마다 _groupOrder를 따로 설정해두지 않았으면, 연인 → 친구 →
-  // 일반 순서를 기본값으로 쓴다 (일괄 관리 스튜디오의 "카드 배치 순" 정렬과 같은 기본값).
-  const DEFAULT_GROUP_ORDER = { '관계': ['연인', '친구', '일반'] };
-  const groupOrderArray = parsedDesc.meta._groupOrder?.[data.groupCriteria] || DEFAULT_GROUP_ORDER[data.groupCriteria] || [];
-  const sortedGroupNames = Object.keys(groupedChars).sort((a, b) => {
-    let idxA = groupOrderArray.indexOf(a);
-    let idxB = groupOrderArray.indexOf(b);
-    if (idxA === -1) idxA = 999;
-    if (idxB === -1) idxB = 999;
-    return idxA - idxB;
-  });
 
   return (
     <div className="main-content-wrap">
