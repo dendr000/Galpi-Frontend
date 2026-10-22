@@ -37,6 +37,7 @@ src/
  ├── components/                                # [공통 UI 컴포넌트 구역]
  │   ├── common/
  │   │   ├── BossBlindLayer.jsx                 # 보스키 트리거 감지 시 브라우저를 즉각 마스킹 처리하는 위장막 레이어
+ │   │   ├── FindBar.jsx                        # Ctrl+F 페이지 찾기창(Electron exe 에는 기본 찾기 창이 없어 직접 제공)
  │   │   ├── ModalOverlay.jsx                   # 팝업 모달창 활성화 시 뒷배경을 어둡게 처리하는 공통 UI 레이어 컴포넌트
  │   │   ├── SettingModal.jsx                   # 사용자 뷰 설정 변경값을 스토어에 바인딩하는 시스템 환경설정 팝업
  │   │   └── TextPromptModal.jsx                # window.prompt 대신 쓰는 앱 안의 글자 입력 모달(Electron exe 는 prompt 미지원)

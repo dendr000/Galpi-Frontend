@@ -15,6 +15,7 @@ import BossBlindLayer from './components/common/BossBlindLayer';
 import SettingModal from './components/common/SettingModal';
 import SafeDeleteModal from './components/common/SafeDeleteModal';
 import TextPromptModal from './components/common/TextPromptModal';
+import FindBar from './components/common/FindBar';
 import FabMenu from './components/layout/FabMenu';
 import GlobalContextMenu from './components/layout/GlobalContextMenu';
 import Footer from './components/layout/footer/Footer';
@@ -85,6 +86,7 @@ function App() {
       <SettingModal isOpen={isSettingOpen} onClose={() => setIsSettingOpen(false)} />
       <SafeDeleteModal />
       <TextPromptModal />
+      <FindBar /> {/* exe(Electron)에는 기본 찾기 창이 없어 Ctrl+F 를 직접 처리 */}
       <BossBlindLayer />
       <GlobalContextMenu /> 
       
