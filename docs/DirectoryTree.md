@@ -69,6 +69,8 @@ src/
  │   │   ├── CharacterGrid.jsx                  # 속성값 정렬 기준에 매핑된 인물 카드를 격자 배열하는 갤러리 컴포넌트
  │   │   ├── CharacterInfobox.jsx               # 우측 영역에 상시 밀착하여 캐릭터 핵심 프로필 정보를 요약 표출하는 인포박스
  │   │   ├── CharacterQuickNav.jsx              # 상세 정보 하단에 배치되어 해당 캐릭터 카드로 초점을 강제 이동시키는 바
+ │   │   ├── characterFilter.js                 # 소속, 등급 칩 필터의 칩 모으기와 걸러내기 순수 로직(그룹 안 OR, 그룹 사이 AND)
+ │   │   ├── FilterChips.jsx                    # 캐릭터 목록 위의 소속, 등급 칩 필터 UI
  │   │   ├── classified.js                      # 캐릭터의 기밀 여부(기밀 속성) 판정과 기본 상태
  │   │   ├── ClassifiedStamp.jsx                # 기밀 캐릭터에 붙이는 "기밀" 도장
  │   │   ├── useClassifiedMask.js               # "기밀 가리기" 켜짐(작품별 저장)과 열람 기록을 가진 커스텀 훅

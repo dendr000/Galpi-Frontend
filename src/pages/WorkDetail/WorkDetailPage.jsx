@@ -2,7 +2,7 @@
 // 기능 요약: 전용 커스텀 데이터 훅으로부터 컴포넌트 라이프사이클 상태를 주입받아 도메인 단위 서브 모듈들을 조합하여 화면에 표출하는 순수 허브 레이아웃 파일
 // 버전: v3.1.0 (비즈니스 상태 로직 완전 격리 개편본)
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import './themes/wuxia.css';
 import './themes/wuxia-ink.css';
@@ -55,6 +55,7 @@ import { getAffiliationMembers } from '../../domains/work/organization';
 import { useCharacterSort } from '../../domains/character/useCharacterSort';
 import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
 import { useClassifiedMask } from '../../domains/character/useClassifiedMask';
+import { collectFilterGroups, filterChars, toggleFilterValue } from '../../domains/character/characterFilter';
 import PageMemberList from '../../domains/character/PageMemberList';
 import RatingScaleTable from '../../domains/character/RatingScaleTable';
 import { parseRatingAxes, parseRatingScale } from '../../domains/character/ratings';
@@ -76,6 +77,11 @@ const WorkDetailPage = () => {
 
   // 캐릭터 그리드 정렬 선택(속성 이름, 방향): 작품별로 저장되고, 비어 있으면 수동 순서
   const { sortKey, sortDir, setSort } = useCharacterSort(data.workId);
+
+  // 캐릭터 목록 위의 칩 필터 선택({ 속성이름: [선택한 값들] }). 저장하지 않고 이 화면에서만 유지한다
+  const [filterSelection, setFilterSelection] = useState({});
+  const handleFilterToggle = (key, value) => setFilterSelection(prev => toggleFilterValue(prev, key, value));
+  const handleFilterClear = () => setFilterSelection({});
 
   // 기밀 표시와 "기밀 가리기" 상태(작품별 저장). 그리드, 정보 상자, 소속 인물 목록이 같은 상태를 쓴다
   const classified = useClassifiedMask(data.workId, data.characters);
@@ -166,9 +172,13 @@ const WorkDetailPage = () => {
     return { ...base, _baseCharId: base.id };
   });
 
+  // 칩 필터: 칩은 화면에 보이는 캐릭터 전체 기준으로 만들고, 그리드에는 선택에 맞는 캐릭터만 넘긴다
+  const filterGroups = collectFilterGroups(displayChars);
+  const visibleChars = filterChars(displayChars, filterSelection);
+
   // 캐릭터 갤러리 정렬용 그룹 명칭 및 트리 추출 연산
   const groupedChars = {};
-  displayChars.forEach(c => {
+  visibleChars.forEach(c => {
     const rawVal = c[data.groupCriteria] || "미분류";
     const tags = String(rawVal).split(',').map(s => s.trim()).filter(Boolean);
     let validTags = tags.filter(t => !t.startsWith('*'));
@@ -339,6 +349,12 @@ const WorkDetailPage = () => {
                 ratingAxes={ratingAxes}
                 ratingScale={ratingScale}
                 classified={classified}
+                filterGroups={filterGroups}
+                filterSelection={filterSelection}
+                onFilterToggle={handleFilterToggle}
+                onFilterClear={handleFilterClear}
+                filterShown={visibleChars.length}
+                filterTotal={displayChars.length}
               />
             )}
 

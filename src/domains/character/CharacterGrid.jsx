@@ -8,6 +8,8 @@ import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import AffiliationLinks from './AffiliationLinks';
 import RatingBadges from './RatingBadges';
 import ClassifiedStamp from './ClassifiedStamp';
+import FilterChips from './FilterChips';
+import { hasActiveFilter } from './characterFilter';
 import { getRatings } from './ratings';
 import { NO_CLASSIFIED } from './classified';
 
@@ -38,7 +40,13 @@ const CharacterGrid = ({
   wikiPages = [],      // 소속 값과 같은 제목의 하위 문서를 링크로 잇는 데 쓴다
   ratingAxes = [],     // 등급 배지 설정(판정 축과 기준표)
   ratingScale = [],
-  classified = NO_CLASSIFIED // 기밀 표시와 가리기 상태(useClassifiedMask)
+  classified = NO_CLASSIFIED, // 기밀 표시와 가리기 상태(useClassifiedMask)
+  filterGroups = [],          // 칩 필터 그룹(소속, 등급)과 선택 상태
+  filterSelection = {},
+  onFilterToggle = () => {},
+  onFilterClear = () => {},
+  filterShown = 0,            // 필터를 거친 뒤 보이는 인원과 전체 인원
+  filterTotal = 0
 }) => {
   console.log("[CharacterGrid] 등장인물 갤러리 그리드 컴포넌트 렌더링 개시");
 
@@ -136,6 +144,13 @@ const CharacterGrid = ({
           </button>
         </div>
       </div>
+
+      <FilterChips groups={filterGroups} selection={filterSelection} onToggle={onFilterToggle} onClear={onFilterClear} shown={filterShown} total={filterTotal} />
+      {hasActiveFilter(filterSelection) && filterShown === 0 && (
+        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '30px', background: 'var(--table-bg-alt)', borderRadius: '8px', border: '1px dashed var(--border-color)', marginBottom: '20px' }}>
+          조건에 맞는 인물이 없습니다.
+        </div>
+      )}
 
       <div>
         {sortedGroupNames.map(gName => {

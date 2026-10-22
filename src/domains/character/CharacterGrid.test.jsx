@@ -182,3 +182,32 @@ describe('CharacterGrid 기밀 표시', () => {
     expect(props.navigate).not.toHaveBeenCalled();
   });
 });
+
+describe('CharacterGrid 칩 필터', () => {
+  const groups = [{ key: '소속', options: [{ value: '북부', count: 1 }] }];
+
+  it('필터 그룹이 있으면 칩을 그리고, 누르면 onFilterToggle 을 부른다', () => {
+    const onFilterToggle = vi.fn();
+    renderGrid({ filterGroups: groups, filterSelection: {}, onFilterToggle, onFilterClear: vi.fn(), filterShown: 2, filterTotal: 2 });
+    fireEvent.click(screen.getByRole('button', { name: '북부 1' }));
+    expect(onFilterToggle).toHaveBeenCalledWith('소속', '북부');
+  });
+
+  it('필터 그룹이 없으면 칩을 그리지 않는다', () => {
+    renderGrid();
+    expect(document.querySelector('.gt-filter-chips')).toBeNull();
+  });
+
+  it('필터 때문에 보이는 인물이 0명이면 안내 문구를 보여 준다', () => {
+    renderGrid({
+      filterGroups: groups, filterSelection: { 소속: ['북부'] }, onFilterToggle: vi.fn(), onFilterClear: vi.fn(),
+      filterShown: 0, filterTotal: 2, sortedGroupNames: [], groupedChars: {},
+    });
+    expect(screen.getByText('조건에 맞는 인물이 없습니다.')).toBeTruthy();
+  });
+
+  it('필터가 없는 상태에서 인물이 0명이면 안내 문구를 만들지 않는다', () => {
+    renderGrid({ sortedGroupNames: [], groupedChars: {}, filterShown: 0, filterTotal: 0 });
+    expect(screen.queryByText('조건에 맞는 인물이 없습니다.')).toBeNull();
+  });
+});
