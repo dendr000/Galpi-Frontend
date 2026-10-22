@@ -50,6 +50,11 @@ import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
 import { getGroupSortOrder } from '../../domains/character/characterOrder';
 import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
+import { useSelectCharFromUrl } from '../../domains/work/useSelectCharFromUrl';
+import { getAffiliationMembers } from '../../domains/work/organization';
+import { useCharacterSort } from '../../domains/character/useCharacterSort';
+import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
+import PageMemberList from '../../domains/character/PageMemberList';
 
 const WorkDetailPage = () => {
   console.log("[WorkDetailPage] 조립형 레이아웃 뷰 가동 개시");
@@ -64,6 +69,14 @@ const WorkDetailPage = () => {
   const handleBacklink = useWorkBacklink({
     characters: data.characters, formSwaps: data.formSwaps, workId: data.workId,
     setActiveCharId: data.setActiveCharId, navigate: data.navigate,
+  });
+
+  // 캐릭터 그리드 정렬 선택(속성 이름, 방향): 작품별로 저장되고, 비어 있으면 수동 순서
+  const { sortKey, sortDir, setSort } = useCharacterSort(data.workId);
+
+  // 주소의 ?charId= (소속 인물 목록에서 넘어올 때)로 열리면 그 캐릭터를 선택하고 카드로 스크롤
+  useSelectCharFromUrl({
+    loading: data.loading, charIdParam: data.charIdParam, characters: data.characters, setActiveCharId: data.setActiveCharId,
   });
 
   // GNB 팔레트 버튼이 테마를 순환시키면(별도 API 호출) 여기서도 즉시 반영되도록 이벤트를 듣는다
@@ -179,7 +192,10 @@ const WorkDetailPage = () => {
       };
       return getBaseSort(a) - getBaseSort(b);
     });
+    // 속성 정렬을 골랐으면 수동 순서 위에 속성값 순서를 덮어쓴다(같은 값끼리는 수동 순서 유지)
+    if (sortKey) groupedChars[k] = sortCharsByProperty(groupedChars[k], sortKey, sortDir);
   });
+  const sortKeys = collectSortKeys(baseChars);
 
   // "관계" 기준으로 볼 때 작품마다 _groupOrder를 따로 설정해두지 않았으면, 연인 → 친구 →
   // 일반 순서를 기본값으로 쓴다 (일괄 관리 스튜디오의 "카드 배치 순" 정렬과 같은 기본값).
@@ -251,6 +267,10 @@ const WorkDetailPage = () => {
                   </div>
                 </div>
                 <MarkdownRenderer rawText={activePage.content} onNodeClick={handleBacklink} />
+                <PageMemberList
+                  members={sortCharsByProperty(getAffiliationMembers(data.characters, activePage.title), sortKey, sortDir)}
+                  workId={data.workId} work={data.work} charExt={charExt} navigate={data.navigate} styles={styles} sortKey={sortKey}
+                />
               </section>
             ) : (
               <>
@@ -299,6 +319,11 @@ const WorkDetailPage = () => {
                 handleCharDragStart={handleCharDragStart}
                 handleCharDragOver={handleCharDragOver}
                 handleCharDragEnd={handleCharDragEnd}
+                sortKeys={sortKeys}
+                sortKey={sortKey}
+                sortDir={sortDir}
+                setSort={setSort}
+                wikiPages={data.wikiPages}
               />
             )}
 
@@ -316,7 +341,7 @@ const WorkDetailPage = () => {
           
           {/* 스마트 정보 박스 배치 구역 */}
           <aside className={styles.wikiAside}>
-            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} />
+            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} />
           </aside>
         </div>
       </div>

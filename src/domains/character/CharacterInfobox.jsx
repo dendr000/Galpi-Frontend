@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api/axiosCore';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
+import AffiliationLinks from './AffiliationLinks';
 
-const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps }) => {
+const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps, wikiPages = [], onOpenPage }) => {
   const navigate = useNavigate();
   const [variantIdx, setVariantIdx] = useState(0);
   const [existingVariants, setExistingVariants] = useState(null); // null = 아직 확인 전
@@ -214,7 +215,11 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
           {validKeys.map(k => (
             <tr key={k}>
               <th>{k}</th>
-              <td style={{ fontWeight: '600' }}>{String(mergedProps[k]).split(',').map(s => s.trim().replace(/^\*/, '')).join(', ')}</td>
+              <td style={{ fontWeight: '600' }}>
+                {k === '소속' && onOpenPage
+                  ? <AffiliationLinks value={mergedProps[k]} wikiPages={wikiPages} onOpenPage={onOpenPage} />
+                  : String(mergedProps[k]).split(',').map(s => s.trim().replace(/^\*/, '')).join(', ')}
+              </td>
             </tr>
           ))}
         </tbody>

@@ -4,7 +4,7 @@
 // 공백을 모두 지우고 소문자로 바꿔 비교한다: "레온 폰 아인하르트"와 "레온폰아인하르트"를 같은 이름으로 본다.
 export const normalizeName = (str) => (str || '').replace(/\s+/g, '').toLowerCase();
 
-const isHidden = (c) => {
+export const isHiddenChar = (c) => {
   try {
     let dp = JSON.parse(c.dynamicProperties || c._rawDynamic || '{}');
     if (typeof dp === 'string') dp = JSON.parse(dp);
@@ -22,7 +22,7 @@ export const findCharacterTarget = (characters, formSwaps, keyword) => {
   if (!key || !Array.isArray(characters)) return null;
   const swaps = formSwaps || {};
   for (const base of characters) {
-    if (isHidden(base)) continue;
+    if (isHiddenChar(base)) continue;
     const shownId = swaps[base.id] && swaps[base.id] !== base.id ? swaps[base.id] : base.id;
     const shown = shownId === base.id ? base : characters.find((c) => c.id === shownId) || base;
     if (normalizeName(base.name) === key || normalizeName(shown.name) === key) {

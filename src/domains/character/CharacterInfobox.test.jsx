@@ -3,8 +3,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import CharacterInfobox from './CharacterInfobox';
 
@@ -31,6 +31,44 @@ const renderBox = () =>
   );
 
 afterEach(cleanup);
+
+describe('CharacterInfobox 소속 링크', () => {
+  const withAffiliation = { ...char, 소속: '북부 대공가, *비밀결사, 남부', _propOrder: ['소속'] };
+  const renderWith = (wikiPages) => {
+    const navigate = vi.fn();
+    render(
+      <MemoryRouter>
+        <CharacterInfobox
+          char={withAffiliation} workId={91} workTitle="작품" charExt="png" imgVariants={[]}
+          setCharacters={() => {}} setActiveCharId={() => {}} characters={[withAffiliation]}
+          cardVariants={{}} setCardVariants={() => {}} formSwaps={{}} setFormSwaps={() => {}}
+          wikiPages={wikiPages} onOpenPage={navigate}
+        />
+      </MemoryRouter>
+    );
+    return navigate;
+  };
+
+  it('같은 제목의 하위 문서가 있는 소속 값만 링크가 되고, 누르면 문서를 연다', () => {
+    const open = renderWith([{ id: 7, title: '북부대공가' }]);
+    const links = screen.getAllByRole('link');
+    expect(links.map((a) => a.textContent)).toEqual(['북부 대공가']);
+    fireEvent.click(links[0]);
+    expect(open).toHaveBeenCalledWith(7);
+  });
+
+  it('*로 시작하는 값은 *를 떼고 일반 글자로 보인다(문서가 있어도 링크 아님)', () => {
+    renderWith([{ id: 8, title: '비밀결사' }]);
+    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.getByText(/비밀결사/)).toBeTruthy();
+  });
+
+  it('하위 문서가 없으면 링크 없이 값만 보인다', () => {
+    renderWith([]);
+    expect(screen.queryByRole('link')).toBeNull();
+    expect(screen.getByText(/북부 대공가, 비밀결사, 남부/)).toBeTruthy();
+  });
+});
 
 // 인포박스는 화면에 붙어 따라다니는(sticky) 상자다. 속성이 많아 상자가 화면보다 길어지면 아래쪽의
 // 수정/삭제 버튼이 화면 밖으로 밀려 눌러 볼 수 없었다. 긴 내용은 안쪽 영역이 스크롤하고

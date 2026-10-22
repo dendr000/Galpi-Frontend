@@ -55,17 +55,23 @@ src/
  │   │   ├── FloatingLeftTree.jsx               # 하위 위키 문서들의 부모-자식 계층 구조를 시각화하는 플로팅 사이드 트리
  │   │   ├── FloatingToc.jsx                    # 실시간 DOM 헤딩을 추적하여 부드러운 스크롤 이동을 지원하는 플로팅 목차
  │   │   ├── InlineCategoryForm.jsx             # 장르 태그 배지를 실시간 비동기로 즉시 추가하는 인라인 전용 입력 폼
+ │   │   ├── organization.js                    # 소속 값과 같은 제목의 하위 문서를 잇고 소속 인물을 모으는 순수 로직
  │   │   ├── SubPageList.jsx                    # 현재 경로에 배속된 자식 문서들을 노션 스타일 그리드로 표출하는 모듈
  │   │   ├── WorkCategoryBar.jsx                # 지정된 분류 태그들을 호버 링크로 정렬 및 삭제 관리하는 도메인 바
  │   │   ├── WorkCover.jsx                      # 작품 상세 상단 타이틀 이미지를 휠 확대 및 드래그 위치 제어하는 배너
  │   │   ├── useWorkBacklink.js                 # [[이름]] 링크 클릭 시 캐릭터 선택+스크롤 또는 작품 이동을 처리하는 커스텀 훅
+ │   │   ├── useSelectCharFromUrl.js            # 주소의 ?charId= 로 열리면 그 캐릭터를 선택하고 카드로 스크롤하는 훅
  │   │   └── useWorkDetailData.js               # 작품 상세 화면의 데이터 로드, 목차 스캔, 상태 관리를 전담하는 커스텀 훅
  │   ├── character/
  │   │   ├── BatchImageModal.jsx                # 모든 등장인물의 썸네일 세로 정렬 및 확대 배율을 동시 조작하는 일괄 모달
+ │   │   ├── AffiliationLinks.jsx               # 소속 값을 쉼표 단위로 보여 주고 같은 제목의 하위 문서가 있으면 링크로 그리는 조각
  │   │   ├── CharacterDetailSection.jsx         # 선택된 인물의 세부 원장 및 마크다운 본문을 안전하게 렌더링하는 컨테이너
  │   │   ├── CharacterGrid.jsx                  # 속성값 정렬 기준에 매핑된 인물 카드를 격자 배열하는 갤러리 컴포넌트
  │   │   ├── CharacterInfobox.jsx               # 우측 영역에 상시 밀착하여 캐릭터 핵심 프로필 정보를 요약 표출하는 인포박스
  │   │   ├── CharacterQuickNav.jsx              # 상세 정보 하단에 배치되어 해당 캐릭터 카드로 초점을 강제 이동시키는 바
+ │   │   ├── characterSort.js                   # 속성값(서열, 나이 등)으로 캐릭터를 정렬하는 순수 로직
+ │   │   ├── PageMemberList.jsx                 # 하위 문서 아래에 같은 소속의 인물을 카드로 모아 보여 주는 목록
+ │   │   ├── useCharacterSort.js                # 작품별 정렬 선택(속성, 방향)을 저장하는 커스텀 훅
  │   │   └── useCharacterDrag.js                # 마우스 드래그 이벤트를 추적하여 캐릭터 카드 간 영구 정렬 순서를 바꾸는 훅
  │   ├── memo/
  │   │   ├── FabMemoWidget.jsx                  # 플로팅 액션 버튼 메뉴와 유기적으로 호환되는 소형 레이어 메모 위젯

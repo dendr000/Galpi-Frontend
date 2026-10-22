@@ -11,6 +11,7 @@ export const useWorkDetailData = () => {
   const { workId } = useParams();
   const [searchParams] = useSearchParams();
   const pageId = searchParams.get('pageId');
+  const charIdParam = searchParams.get('charId'); // 소속 인물 목록에서 넘어올 때 선택할 캐릭터 번호
   const navigate = useNavigate();
 
   console.log(`[useWorkDetailData] 데이터 상태 추적 코어 훅 가동 개시. 작품 ID: ${workId}, 현재 페이지 ID: ${pageId}`);
@@ -156,6 +157,7 @@ export const useWorkDetailData = () => {
   return {
     workId,
     pageId,
+    charIdParam,
     navigate,
     work,
     setWork,

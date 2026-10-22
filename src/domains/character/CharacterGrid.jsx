@@ -5,6 +5,7 @@
 import React from 'react';
 import { IconImage, IconPlus } from '../../components/common/icons/DomainIcons';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
+import AffiliationLinks from './AffiliationLinks';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -25,7 +26,12 @@ const CharacterGrid = ({
   setActiveCharId,
   handleCharDragStart = () => {},
   handleCharDragOver = () => {},
-  handleCharDragEnd = () => {}
+  handleCharDragEnd = () => {},
+  sortKeys = [],       // 정렬 기준으로 고를 수 있는 속성 이름들
+  sortKey = '',        // 선택된 정렬 속성(빈 값이면 수동 순서)
+  sortDir = 'asc',
+  setSort = () => {},
+  wikiPages = []       // 소속 값과 같은 제목의 하위 문서를 링크로 잇는 데 쓴다
 }) => {
   console.log("[CharacterGrid] 등장인물 갤러리 그리드 컴포넌트 렌더링 개시");
 
@@ -37,6 +43,14 @@ const CharacterGrid = ({
   const handleBatchModalOpen = () => {
     console.log("[CharacterGrid] 일괄 이미지 위치 조정 모달 트리거 활성화");
     setIsBatchImgModalOpen(true);
+  };
+
+  // 정렬 선택값은 "방향:속성이름" 형태(예: "desc:서열"), 수동 순서는 빈 문자열
+  const handleSortChange = (e) => {
+    const v = e.target.value;
+    if (!v) { setSort('', 'asc'); return; }
+    const i = v.indexOf(':');
+    setSort(v.slice(i + 1), v.slice(0, i));
   };
 
   const handleNewCharClick = () => {
@@ -66,6 +80,25 @@ const CharacterGrid = ({
               <option value="성별">성별별</option>
             </select>
           </div>
+          {sortKeys.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <label style={{ fontWeight: 'bold' }} htmlFor="char-sort-select">정렬:</label>
+              <select
+                id="char-sort-select"
+                aria-label="정렬 기준"
+                value={sortKey ? `${sortDir}:${sortKey}` : ''}
+                onChange={handleSortChange}
+                className="gt-section-select"
+                style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '12px', fontWeight: 'bold', color: 'var(--primary-color)', background: 'var(--surface-color)', outline: 'none', cursor: 'pointer' }}
+              >
+                <option value="">수동 순서</option>
+                {sortKeys.flatMap(k => [
+                  <option key={`asc:${k}`} value={`asc:${k}`}>{k} (오름차순)</option>,
+                  <option key={`desc:${k}`} value={`desc:${k}`}>{k} (내림차순)</option>
+                ])}
+              </select>
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
@@ -151,7 +184,9 @@ const CharacterGrid = ({
                     return (
                       <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                         <span style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', flexShrink: 0 }}>{key}</span>
-                        <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }} title={val}>{val}</span>
+                        <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }} title={val}>
+                          {key === '소속' ? <AffiliationLinks value={val} wikiPages={wikiPages} onOpenPage={(id) => navigate(`/work/${workId}?pageId=${id}`)} /> : val}
+                        </span>
                       </div>
                     );
                   }).filter(Boolean);
@@ -175,7 +210,7 @@ const CharacterGrid = ({
                           setActiveCharId(activeCharId === c.id ? null : c.id);
                         }
                       }}
-                      draggable="true"
+                      draggable={sortKey ? "false" : "true"}
                       onDragStart={(e) => { handleCharDragStart(e, c, gName); }}
                       onDragOver={(e) => handleCharDragOver(e, c, gName)}
                       onDrop={(e) => e.preventDefault()}

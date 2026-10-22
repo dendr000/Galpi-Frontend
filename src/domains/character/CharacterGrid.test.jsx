@@ -1,0 +1,110 @@
+// Copyright (c) dendr000. MIT License.
+// @vitest-environment jsdom
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import CharacterGrid from './CharacterGrid';
+
+afterEach(cleanup);
+
+const chars = [
+  { id: 1, name: '릴리', _baseCharId: 1, 소속: '아인하르트 대공저', _propOrder: ['소속', '서열'], 서열: '3' },
+  { id: 2, name: '레온', _baseCharId: 2, 소속: '북부', _propOrder: ['소속', '서열'], 서열: '1' },
+];
+
+const renderGrid = (over = {}) => {
+  const props = {
+    styles: {},
+    charSectionNum: 3,
+    groupCriteria: '관계',
+    setGroupCriteria: vi.fn(),
+    setIsBatchImgModalOpen: vi.fn(),
+    navigate: vi.fn(),
+    workId: '91',
+    sortedGroupNames: ['일반'],
+    groupedChars: { 일반: chars },
+    cardVariants: {},
+    setCardVariants: vi.fn(),
+    fullVariants: [''],
+    work: { title: '작품' },
+    charExt: 'png',
+    activeCharId: null,
+    setActiveCharId: vi.fn(),
+    sortKeys: ['소속', '서열'],
+    sortKey: '',
+    sortDir: 'asc',
+    setSort: vi.fn(),
+    wikiPages: [],
+    ...over,
+  };
+  return { props, ...render(<CharacterGrid {...props} />) };
+};
+
+const sortSelect = () => screen.getByLabelText('정렬 기준');
+
+describe('CharacterGrid 정렬 선택', () => {
+  it('수동 순서와 속성별 오름차순, 내림차순 항목을 보여 준다', () => {
+    renderGrid();
+    const labels = Array.from(sortSelect().querySelectorAll('option')).map((o) => o.textContent);
+    expect(labels).toEqual(['수동 순서', '소속 (오름차순)', '소속 (내림차순)', '서열 (오름차순)', '서열 (내림차순)']);
+  });
+
+  it('항목을 고르면 속성 이름과 방향으로 setSort 를 부른다', () => {
+    const { props } = renderGrid();
+    fireEvent.change(sortSelect(), { target: { value: 'desc:서열' } });
+    expect(props.setSort).toHaveBeenCalledWith('서열', 'desc');
+    fireEvent.change(sortSelect(), { target: { value: '' } });
+    expect(props.setSort).toHaveBeenCalledWith('', 'asc');
+  });
+
+  it('현재 선택된 정렬이 선택 상태로 보인다', () => {
+    renderGrid({ sortKey: '서열', sortDir: 'desc' });
+    expect(sortSelect().value).toBe('desc:서열');
+  });
+
+  it('정렬 가능한 속성이 없으면 정렬 선택을 그리지 않는다', () => {
+    renderGrid({ sortKeys: [] });
+    expect(screen.queryByLabelText('정렬 기준')).toBeNull();
+  });
+});
+
+describe('CharacterGrid 카드 드래그', () => {
+  const cards = () => Array.from(document.querySelectorAll('[id^="char-card-"]'));
+
+  it('수동 순서일 때는 카드를 끌 수 있다', () => {
+    renderGrid();
+    expect(cards().every((el) => el.getAttribute('draggable') === 'true')).toBe(true);
+  });
+
+  it('속성 정렬을 켜면 카드를 끌 수 없다(화면 순서와 저장 순서가 어긋나지 않게)', () => {
+    renderGrid({ sortKey: '서열' });
+    expect(cards().every((el) => el.getAttribute('draggable') === 'false')).toBe(true);
+  });
+});
+
+describe('CharacterGrid 소속 링크', () => {
+  const pages = [{ id: 7, title: '북부' }];
+  const labelRowFor = (name) => screen.getByText(name);
+
+  it('같은 제목의 하위 문서가 있으면 소속 값이 링크가 되어 그 문서로 이동한다', () => {
+    const { props } = renderGrid({ wikiPages: pages });
+    fireEvent.click(screen.getByRole('link', { name: '북부' }));
+    expect(props.navigate).toHaveBeenCalledWith('/work/91?pageId=7');
+  });
+
+  it('링크를 눌러도 카드 선택은 바뀌지 않는다', () => {
+    const { props } = renderGrid({ wikiPages: pages });
+    fireEvent.click(screen.getByRole('link', { name: '북부' }));
+    expect(props.setActiveCharId).not.toHaveBeenCalled();
+  });
+
+  it('링크 글자색은 부모를 따른다(테마가 정한 글자색을 덮어쓰지 않아 어두운 테마에서도 읽힌다)', () => {
+    renderGrid({ wikiPages: pages });
+    expect(screen.getByRole('link', { name: '북부' }).style.color).toBe('inherit');
+  });
+
+  it('같은 제목의 문서가 없으면 일반 글자로 둔다', () => {
+    renderGrid({ wikiPages: [] });
+    expect(screen.queryByRole('link')).toBeNull();
+    expect(labelRowFor('북부')).toBeTruthy();
+  });
+});
