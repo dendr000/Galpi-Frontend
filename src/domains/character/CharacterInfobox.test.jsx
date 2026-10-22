@@ -35,12 +35,27 @@ afterEach(cleanup);
 // 인포박스는 화면에 붙어 따라다니는(sticky) 상자다. 속성이 많아 상자가 화면보다 길어지면 아래쪽의
 // 수정/삭제 버튼이 화면 밖으로 밀려 눌러 볼 수 없었다. 긴 내용은 안쪽 영역이 스크롤하고
 // 버튼 줄은 그 바깥(상자 맨 아래)에 고정돼야 한다.
-describe('CharacterInfobox 긴 상자에서 수정/삭제 버튼 접근', () => {
-  it('속성 표는 스크롤 영역 안에 있다', () => {
+describe('CharacterInfobox 긴 상자에서 이름란, 사진, 수정/삭제 버튼 고정', () => {
+  it('속성 표와 설명은 스크롤 영역 안에 있다', () => {
     renderBox();
     const scroll = document.querySelector('[class*="infoboxScroll"]');
     expect(scroll).not.toBeNull();
     expect(scroll.querySelector('table')).not.toBeNull();
+    expect(scroll.querySelector('.gt-infobox-desc')).not.toBeNull();
+  });
+
+  it('이름란과 사진은 스크롤 영역 바깥(위쪽)에 있어 스크롤해도 사라지지 않는다', () => {
+    renderBox();
+    const scroll = document.querySelector('[class*="infoboxScroll"]');
+    const title = document.querySelector('.gt-infobox-title');
+    const image = document.querySelector('.gt-infobox-image');
+    expect(title).not.toBeNull();
+    expect(image).not.toBeNull();
+    expect(scroll.contains(title)).toBe(false);
+    expect(scroll.contains(image)).toBe(false);
+    // 위쪽에 놓여 있어야 한다: 이름란, 사진 다음에 스크롤 영역이 온다
+    expect(title.compareDocumentPosition(scroll) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(image.compareDocumentPosition(scroll) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('수정/삭제 버튼은 스크롤 영역 바깥에 있어 내용이 길어도 가려지지 않는다', () => {
@@ -63,6 +78,13 @@ describe('WorkDetail.module.css 인포박스 높이 제한', () => {
     expect(r).toMatch(/max-height:\s*calc\(100vh/);
     expect(r).toMatch(/display:\s*flex/);
     expect(r).toMatch(/flex-direction:\s*column/);
+  });
+
+  it('이름란과 사진은 줄어들지 않고, 사진 높이는 낮은 화면에서 줄어든다', () => {
+    expect(rule('infoboxTitle')).toMatch(/flex-shrink:\s*0/);
+    const img = rule('infoboxImage');
+    expect(img).toMatch(/flex-shrink:\s*0/);
+    expect(img).toMatch(/height:\s*min\(300px,\s*38vh\)/);
   });
 
   it('스크롤 영역은 남는 높이만 쓰고(min-height:0) 세로로 스크롤한다', () => {

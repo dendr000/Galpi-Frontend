@@ -181,8 +181,6 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
 
   return (
     <div className={`${styles.wikiInfobox} gt-infobox`} style={{ borderTop: `4px solid ${themeColor}` }}>
-      {/* 상자가 화면보다 길어지면 이 영역만 스크롤하고, 수정/삭제 버튼 줄은 상자 맨 아래에 고정한다 */}
-      <div className={styles.infoboxScroll}>
       <h3 className={`${styles.infoboxTitle} gt-infobox-title`} style={{ backgroundColor: themeColor }}>
         <div style={{ fontSize: '20px', fontWeight: 900 }}>{char.name}</div>
         {mergedProps["부제목"] && <div style={{ fontSize: '13px', fontWeight: 500, opacity: 0.85, marginTop: '5px' }}>{mergedProps["부제목"]}</div>}
@@ -209,6 +207,8 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
         />
       </div>
 
+      {/* 상자가 화면보다 길어지면 속성 표와 설명만 스크롤한다. 이름란, 사진은 위에, 수정/삭제 버튼 줄은 맨 아래에 고정한다 */}
+      <div className={styles.infoboxScroll}>
       <table className={`${styles.infoboxTable} gt-infobox-table`}>
         <tbody>
           {validKeys.map(k => (
