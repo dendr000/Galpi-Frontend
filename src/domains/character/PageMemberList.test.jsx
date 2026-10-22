@@ -51,3 +51,23 @@ describe('PageMemberList', () => {
     expect(img.getAttribute('src')).toBe(`/img/character/${encodeURIComponent('작품_존 왓슨.png')}`);
   });
 });
+
+describe('PageMemberList 기밀 표시', () => {
+  const secretMembers = [{ id: 4, name: '존 왓슨', 기밀: 'Y' }, { id: 1, name: '셜록 홈즈' }];
+  const classified = (concealed) => ({
+    has: true, mask: concealed, setMask: vi.fn(), reveal: vi.fn(),
+    isClassified: (c) => c.기밀 === 'Y', isConcealed: (c) => concealed && c.기밀 === 'Y',
+  });
+
+  it('기밀 캐릭터 카드에 도장이 붙는다', () => {
+    renderList({ members: secretMembers, classified: classified(false) });
+    expect(document.querySelectorAll('.gt-classified-stamp')).toHaveLength(1);
+  });
+
+  it('가려진 카드는 사진이 흐려지지만 나머지는 그대로다', () => {
+    renderList({ members: secretMembers, classified: classified(true) });
+    const blurred = document.querySelectorAll('[data-concealed]');
+    expect(blurred).toHaveLength(1);
+    expect(blurred[0].getAttribute('alt')).toBe('존 왓슨');
+  });
+});

@@ -7,7 +7,9 @@ import { IconImage, IconPlus } from '../../components/common/icons/DomainIcons';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import AffiliationLinks from './AffiliationLinks';
 import RatingBadges from './RatingBadges';
+import ClassifiedStamp from './ClassifiedStamp';
 import { getRatings } from './ratings';
+import { NO_CLASSIFIED } from './classified';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -35,7 +37,8 @@ const CharacterGrid = ({
   setSort = () => {},
   wikiPages = [],      // 소속 값과 같은 제목의 하위 문서를 링크로 잇는 데 쓴다
   ratingAxes = [],     // 등급 배지 설정(판정 축과 기준표)
-  ratingScale = []
+  ratingScale = [],
+  classified = NO_CLASSIFIED // 기밀 표시와 가리기 상태(useClassifiedMask)
 }) => {
   console.log("[CharacterGrid] 등장인물 갤러리 그리드 컴포넌트 렌더링 개시");
 
@@ -103,6 +106,17 @@ const CharacterGrid = ({
               </select>
             </div>
           )}
+          {classified.has && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 'bold', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                aria-label="기밀 가리기"
+                checked={classified.mask}
+                onChange={(e) => classified.setMask(e.target.checked)}
+              />
+              기밀 가리기
+            </label>
+          )}
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
@@ -136,6 +150,9 @@ const CharacterGrid = ({
               <div className={styles.characterGridContainer}>
                 {charList.map(c => {
                   const vIdx = cardVariants[c.id] || 0;
+                  const isSecret = classified.isClassified(c);
+                  const concealed = classified.isConcealed(c);
+                  const blur = concealed ? { filter: 'blur(9px)', userSelect: 'none' } : null;
                   const suffix = fullVariants[vIdx] ? `_${fullVariants[vIdx]}` : "";
                   const workTitle = sanitizeFilenameTitle(work?.title || "작품");
                   const safeName = sanitizeFilenameTitle(c.name);
@@ -189,7 +206,7 @@ const CharacterGrid = ({
                       <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                         <span style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', flexShrink: 0 }}>{key}</span>
                         <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }} title={val}>
-                          {key === '소속' ? <AffiliationLinks value={val} wikiPages={wikiPages} onOpenPage={(id) => navigate(`/work/${workId}?pageId=${id}`)} /> : val}
+                          {key === '소속' ? <AffiliationLinks value={val} wikiPages={concealed ? [] : wikiPages} onOpenPage={(id) => navigate(`/work/${workId}?pageId=${id}`)} /> : val}
                         </span>
                       </div>
                     );
@@ -207,6 +224,12 @@ const CharacterGrid = ({
                         height: 'max-content'
                       }} 
                       onClick={(e) => {
+                        if (concealed) {
+                          // 가려진 카드는 첫 클릭에서 열람만 한다(선택하지 않음)
+                          e.stopPropagation();
+                          classified.reveal(c.id);
+                          return;
+                        }
                         if (e.shiftKey) {
                           e.preventDefault(); 
                           e.stopPropagation();
@@ -227,11 +250,14 @@ const CharacterGrid = ({
                           style={{ 
                             objectPosition: `${cardImgX}% ${cardImgY}%`,
                             transform: `scale(${cardImgScale})`,
-                            transition: 'transform 0.2s ease, object-position 0.2s ease'
+                            transition: 'transform 0.2s ease, object-position 0.2s ease',
+                            ...blur
                           }} 
+                          data-concealed={concealed ? '' : undefined}
                           onError={handleCardImgError}
                           alt={c.name}
                         />
+                        {isSecret && <ClassifiedStamp style={{ position: 'absolute', top: '8px', right: '8px' }} />}
                       </div>
 
                       {/* 이름 및 이름 옆 라벨 */}
@@ -241,11 +267,11 @@ const CharacterGrid = ({
 
                         {/* 이름 아래 라벨 리스트 */}
                       {renderedLabels.length > 0 && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', ...blur }} data-concealed={concealed ? '' : undefined}>
                           {renderedLabels}
                         </div>
                       )}
-                      <RatingBadges ratings={getRatings(c, ratingAxes, ratingScale)} style={{ marginTop: '8px' }} />
+                      <RatingBadges ratings={getRatings(c, ratingAxes, ratingScale)} style={{ marginTop: '8px', ...blur }} />
                     </div>
                   );
                 })}

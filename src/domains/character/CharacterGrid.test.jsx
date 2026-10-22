@@ -124,3 +124,61 @@ describe('CharacterGrid 등급 배지', () => {
     expect(document.querySelector('.gt-rating-badges')).toBeNull();
   });
 });
+
+describe('CharacterGrid 기밀 표시', () => {
+  const secret = [
+    { id: 1, name: '릴리', _baseCharId: 1, 소속: '북부', 기밀: 'Y' },
+    { id: 2, name: '레온', _baseCharId: 2, 소속: '북부' },
+  ];
+  const makeClassified = (over = {}) => ({
+    has: true, mask: false, setMask: vi.fn(), reveal: vi.fn(),
+    isClassified: (c) => c.기밀 === 'Y',
+    isConcealed: () => false,
+    ...over,
+  });
+  const card = (id) => document.getElementById(`char-card-${id}`);
+
+  it('기밀 캐릭터 카드에만 기밀 도장이 붙는다', () => {
+    renderGrid({ groupedChars: { 일반: secret }, classified: makeClassified() });
+    expect(card(1).textContent).toContain('기밀');
+    expect(card(2).textContent).not.toContain('기밀');
+  });
+
+  it('기밀 캐릭터가 없으면 "기밀 가리기" 선택을 그리지 않는다', () => {
+    renderGrid({ classified: makeClassified({ has: false }) });
+    expect(screen.queryByLabelText('기밀 가리기')).toBeNull();
+  });
+
+  it('기밀 가리기 선택을 누르면 setMask 로 켜고 끈다', () => {
+    const classified = makeClassified();
+    renderGrid({ groupedChars: { 일반: secret }, classified });
+    fireEvent.click(screen.getByLabelText('기밀 가리기'));
+    expect(classified.setMask).toHaveBeenCalledWith(true);
+  });
+
+  it('가려진 카드는 사진과 내용이 흐려지고, 누르면 선택하지 않고 열람만 한다', () => {
+    const classified = makeClassified({ mask: true, isConcealed: (c) => c.기밀 === 'Y' });
+    const { props } = renderGrid({ groupedChars: { 일반: secret }, classified });
+    expect(card(1).querySelector('[data-concealed]')).not.toBeNull();
+    expect(card(2).querySelector('[data-concealed]')).toBeNull();
+    fireEvent.click(card(1));
+    expect(classified.reveal).toHaveBeenCalledWith(1);
+    expect(props.setActiveCharId).not.toHaveBeenCalled();
+  });
+
+  it('가려지지 않은 카드는 누르면 평소처럼 선택한다', () => {
+    const classified = makeClassified();
+    const { props } = renderGrid({ groupedChars: { 일반: secret }, classified });
+    fireEvent.click(card(1));
+    expect(props.setActiveCharId).toHaveBeenCalledWith(1);
+    expect(classified.reveal).not.toHaveBeenCalled();
+  });
+
+  it('가려진 카드의 소속 링크도 눌러지지 않게 흐려진 영역 안에서는 이동하지 않는다', () => {
+    const classified = makeClassified({ mask: true, isConcealed: (c) => c.기밀 === 'Y' });
+    const { props } = renderGrid({ groupedChars: { 일반: secret }, wikiPages: [{ id: 7, title: '북부' }], classified });
+    const link = card(1).querySelector('a');
+    expect(link).toBeNull();
+    expect(props.navigate).not.toHaveBeenCalled();
+  });
+});

@@ -4,8 +4,10 @@
 import React from 'react';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import { getPropValue } from './characterSort';
+import ClassifiedStamp from './ClassifiedStamp';
+import { NO_CLASSIFIED } from './classified';
 
-const PageMemberList = ({ members, workId, work, charExt, navigate, styles, sortKey }) => {
+const PageMemberList = ({ members, workId, work, charExt, navigate, styles, sortKey, classified = NO_CLASSIFIED }) => {
   if (!members || members.length === 0) return null;
   const ext = String(charExt || 'png').replace(/^\./, '');
   const workTitle = sanitizeFilenameTitle(work?.title || '작품');
@@ -21,6 +23,7 @@ const PageMemberList = ({ members, workId, work, charExt, navigate, styles, sort
         {members.map((c) => {
           const src = `/img/character/${encodeURIComponent(`${workTitle}_${sanitizeFilenameTitle(c.name)}.${ext}`)}`;
           const sortValue = sortKey ? getPropValue(c, sortKey) : '';
+          const concealed = classified.isConcealed(c);
           return (
             <div
               key={c.id}
@@ -32,12 +35,15 @@ const PageMemberList = ({ members, workId, work, charExt, navigate, styles, sort
                 <img
                   src={src}
                   alt={c.name}
+                  data-concealed={concealed ? '' : undefined}
+                  style={concealed ? { filter: 'blur(9px)' } : undefined}
                   onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.style.background = 'var(--table-bg-alt)'; }}
                 />
+                {classified.isClassified(c) && <ClassifiedStamp style={{ position: 'absolute', top: '8px', right: '8px' }} />}
               </div>
               <h4 style={{ margin: '10px 0 4px 0', color: 'var(--primary-color)', fontSize: '15px', fontWeight: 900 }}>{c.name}</h4>
               {sortKey && sortValue ? (
-                <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{`${sortKey} ${sortValue}`}</div>
+                <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', ...(concealed ? { filter: 'blur(6px)', userSelect: 'none' } : null) }}>{`${sortKey} ${sortValue}`}</div>
               ) : null}
             </div>
           );

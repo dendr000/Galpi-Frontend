@@ -10,8 +10,10 @@ import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import AffiliationLinks from './AffiliationLinks';
 import RatingBadges from './RatingBadges';
 import { getRatings } from './ratings';
+import ClassifiedStamp from './ClassifiedStamp';
+import { NO_CLASSIFIED } from './classified';
 
-const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps, wikiPages = [], onOpenPage, ratingAxes = [], ratingScale = [] }) => {
+const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps, wikiPages = [], onOpenPage, ratingAxes = [], ratingScale = [], classified = NO_CLASSIFIED }) => {
   const navigate = useNavigate();
   const [variantIdx, setVariantIdx] = useState(0);
   const [existingVariants, setExistingVariants] = useState(null); // null = 아직 확인 전
@@ -182,11 +184,16 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
   
   const validKeys = keysToRender.filter(k => !exclude.includes(k) && !k.startsWith('_') && mergedProps[k] && mergedProps[k] !== "불명" && mergedProps[k] !== "미상" && mergedProps[k] !== "undefined");
 
+  const isSecret = classified.isClassified(mergedProps);
+  const concealed = classified.isConcealed(char);
+  const blurStyle = concealed ? { filter: 'blur(9px)', userSelect: 'none', pointerEvents: 'none' } : undefined;
+
   return (
     <div className={`${styles.wikiInfobox} gt-infobox`} style={{ borderTop: `4px solid ${themeColor}` }}>
       <h3 className={`${styles.infoboxTitle} gt-infobox-title`} style={{ backgroundColor: themeColor }}>
         <div style={{ fontSize: '20px', fontWeight: 900 }}>{char.name}</div>
         {mergedProps["부제목"] && <div style={{ fontSize: '13px', fontWeight: 500, opacity: 0.85, marginTop: '5px' }}>{mergedProps["부제목"]}</div>}
+        {isSecret && <ClassifiedStamp style={{ marginTop: '6px' }} />}
       </h3>
       
       <div className={`${styles.infoboxImage} gt-infobox-image`} style={{ overflow: 'hidden' }}>
@@ -199,8 +206,10 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
             cursor: 'default', // 마우스 커서를 뾰족한 화살표(기본 상태)로 강제 고정
             width: '100%',
             height: '100%',
-            objectFit: 'cover'
+            objectFit: 'cover',
+            ...blurStyle
           }} 
+          data-concealed={concealed ? '' : undefined}
           onClick={(e) => {
             console.log(`[CharacterInfobox] 이미지 클릭 이벤트 감지. 대상: ${char.name}`);
             handleImageClick(e);
@@ -208,10 +217,20 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
           onError={handleImageError}
           alt={char.name}
         />
+        {concealed && (
+          <button
+            type="button"
+            onClick={() => classified.reveal(char.id)}
+            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', padding: '8px 18px', borderRadius: '6px', border: '2px solid #c92a2a', background: 'rgba(255,255,255,0.95)', color: '#c92a2a', fontWeight: 900, cursor: 'pointer' }}
+          >
+            기밀 열람
+          </button>
+        )}
       </div>
 
       {/* 상자가 화면보다 길어지면 속성 표와 설명만 스크롤한다. 이름란, 사진은 위에, 수정/삭제 버튼 줄은 맨 아래에 고정한다 */}
       <div className={styles.infoboxScroll}>
+      <div data-concealed={concealed ? '' : undefined} style={blurStyle}>
       <RatingBadges ratings={getRatings(mergedProps, ratingAxes, ratingScale)} style={{ padding: '10px 10px 0 10px' }} />
       <table className={`${styles.infoboxTable} gt-infobox-table`}>
         <tbody>
@@ -220,7 +239,7 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
               <th>{k}</th>
               <td style={{ fontWeight: '600' }}>
                 {k === '소속' && onOpenPage
-                  ? <AffiliationLinks value={mergedProps[k]} wikiPages={wikiPages} onOpenPage={onOpenPage} />
+                  ? <AffiliationLinks value={mergedProps[k]} wikiPages={concealed ? [] : wikiPages} onOpenPage={onOpenPage} />
                   : String(mergedProps[k]).split(',').map(s => s.trim().replace(/^\*/, '')).join(', ')}
               </td>
             </tr>
@@ -229,6 +248,7 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
       </table>
       <div className="gt-infobox-desc" style={{ padding: '15px', marginTop: '15px', borderTop: '1px dashed var(--border-color)', fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)', background: 'var(--surface-color)', borderRadius: '0 0 8px 8px', wordBreak: 'keep-all' }}>
         {previewText ? <div>{previewText}</div> : <div style={{ textAlign: 'center', opacity: 0.6, fontSize: '12px', padding: '10px 0' }}>등록된 상세 설정이 없습니다.</div>}
+      </div>
       </div>
       </div>
       <div id="btn-container" style={{ display: 'flex', flexShrink: 0, gap: '8px', padding: '15px', borderTop: '1px solid var(--border-color)' }}>

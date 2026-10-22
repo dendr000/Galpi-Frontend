@@ -157,3 +157,68 @@ describe('CharacterInfobox 등급 배지', () => {
     expect(document.querySelector('.gt-rating-badges')).toBeNull();
   });
 });
+
+describe('CharacterInfobox 기밀 표시', () => {
+  const secret = { ...char, 기밀: 'Y' };
+  const make = (over = {}) => ({
+    has: true, mask: false, setMask: vi.fn(), reveal: vi.fn(),
+    isClassified: (c) => c.기밀 === 'Y', isConcealed: () => false, ...over,
+  });
+  const renderSecret = (classified, who = secret) =>
+    render(
+      <MemoryRouter>
+        <CharacterInfobox
+          char={who} workId={91} workTitle="작품" charExt="png" imgVariants={[]}
+          setCharacters={() => {}} setActiveCharId={() => {}} characters={[who]}
+          cardVariants={{}} setCardVariants={() => {}} formSwaps={{}} setFormSwaps={() => {}} classified={classified}
+        />
+      </MemoryRouter>
+    );
+
+  it('기밀 캐릭터면 기밀 도장이 보이고, 가려지지 않았으면 흐려지지 않는다', () => {
+    renderSecret(make());
+    expect(document.querySelector('.gt-classified-stamp')).not.toBeNull();
+    expect(document.querySelector('[data-concealed]')).toBeNull();
+    expect(screen.queryByRole('button', { name: '기밀 열람' })).toBeNull();
+  });
+
+  it('기밀이 아닌 캐릭터에는 도장이 없다', () => {
+    renderSecret(make(), char);
+    expect(document.querySelector('.gt-classified-stamp')).toBeNull();
+  });
+
+  it('가려진 상태면 사진과 속성 표가 흐려지고 "기밀 열람" 버튼이 나온다', () => {
+    renderSecret(make({ mask: true, isConcealed: () => true }));
+    expect(document.querySelectorAll('[data-concealed]').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByRole('button', { name: '기밀 열람' })).toBeTruthy();
+  });
+
+  it('"기밀 열람"을 누르면 그 캐릭터를 열람 처리한다', () => {
+    const classified = make({ mask: true, isConcealed: () => true });
+    renderSecret(classified);
+    fireEvent.click(screen.getByRole('button', { name: '기밀 열람' }));
+    expect(classified.reveal).toHaveBeenCalledWith(7);
+  });
+
+  it('가려진 상태에서도 수정, 삭제 버튼은 그대로 쓸 수 있다', () => {
+    renderSecret(make({ mask: true, isConcealed: () => true }));
+    expect(screen.getByRole('button', { name: '수정' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '삭제' })).toBeTruthy();
+  });
+
+  it('가려진 상태에서는 소속 링크를 그리지 않는다', () => {
+    const who = { ...secret, 소속: '북부', _propOrder: ['소속'] };
+    render(
+      <MemoryRouter>
+        <CharacterInfobox
+          char={who} workId={91} workTitle="작품" charExt="png" imgVariants={[]}
+          setCharacters={() => {}} setActiveCharId={() => {}} characters={[who]}
+          cardVariants={{}} setCardVariants={() => {}} formSwaps={{}} setFormSwaps={() => {}}
+          wikiPages={[{ id: 7, title: '북부' }]} onOpenPage={() => {}}
+          classified={make({ mask: true, isConcealed: () => true })}
+        />
+      </MemoryRouter>
+    );
+    expect(screen.queryByRole('link')).toBeNull();
+  });
+});

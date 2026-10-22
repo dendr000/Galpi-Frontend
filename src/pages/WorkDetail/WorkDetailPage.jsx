@@ -54,6 +54,7 @@ import { useSelectCharFromUrl } from '../../domains/work/useSelectCharFromUrl';
 import { getAffiliationMembers } from '../../domains/work/organization';
 import { useCharacterSort } from '../../domains/character/useCharacterSort';
 import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
+import { useClassifiedMask } from '../../domains/character/useClassifiedMask';
 import PageMemberList from '../../domains/character/PageMemberList';
 import RatingScaleTable from '../../domains/character/RatingScaleTable';
 import { parseRatingAxes, parseRatingScale } from '../../domains/character/ratings';
@@ -75,6 +76,9 @@ const WorkDetailPage = () => {
 
   // 캐릭터 그리드 정렬 선택(속성 이름, 방향): 작품별로 저장되고, 비어 있으면 수동 순서
   const { sortKey, sortDir, setSort } = useCharacterSort(data.workId);
+
+  // 기밀 표시와 "기밀 가리기" 상태(작품별 저장). 그리드, 정보 상자, 소속 인물 목록이 같은 상태를 쓴다
+  const classified = useClassifiedMask(data.workId, data.characters);
 
   // 주소의 ?charId= (소속 인물 목록에서 넘어올 때)로 열리면 그 캐릭터를 선택하고 카드로 스크롤
   useSelectCharFromUrl({
@@ -275,6 +279,7 @@ const WorkDetailPage = () => {
                 <PageMemberList
                   members={sortCharsByProperty(getAffiliationMembers(data.characters, activePage.title), sortKey, sortDir)}
                   workId={data.workId} work={data.work} charExt={charExt} navigate={data.navigate} styles={styles} sortKey={sortKey}
+                  classified={classified}
                 />
               </section>
             ) : (
@@ -333,6 +338,7 @@ const WorkDetailPage = () => {
                 wikiPages={data.wikiPages}
                 ratingAxes={ratingAxes}
                 ratingScale={ratingScale}
+                classified={classified}
               />
             )}
 
@@ -350,7 +356,7 @@ const WorkDetailPage = () => {
           
           {/* 스마트 정보 박스 배치 구역 */}
           <aside className={styles.wikiAside}>
-            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} ratingAxes={ratingAxes} ratingScale={ratingScale} />
+            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} ratingAxes={ratingAxes} ratingScale={ratingScale} classified={classified} />
           </aside>
         </div>
       </div>
