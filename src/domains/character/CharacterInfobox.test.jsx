@@ -131,3 +131,29 @@ describe('WorkDetail.module.css 인포박스 높이 제한', () => {
     expect(r).toMatch(/overflow-y:\s*auto/);
   });
 });
+
+describe('CharacterInfobox 등급 배지', () => {
+  const rated = { ...char, 위험도: '3' };
+  const renderRated = (extra) =>
+    render(
+      <MemoryRouter>
+        <CharacterInfobox
+          char={rated} workId={91} workTitle="작품" charExt="png" imgVariants={[]}
+          setCharacters={() => {}} setActiveCharId={() => {}} characters={[rated]}
+          cardVariants={{}} setCardVariants={() => {}} formSwaps={{}} setFormSwaps={() => {}} {...extra}
+        />
+      </MemoryRouter>
+    );
+
+  it('등급 설정이 있고 값이 있으면 정보 상자에 배지를 보여 준다(스크롤 영역 안)', () => {
+    renderRated({ ratingAxes: [{ key: '위험도', abbr: 'R' }], ratingScale: [{ level: 3, name: '중대', desc: '' }] });
+    const chip = screen.getByText('R 3');
+    expect(chip.closest('[class*="infoboxScroll"]')).not.toBeNull();
+    expect(chip.closest('[title]').getAttribute('title')).toBe('위험도 3 중대');
+  });
+
+  it('등급 설정이 없으면 배지를 그리지 않는다', () => {
+    renderRated();
+    expect(document.querySelector('.gt-rating-badges')).toBeNull();
+  });
+});

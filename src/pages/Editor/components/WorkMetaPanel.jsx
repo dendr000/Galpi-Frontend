@@ -188,6 +188,28 @@ const WorkMetaPanel = ({ workMeta, setWorkMeta }) => {
           />
         </div>
 
+        {/* 등급 배지 설정: 판정 축(속성이름:약칭)과 등급 기준표(등급:명칭:기준) */}
+        <div className={styles.propRow} style={{ gridColumn: '1 / -1', alignItems: 'flex-start' }}>
+          <label>등급 판정 축<br/><span style={{fontSize:'10px', color:'var(--primary-color)'}}>속성이름:약칭 (한 줄에 하나)</span></label>
+          <textarea
+            rows="3"
+            aria-label="등급 판정 축"
+            value={workMeta.ratingAxesStr || ''}
+            onChange={e => setWorkMeta({...workMeta, ratingAxesStr: e.target.value})}
+            placeholder={"위험도:R\n유용성:U\n희귀도:S"}
+          />
+        </div>
+        <div className={styles.propRow} style={{ gridColumn: '1 / -1', alignItems: 'flex-start' }}>
+          <label>등급 기준표<br/><span style={{fontSize:'10px', color:'var(--primary-color)'}}>등급:명칭:기준 (한 줄에 하나)</span></label>
+          <textarea
+            rows="4"
+            aria-label="등급 기준표"
+            value={workMeta.ratingScaleStr || ''}
+            onChange={e => setWorkMeta({...workMeta, ratingScaleStr: e.target.value})}
+            placeholder={"0:무해:오컬트성 확인 불가\n1:미미:관찰자 1인 이내\n2:경미:소규모 집단 영향"}
+          />
+        </div>
+
         {/* 이미지 변환(바리에이션) 동적 리스트 영역 */}
         <div className={styles.propRow} style={{ gridColumn: '1 / -1', alignItems: 'flex-start', paddingTop: '15px', borderTop: '1px dashed var(--border-color)' }}>
           <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>

@@ -8,8 +8,10 @@ import api from '../../api/axiosCore';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import AffiliationLinks from './AffiliationLinks';
+import RatingBadges from './RatingBadges';
+import { getRatings } from './ratings';
 
-const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps, wikiPages = [], onOpenPage }) => {
+const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps, wikiPages = [], onOpenPage, ratingAxes = [], ratingScale = [] }) => {
   const navigate = useNavigate();
   const [variantIdx, setVariantIdx] = useState(0);
   const [existingVariants, setExistingVariants] = useState(null); // null = 아직 확인 전
@@ -210,6 +212,7 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
 
       {/* 상자가 화면보다 길어지면 속성 표와 설명만 스크롤한다. 이름란, 사진은 위에, 수정/삭제 버튼 줄은 맨 아래에 고정한다 */}
       <div className={styles.infoboxScroll}>
+      <RatingBadges ratings={getRatings(mergedProps, ratingAxes, ratingScale)} style={{ padding: '10px 10px 0 10px' }} />
       <table className={`${styles.infoboxTable} gt-infobox-table`}>
         <tbody>
           {validKeys.map(k => (

@@ -55,6 +55,8 @@ import { getAffiliationMembers } from '../../domains/work/organization';
 import { useCharacterSort } from '../../domains/character/useCharacterSort';
 import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
 import PageMemberList from '../../domains/character/PageMemberList';
+import RatingScaleTable from '../../domains/character/RatingScaleTable';
+import { parseRatingAxes, parseRatingScale } from '../../domains/character/ratings';
 
 const WorkDetailPage = () => {
   console.log("[WorkDetailPage] 조립형 레이아웃 뷰 가동 개시");
@@ -126,7 +128,10 @@ const WorkDetailPage = () => {
   const parsedDesc = extractMeta(data.work.description || "");
   const coverExt = parsedDesc.meta.coverExt;
   const charExt = parsedDesc.meta.charExt || "png";
-  const imgVariants = parsedDesc.meta.imgVariants || []; 
+  const imgVariants = parsedDesc.meta.imgVariants || [];
+  // 등급 배지 설정(작품 편집기의 "등급 판정 축", "등급 기준표")
+  const ratingAxes = parseRatingAxes(parsedDesc.meta.ratingAxes);
+  const ratingScale = parseRatingScale(parsedDesc.meta.ratingScale);
   const fullVariants = ["", ...imgVariants.filter(v => v.trim() !== "")]; 
   const coverUrl = `/img/cover/${encodeURIComponent(sanitizeFilenameTitle(data.work.title) + "." + (coverExt || 'png'))}`;
 
@@ -291,6 +296,8 @@ const WorkDetailPage = () => {
                   </div>
                   <MarkdownRenderer rawText={parsedDesc.clean} startH1={3} onNodeClick={handleBacklink} />
                 </section>
+
+                <RatingScaleTable axes={ratingAxes} scale={ratingScale} styles={styles} />
               </>
             )}
 
@@ -324,6 +331,8 @@ const WorkDetailPage = () => {
                 sortDir={sortDir}
                 setSort={setSort}
                 wikiPages={data.wikiPages}
+                ratingAxes={ratingAxes}
+                ratingScale={ratingScale}
               />
             )}
 
@@ -341,7 +350,7 @@ const WorkDetailPage = () => {
           
           {/* 스마트 정보 박스 배치 구역 */}
           <aside className={styles.wikiAside}>
-            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} />
+            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} ratingAxes={ratingAxes} ratingScale={ratingScale} />
           </aside>
         </div>
       </div>

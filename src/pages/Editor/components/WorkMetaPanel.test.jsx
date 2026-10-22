@@ -114,3 +114,24 @@ describe('WorkMetaPanel - 제작자 Tab으로 확장자 자동 적용', () => {
     expect(setWorkMeta).not.toHaveBeenCalled();
   });
 });
+
+describe('WorkMetaPanel 등급 설정 칸', () => {
+  it('판정 축과 기준표 입력칸이 있고 값이 workMeta 에서 채워진다', () => {
+    renderPanel(baseMeta({ ratingAxesStr: '위험도:R', ratingScaleStr: '0:무해' }));
+    expect(document.querySelector('textarea[aria-label="등급 판정 축"]').value).toBe('위험도:R');
+    expect(document.querySelector('textarea[aria-label="등급 기준표"]').value).toBe('0:무해');
+  });
+
+  it('입력하면 setWorkMeta 로 각 필드에 반영한다', () => {
+    const { setWorkMeta } = renderPanel(baseMeta());
+    fireEvent.change(document.querySelector('textarea[aria-label="등급 판정 축"]'), { target: { value: '유용성:U' } });
+    fireEvent.change(document.querySelector('textarea[aria-label="등급 기준표"]'), { target: { value: '1:미미' } });
+    expect(setWorkMeta).toHaveBeenNthCalledWith(1, expect.objectContaining({ ratingAxesStr: '유용성:U' }));
+    expect(setWorkMeta).toHaveBeenNthCalledWith(2, expect.objectContaining({ ratingScaleStr: '1:미미' }));
+  });
+
+  it('workMeta 에 등급 필드가 없는 예전 상태여도 오류 없이 빈 칸으로 그린다', () => {
+    renderPanel(baseMeta());
+    expect(document.querySelector('textarea[aria-label="등급 판정 축"]').value).toBe('');
+  });
+});

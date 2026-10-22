@@ -71,6 +71,9 @@ src/
  │   │   ├── CharacterQuickNav.jsx              # 상세 정보 하단에 배치되어 해당 캐릭터 카드로 초점을 강제 이동시키는 바
  │   │   ├── characterSort.js                   # 속성값(서열, 나이 등)으로 캐릭터를 정렬하는 순수 로직
  │   │   ├── PageMemberList.jsx                 # 하위 문서 아래에 같은 소속의 인물을 카드로 모아 보여 주는 목록
+ │   │   ├── RatingBadges.jsx                   # 등급을 "R 3" 같은 작은 칩으로 보여 주는 조각
+ │   │   ├── RatingScaleTable.jsx               # 작품 페이지의 등급 기준표(판정 축, 등급 기준)
+ │   │   ├── ratings.js                         # 등급 설정(판정 축, 기준표) 해석과 캐릭터 배지 계산 순수 로직
  │   │   ├── useCharacterSort.js                # 작품별 정렬 선택(속성, 방향)을 저장하는 커스텀 훅
  │   │   └── useCharacterDrag.js                # 마우스 드래그 이벤트를 추적하여 캐릭터 카드 간 영구 정렬 순서를 바꾸는 훅
  │   ├── memo/

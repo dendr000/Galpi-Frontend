@@ -11,7 +11,7 @@ export const useEditorState = () => {
 
   const [workMeta, setWorkMeta] = useState({
     creator: '', genre: '', status: '진행 전', alias: '', 
-    coverExt: '', charExt: 'png', groupOrderStr: '', 
+    coverExt: '', charExt: 'png', groupOrderStr: '', ratingAxesStr: '', ratingScaleStr: '',
     imgVariants: [''], originalMeta: {}
   });
 

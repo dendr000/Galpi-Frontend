@@ -108,3 +108,19 @@ describe('CharacterGrid 소속 링크', () => {
     expect(labelRowFor('북부')).toBeTruthy();
   });
 });
+
+describe('CharacterGrid 등급 배지', () => {
+  const axes = [{ key: '서열', abbr: 'R' }];
+  const scale = [{ level: 3, name: '중대', desc: '도시 단위' }];
+
+  it('등급 설정이 있으면 값이 있는 카드에 배지를 보여 준다', () => {
+    renderGrid({ ratingAxes: axes, ratingScale: scale });
+    expect(screen.getByText('R 3').closest('[title]').getAttribute('title')).toBe('서열 3 중대: 도시 단위');
+    expect(screen.getByText('R 1')).toBeTruthy();
+  });
+
+  it('등급 설정이 없으면 배지를 그리지 않는다', () => {
+    renderGrid();
+    expect(document.querySelector('.gt-rating-badges')).toBeNull();
+  });
+});

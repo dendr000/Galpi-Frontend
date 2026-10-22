@@ -6,6 +6,8 @@ import React from 'react';
 import { IconImage, IconPlus } from '../../components/common/icons/DomainIcons';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import AffiliationLinks from './AffiliationLinks';
+import RatingBadges from './RatingBadges';
+import { getRatings } from './ratings';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -31,7 +33,9 @@ const CharacterGrid = ({
   sortKey = '',        // 선택된 정렬 속성(빈 값이면 수동 순서)
   sortDir = 'asc',
   setSort = () => {},
-  wikiPages = []       // 소속 값과 같은 제목의 하위 문서를 링크로 잇는 데 쓴다
+  wikiPages = [],      // 소속 값과 같은 제목의 하위 문서를 링크로 잇는 데 쓴다
+  ratingAxes = [],     // 등급 배지 설정(판정 축과 기준표)
+  ratingScale = []
 }) => {
   console.log("[CharacterGrid] 등장인물 갤러리 그리드 컴포넌트 렌더링 개시");
 
@@ -241,6 +245,7 @@ const CharacterGrid = ({
                           {renderedLabels}
                         </div>
                       )}
+                      <RatingBadges ratings={getRatings(c, ratingAxes, ratingScale)} style={{ marginTop: '8px' }} />
                     </div>
                   );
                 })}
