@@ -1,0 +1,73 @@
+// Copyright (c) dendr000. MIT License.
+// @vitest-environment jsdom
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import CharacterInfobox from './CharacterInfobox';
+
+const char = { id: 7, name: '세라', age: '22세', gender: '여성', species: '인간' };
+
+const renderBox = () =>
+  render(
+    <MemoryRouter>
+      <CharacterInfobox
+        char={char}
+        workId={1}
+        workTitle="작품"
+        charExt="png"
+        imgVariants={[]}
+        setCharacters={() => {}}
+        setActiveCharId={() => {}}
+        characters={[char]}
+        cardVariants={{}}
+        setCardVariants={() => {}}
+        formSwaps={{}}
+        setFormSwaps={() => {}}
+      />
+    </MemoryRouter>
+  );
+
+afterEach(cleanup);
+
+// 인포박스는 화면에 붙어 따라다니는(sticky) 상자다. 속성이 많아 상자가 화면보다 길어지면 아래쪽의
+// 수정/삭제 버튼이 화면 밖으로 밀려 눌러 볼 수 없었다. 긴 내용은 안쪽 영역이 스크롤하고
+// 버튼 줄은 그 바깥(상자 맨 아래)에 고정돼야 한다.
+describe('CharacterInfobox 긴 상자에서 수정/삭제 버튼 접근', () => {
+  it('속성 표는 스크롤 영역 안에 있다', () => {
+    renderBox();
+    const scroll = document.querySelector('[class*="infoboxScroll"]');
+    expect(scroll).not.toBeNull();
+    expect(scroll.querySelector('table')).not.toBeNull();
+  });
+
+  it('수정/삭제 버튼은 스크롤 영역 바깥에 있어 내용이 길어도 가려지지 않는다', () => {
+    renderBox();
+    const scroll = document.querySelector('[class*="infoboxScroll"]');
+    expect(scroll.contains(screen.getByRole('button', { name: '수정' }))).toBe(false);
+    expect(scroll.contains(screen.getByRole('button', { name: '삭제' }))).toBe(false);
+  });
+});
+
+describe('WorkDetail.module.css 인포박스 높이 제한', () => {
+  const css = fs.readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), '../../pages/WorkDetail/WorkDetail.module.css'),
+    'utf8'
+  );
+  const rule = (name) => (css.match(new RegExp(`\\.${name}\\s*\\{([^}]*)\\}`)) || [])[1] || '';
+
+  it('상자는 화면 높이를 넘지 않도록 max-height 를 갖고 세로 flex 이다', () => {
+    const r = rule('wikiInfobox');
+    expect(r).toMatch(/max-height:\s*calc\(100vh/);
+    expect(r).toMatch(/display:\s*flex/);
+    expect(r).toMatch(/flex-direction:\s*column/);
+  });
+
+  it('스크롤 영역은 남는 높이만 쓰고(min-height:0) 세로로 스크롤한다', () => {
+    const r = rule('infoboxScroll');
+    expect(r).toMatch(/min-height:\s*0/);
+    expect(r).toMatch(/overflow-y:\s*auto/);
+  });
+});

@@ -181,6 +181,8 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
 
   return (
     <div className={`${styles.wikiInfobox} gt-infobox`} style={{ borderTop: `4px solid ${themeColor}` }}>
+      {/* 상자가 화면보다 길어지면 이 영역만 스크롤하고, 수정/삭제 버튼 줄은 상자 맨 아래에 고정한다 */}
+      <div className={styles.infoboxScroll}>
       <h3 className={`${styles.infoboxTitle} gt-infobox-title`} style={{ backgroundColor: themeColor }}>
         <div style={{ fontSize: '20px', fontWeight: 900 }}>{char.name}</div>
         {mergedProps["부제목"] && <div style={{ fontSize: '13px', fontWeight: 500, opacity: 0.85, marginTop: '5px' }}>{mergedProps["부제목"]}</div>}
@@ -220,7 +222,8 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
       <div className="gt-infobox-desc" style={{ padding: '15px', marginTop: '15px', borderTop: '1px dashed var(--border-color)', fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)', background: 'var(--surface-color)', borderRadius: '0 0 8px 8px', wordBreak: 'keep-all' }}>
         {previewText ? <div>{previewText}</div> : <div style={{ textAlign: 'center', opacity: 0.6, fontSize: '12px', padding: '10px 0' }}>등록된 상세 설정이 없습니다.</div>}
       </div>
-      <div id="btn-container" style={{ display: 'flex', gap: '8px', padding: '15px', borderTop: '1px solid var(--border-color)' }}>
+      </div>
+      <div id="btn-container" style={{ display: 'flex', flexShrink: 0, gap: '8px', padding: '15px', borderTop: '1px solid var(--border-color)' }}>
         <button className={`${styles.actionBtnEdit} gt-btn-edit`} style={{ borderColor: themeColor, color: themeColor }} onClick={() => navigate(`/edit?type=char&action=edit&workId=${workId}&id=${char.id}`)}>수정</button>
         <button className={`${styles.actionBtnDel} gt-btn-del`} onClick={handleDelete}>삭제</button>
       </div>
