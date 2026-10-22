@@ -56,6 +56,17 @@ src/
  │   │   ├── FloatingToc.jsx                    # 실시간 DOM 헤딩을 추적하여 부드러운 스크롤 이동을 지원하는 플로팅 목차
  │   │   ├── InlineCategoryForm.jsx             # 장르 태그 배지를 실시간 비동기로 즉시 추가하는 인라인 전용 입력 폼
  │   │   ├── organization.js                    # 소속 값과 같은 제목의 하위 문서를 잇고 소속 인물을 모으는 순수 로직
+ │   │   ├── export/                            # 공개용 HTML 내보내기(작품 페이지를 읽기 전용 단일 파일로)
+ │   │   │   ├── ExportDialog.jsx               # 기밀 처리, 이미지, 문서 포함 옵션을 고르는 창
+ │   │   │   ├── downloadFile.js                # 글자 내용을 파일로 내려받게 하는 도우미
+ │   │   │   ├── exportHtml.js                  # 준비된 데이터로 단일 HTML 문서를 조립하는 순수 함수(모든 글자 이스케이프)
+ │   │   │   ├── exportStyles.js                # 내보낸 파일에 넣는 스타일(라이트/다크 자동, 매크로 위젯 CSS 포함)
+ │   │   │   ├── exportWork.js                  # 데이터 준비와 HTML 조립을 묶고 파일 이름, 날짜를 정한다
+ │   │   │   ├── imageToDataUri.js              # 이미지를 줄여 webp 데이터 주소로 바꾸는 브라우저 전용 함수
+ │   │   │   ├── inlineImages.js                # 본문 속 /img/ 이미지를 데이터 주소로 바꾸거나 제거
+ │   │   │   ├── prepareExportModel.js          # 보이는 캐릭터, 기밀 처리, 이미지, 본문 변환으로 내보낼 데이터를 준비
+ │   │   │   ├── sanitizeExportHtml.js          # 스크립트, 이벤트 속성, 위험한 주소를 제거해 본문 HTML 을 안전하게
+ │   │   │   └── useWorkExport.js               # 화면의 현재 상태로 내보내고 내려받는 함수를 돌려주는 훅
  │   │   ├── SubPageList.jsx                    # 현재 경로에 배속된 자식 문서들을 노션 스타일 그리드로 표출하는 모듈
  │   │   ├── WorkCategoryBar.jsx                # 지정된 분류 태그들을 호버 링크로 정렬 및 삭제 관리하는 도메인 바
  │   │   ├── WorkCover.jsx                      # 작품 상세 상단 타이틀 이미지를 휠 확대 및 드래그 위치 제어하는 배너

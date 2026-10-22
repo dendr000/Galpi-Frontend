@@ -1,9 +1,5 @@
-// 파일 위치: src/utils/markdown/styleInjector.js
-export const injectMacroStyles = () => {
-    if (typeof document === 'undefined' || document.getElementById('galpi-macro-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'galpi-macro-styles';
-    style.innerHTML = `
+// 매크로(각주, 백링크, 접기, 인용, 게이지, 대화) 전용 CSS. 화면에는 injectMacroStyles 가 주입하고, 공개용 내보내기는 이 문자열을 그대로 넣는다.
+export const MACRO_STYLE_CSS = `
         .wiki-footnote { position: relative; display: inline-block; transition: background-color 0.2s; cursor: help; color: var(--primary-color); font-weight: bold; }
         .wiki-footnote:hover { background-color: var(--table-bg-alt); border-radius: 4px; }
         .wiki-backlink { color: var(--primary-color); font-weight: 900; text-decoration: none; border-bottom: 2px solid rgba(59,91,219,0.3); padding: 0 3px; transition: 0.2s; cursor: pointer; border-radius: 2px; }
@@ -31,5 +27,11 @@ export const injectMacroStyles = () => {
         .galpi-ext-msg.right .galpi-ext-msg-bubble { background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); border-top-left-radius: 14px; border-top-right-radius: 4px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     `;
+
+export const injectMacroStyles = () => {
+    if (typeof document === 'undefined' || document.getElementById('galpi-macro-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'galpi-macro-styles';
+    style.innerHTML = MACRO_STYLE_CSS;
     document.head.appendChild(style);
 };

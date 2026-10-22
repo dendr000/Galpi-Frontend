@@ -57,6 +57,8 @@ import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray } from '
 import { useClassifiedMask } from '../../domains/character/useClassifiedMask';
 import { collectFilterGroups, filterChars, toggleFilterValue } from '../../domains/character/characterFilter';
 import PageMemberList from '../../domains/character/PageMemberList';
+import ExportDialog from '../../domains/work/export/ExportDialog';
+import { useWorkExport } from '../../domains/work/export/useWorkExport';
 import RatingScaleTable from '../../domains/character/RatingScaleTable';
 import { parseRatingAxes, parseRatingScale } from '../../domains/character/ratings';
 
@@ -82,6 +84,13 @@ const WorkDetailPage = () => {
   const [filterSelection, setFilterSelection] = useState({});
   const handleFilterToggle = (key, value) => setFilterSelection(prev => toggleFilterValue(prev, key, value));
   const handleFilterClear = () => setFilterSelection({});
+
+  // 공개용 HTML 내보내기: 옵션 창 열림 상태와, 지금 화면의 상태로 파일을 만들어 내려받는 함수
+  const [exportOpen, setExportOpen] = useState(false);
+  const runExport = useWorkExport({
+    work: data.work, characters: data.characters, wikiPages: data.wikiPages, formSwaps: data.formSwaps,
+    groupCriteria: data.groupCriteria, sortKey, sortDir,
+  });
 
   // 기밀 표시와 "기밀 가리기" 상태(작품별 저장). 그리드, 정보 상자, 소속 인물 목록이 같은 상태를 쓴다
   const classified = useClassifiedMask(data.workId, data.characters);
@@ -199,6 +208,14 @@ const WorkDetailPage = () => {
           </div>
         )}
 
+        {!activePage && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '10px 0 0 0' }}>
+            <button type="button" className="wiki-btn gt-btn-edit" style={{ padding: '4px 12px', fontSize: '13px' }} onClick={() => setExportOpen(true)}>
+              공개용 HTML 내보내기
+            </button>
+          </div>
+        )}
+
         {/* 5단계: 메인 그리드 및 사이드 이중 레이아웃 구역 */}
         <div className={styles.wikiContentWrapper}>
           <main className={styles.wikiMain}>
@@ -311,6 +328,8 @@ const WorkDetailPage = () => {
           </aside>
         </div>
       </div>
+
+      <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} onExport={runExport} hasClassified={classified.has} />
 
       {/* 실시간 썸네일 Y축 드래그 조정 일괄 레이어 모달 */}
       <BatchImageModal isOpen={data.isBatchImgModalOpen} onClose={() => data.setIsBatchImgModalOpen(false)} characters={data.characters} work={data.work} charExt={charExt} batchImgY={data.batchImgY} setBatchImgY={data.setBatchImgY} batchImgX={data.batchImgX} setBatchImgX={data.setBatchImgX} setCharacters={data.setCharacters} />
