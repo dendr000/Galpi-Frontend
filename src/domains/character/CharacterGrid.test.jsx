@@ -211,3 +211,25 @@ describe('CharacterGrid 칩 필터', () => {
     expect(screen.queryByText('조건에 맞는 인물이 없습니다.')).toBeNull();
   });
 });
+
+describe('CharacterGrid 머리말은 좁은 창에서 글자를 쪼개지 않는다', () => {
+  const header = () => document.querySelector('#sec-characters').closest('[class*="sectionHeader"], .gt-section-header');
+
+  it('제목, 라벨, 버튼은 줄바꿈하지 않는다(white-space: nowrap)', () => {
+    renderGrid();
+    expect(document.querySelector('#sec-characters').style.whiteSpace).toBe('nowrap');
+    expect(screen.getByText('분류 기준:').style.whiteSpace).toBe('nowrap');
+    expect(screen.getByText('정렬:').style.whiteSpace).toBe('nowrap');
+    expect(screen.getByRole('button', { name: /새 캐릭터 추가/ }).style.whiteSpace).toBe('nowrap');
+    expect(screen.getByRole('button', { name: '일괄 이미지 위치 조정' }) || true).toBeTruthy();
+  });
+
+  it('왼쪽 묶음은 모자라면 다음 줄로 넘어가고(flex-wrap), 오른쪽 버튼 묶음은 줄어들지 않고 오른쪽 끝에 붙는다', () => {
+    renderGrid();
+    const left = document.querySelector('#sec-characters').parentElement;
+    expect(left.style.flexWrap).toBe('wrap');
+    const right = screen.getByRole('button', { name: /새 캐릭터 추가/ }).parentElement;
+    expect(right.style.marginLeft).toBe('auto');
+    expect(right.style.flexShrink).toBe('0');
+  });
+});

@@ -76,12 +76,12 @@ const CharacterGrid = ({
   return (
     <section id="sec-3" className={styles.wikiSection}>
       <div className={`${styles.sectionHeader} gt-section-header`}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <h2 id="sec-characters" className={`${styles.sectionHeaderTitle} gt-section-title auto-toc-target`}>
+        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px 15px' }}>
+          <h2 id="sec-characters" className={`${styles.sectionHeaderTitle} gt-section-title auto-toc-target`} style={{ whiteSpace: 'nowrap' }}>
             {charSectionNum}. 등장인물 목록
           </h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-            <label style={{ fontWeight: 'bold' }}>분류 기준:</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+            <label style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>분류 기준:</label>
             <select
               value={groupCriteria}
               onChange={handleGroupCriteriaChange}
@@ -96,8 +96,8 @@ const CharacterGrid = ({
             </select>
           </div>
           {sortKeys.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              <label style={{ fontWeight: 'bold' }} htmlFor="char-sort-select">정렬:</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+              <label style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} htmlFor="char-sort-select">정렬:</label>
               <select
                 id="char-sort-select"
                 aria-label="정렬 기준"
@@ -126,7 +126,7 @@ const CharacterGrid = ({
             </label>
           )}
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
           <button
             className="wiki-btn gt-btn-edit"
             title="일괄 이미지 위치 조정"
@@ -137,7 +137,7 @@ const CharacterGrid = ({
           </button>
           <button
             className="wiki-btn gt-btn-edit"
-            style={{ padding: '4px 10px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }}
+            style={{ padding: '4px 10px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}
             onClick={handleNewCharClick}
           >
             <IconPlus size={13} /> 새 캐릭터 추가

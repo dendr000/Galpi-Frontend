@@ -26,11 +26,17 @@
 /* 레이아웃 골격 */
 .wikiContentWrapper { display: flex; gap: 30px; align-items: flex-start; position: relative; min-width: 0; max-width: 100%; }
 .wikiMain { flex: 1; min-width: 0; max-width: 100%; box-sizing: border-box; }
+/* 화면을 반으로 나눠 쓰는 좁은 창(1199px 이하)에서는, 캐릭터를 고르지 않아 정보 상자가 비어 있으면(:empty)
+   340px 자리도 접어 본문이 넓게 쓰도록 한다. 넓은 창에서는 자리를 그대로 둬서 캐릭터를 고를 때 본문 폭이 변하지 않는다. */
+@media (max-width: 1199px) {
+  .wikiAside:empty { display: none; }
+}
 .wikiAside { width: 340px; flex-shrink: 0; position: sticky; top: 90px; align-self: flex-start; box-sizing: border-box; }
 
 .wikiSection { margin-bottom: 40px; min-width: 0; flex: 1; max-width: 100%; box-sizing: border-box; }
 .sectionTitle { font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
-.sectionHeader { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; }
+/* flex-wrap: 창이 좁아 모자라면 제목과 버튼 묶음이 글자 단위로 쪼개지지 않고 줄 단위로 넘어간다 */
+.sectionHeader { display: flex; flex-wrap: wrap; gap: 8px 12px; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; }
 .sectionHeaderTitle { border: none; margin: 0; padding: 0; font-size: 22px; font-weight: bold; }
 
 .wikiPageGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
