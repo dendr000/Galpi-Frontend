@@ -258,7 +258,8 @@ describe('GlobalContextMenu - 검색에 숨김 분류 작품 포함 설정', () 
   it('메뉴 항목은 줄바꿈되지 않는다(white-space: nowrap)', () => {
     renderAt('/');
     openMenu();
-    const css = document.querySelector('style')?.textContent || '';
+    // 아이콘 스타일 등 다른 style 도 있으므로 모든 style 의 내용을 합쳐서 본다
+    const css = Array.from(document.querySelectorAll('style')).map((st) => st.textContent).join(' ');
     expect(css).toMatch(/\.context-item\s*\{[^}]*white-space:\s*nowrap/);
   });
 

@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import styles from '../MacroToolbar.module.css';
 import { parseRankValue } from './rankUtils';
+import Icon from '../../../components/common/icons/Icon';
 
 export const BarEditor = ({ selectedText, onInsert, onCancel }) => {
   console.log("[BarEditor] 라이프사이클 이식 스캔 정상");
@@ -48,14 +49,16 @@ export const BarEditor = ({ selectedText, onInsert, onCancel }) => {
                  <input type="text" className={styles.toolInput} value={f.val} onChange={(e) => { const n = [...formList]; n[i].val = e.target.value; setFormList(n); }} placeholder="현재" style={{ width: '60px', textAlign: 'center' }} />
                  <span style={{ color: 'var(--text-secondary)', fontWeight: 'bold' }}>/</span>
                  <input type="text" className={styles.toolInput} value={f.max} onChange={(e) => { const n = [...formList]; n[i].max = e.target.value; setFormList(n); }} placeholder="최대" style={{ width: '60px', textAlign: 'center' }} />
-                 <button onClick={() => { console.log(`[BarEditor] 인덱스 ${i} 삭제`); const n = [...formList]; n.splice(i, 1); setFormList(n); }} style={{ background: 'transparent', border: 'none', color: '#e53e3e', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}>✖</button>
+                 <button onClick={() => { console.log(`[BarEditor] 인덱스 ${i} 삭제`); const n = [...formList]; n.splice(i, 1); setFormList(n); }} style={{ background: 'transparent', border: 'none', color: '#e53e3e', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}><Icon name="close" /></button>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ width: '280px', background: 'var(--table-bg-alt)', borderRadius: '8px', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-color)', boxSizing: 'border-box', padding: '12px', justifyContent: 'flex-start', gap: '10px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)', textAlign: 'center', borderBottom: '1px dashed var(--border-color)', paddingBottom: '5px' }}>🔋 실시간 게이지 프리뷰</div>
+          <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)', textAlign: 'center', borderBottom: '1px dashed var(--border-color)', paddingBottom: '5px' }}>
+            <Icon name="gauge" lead /> 실시간 게이지 프리뷰
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', overflowY: 'auto', maxHeight: '200px' }}>
             {formList.filter(f => f.label.trim() !== "").map((f, idx) => {
               const cur = parseRankValue(f.val); 

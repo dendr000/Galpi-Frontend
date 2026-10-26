@@ -5,6 +5,7 @@
 // - H1 클릭 시 해당 섹션(.md-box) 전체를 숨김 처리하고, 하위 태그(H2, H3 등) 클릭 시에는 동급 이상의 다음 태그가 나타나기 전까지의 형제 노드(Siblings)를 추적하여 스마트하게 디스플레이를 토글합니다.
 
 import { useEffect } from 'react';
+import { iconHtml } from '../../../components/common/icons/iconRegistry';
 
 export const useHeadingFold = (containerRef, dependencies) => {
   useEffect(() => {
@@ -18,7 +19,7 @@ export const useHeadingFold = (containerRef, dependencies) => {
 
       const btn = document.createElement('span');
       btn.className = 'wiki-fold-btn';
-      btn.innerHTML = '▼';
+      btn.innerHTML = iconHtml('chevron-down');
       btn.title = "문단 접기/펼치기";
       btn.style.cssText = "cursor: pointer; font-size: 0.7em; margin-left: 8px; color: var(--text-secondary); user-select: none; transition: color 0.2s; vertical-align: middle;";
 
@@ -33,7 +34,7 @@ export const useHeadingFold = (containerRef, dependencies) => {
         e.stopPropagation();
         
         const isCollapsed = heading.classList.toggle('is-collapsed');
-        btn.innerHTML = isCollapsed ? '◀' : '▼';
+        btn.innerHTML = iconHtml(isCollapsed ? 'chevron-left' : 'chevron-down');
         btn.style.color = isCollapsed ? 'var(--primary-color)' : 'var(--text-secondary)';
 
         // 1. H1 태그를 클릭한 경우: 바로 뒤에 붙어있는 md-box 전체를 통째로 토글

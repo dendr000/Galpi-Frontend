@@ -41,7 +41,7 @@ export const useDictData = ({ showToast, onDataChanged }) => {
 
       setDictInput({ word: '', trans: '' });
       setEditingTarget(null);
-      showToast(editingTarget ? "✨ 사전 데이터가 수정되었습니다." : "✨ 사전 데이터베이스에 저장 완료되었습니다.");
+      showToast(editingTarget ? "사전 데이터가 수정되었습니다." : "사전 데이터베이스에 저장 완료되었습니다.");
       onDataChanged?.();
     } catch (e) {
       console.error(e);
@@ -60,7 +60,7 @@ export const useDictData = ({ showToast, onDataChanged }) => {
         await api.post('/api/dicts/bulk', payloads);
         setDictBulk('');
         setIsDictBulkMode(false);
-        showToast(`✨ 총 ${payloads.length}개의 어휘 묶음 처리가 종료되었습니다.`);
+        showToast(`총 ${payloads.length}개의 어휘 묶음 처리가 종료되었습니다.`);
         // 일괄 등록은 실제로 몇 건이 새로 들어갔는지 알 수 없어 항목별로 로컬 캐시를 갱신하기
         // 애매하다 — 전체를 다시 적재해서 확실하게 맞춘다.
         await forceReseedDict(api);
@@ -78,7 +78,7 @@ export const useDictData = ({ showToast, onDataChanged }) => {
       try {
         await api.delete(`/api/dicts?word=${encodeURIComponent(d.word)}&translation=${encodeURIComponent(d.translation)}`);
         await removeEntryLocal(d.word, d.translation);
-        showToast("🗑️ 사전 색인이 말소 처리되었습니다.");
+        showToast("사전 색인이 말소 처리되었습니다.");
         onDataChanged?.();
       } catch (e) {
         console.error(e);

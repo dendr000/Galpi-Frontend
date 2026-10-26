@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axiosCore';
 import { useDrag } from '@use-gesture/react';
+import Icon from '../../components/common/icons/Icon';
 
 const BatchImageModal = ({ isOpen, onClose, characters, work, charExt, batchImgY, setBatchImgY, batchImgX, setBatchImgX, setCharacters }) => {
   const [zoomScale, setZoomScale] = useState(1.0);
@@ -94,7 +95,9 @@ const BatchImageModal = ({ isOpen, onClose, characters, work, charExt, batchImgY
       <div style={{ background: 'var(--surface-color)', width: '380px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column' }} onClick={e => e.stopPropagation()}>
         
         <div style={{ padding: '15px 20px', background: 'var(--table-bg-alt)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--primary-color)' }}>🖼️ 캐릭터 썸네일 일괄 조정</h3>
+          <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--primary-color)' }}>
+            <Icon name="image" lead /> 캐릭터 썸네일 일괄 조정
+          </h3>
           <button style={{ background: 'transparent', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-secondary)' }} onClick={onClose}>&times;</button>
         </div>
 
@@ -137,7 +140,9 @@ const BatchImageModal = ({ isOpen, onClose, characters, work, charExt, batchImgY
           </div>
 
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>🔍 이미지 확대 제어:</span>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+              <Icon name="search" lead /> 이미지 확대 제어:
+            </span>
             <button className="wiki-btn" onClick={() => setZoomScale(prev => Math.max(1.0, prev - 0.1))} style={{ padding: '2px 6px', fontSize: '11px' }}>-</button>
             <span style={{ fontSize: '11px', fontWeight: 'bold', width: '35px', textAlign: 'center' }}>{Math.round(zoomScale * 100)}%</span>
             <button className="wiki-btn" onClick={() => setZoomScale(prev => Math.min(2.0, prev + 0.1))} style={{ padding: '2px 6px', fontSize: '11px' }}>+</button>

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../api/axiosCore';
 import { extractMeta } from '../../utils/markdownParser';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
+import Icon from '../../components/common/icons/Icon';
 
 const WorkCover = ({ work, workId, coverExt, coverUrl, coverY, setCoverY, isCoverEdit, setIsCoverEdit, isCoverDragging, setIsCoverDragging, setWork }) => {
   const navigate = useNavigate();
@@ -55,12 +56,20 @@ const WorkCover = ({ work, workId, coverExt, coverUrl, coverY, setCoverY, isCove
           </div>
           <div className={`${styles.coverControls} ${isCoverEdit ? styles.activeDrag : ''}`}>
             {!isCoverEdit ? (
-              <button className="wiki-btn" style={{ background: 'rgba(0,0,0,0.5)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(4px)', borderRadius: '20px', padding: '6px 16px', fontWeight: 'bold' }} onClick={() => setIsCoverEdit(true)}>🖼️ 위치 및 크기 변경</button>
+              <button className="wiki-btn" style={{ background: 'rgba(0,0,0,0.5)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(4px)', borderRadius: '20px', padding: '6px 16px', fontWeight: 'bold' }} onClick={() => setIsCoverEdit(true)}>
+                <Icon name="image" lead /> 위치 및 크기 변경
+              </button>
             ) : (
               <>
-                <span style={{ color: 'white', fontSize: '13px', fontWeight: 'bold', background: 'rgba(0,0,0,0.7)', padding: '6px 12px', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>↕️↔️ 마우스 드래그로 이동하세요.</span>
-                <button className="wiki-btn" style={{ background: '#10b981', color: 'white', border: 'none', borderRadius: '20px', padding: '6px 16px', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.5)' }} onClick={saveCoverPosition}>💾 저장</button>
-                <button className="wiki-btn" style={{ background: '#e53e3e', color: 'white', border: 'none', borderRadius: '20px', padding: '6px 16px', fontWeight: 'bold' }} onClick={() => setIsCoverEdit(false)}>✖ 취소</button>
+                <span style={{ color: 'white', fontSize: '13px', fontWeight: 'bold', background: 'rgba(0,0,0,0.7)', padding: '6px 12px', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>
+                  <Icon name="move" lead /> 마우스 드래그로 이동하세요.
+                </span>
+                <button className="wiki-btn" style={{ background: '#10b981', color: 'white', border: 'none', borderRadius: '20px', padding: '6px 16px', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(0,0,0,0.5)' }} onClick={saveCoverPosition}>
+                  <Icon name="save" lead /> 저장
+                </button>
+                <button className="wiki-btn" style={{ background: '#e53e3e', color: 'white', border: 'none', borderRadius: '20px', padding: '6px 16px', fontWeight: 'bold' }} onClick={() => setIsCoverEdit(false)}>
+                  <Icon name="close" lead /> 취소
+                </button>
               </>
             )}
           </div>
@@ -69,7 +78,9 @@ const WorkCover = ({ work, workId, coverExt, coverUrl, coverY, setCoverY, isCove
         <div className={`${styles.wikiTitleArea} gt-hero gt-hero-fallback`}>
           <h1 className={`${styles.wikiTitle} gt-hero-title`} data-title={work.title}>{work.title}</h1>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button className="wiki-btn" style={{ background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={() => navigate(`/edit?type=work&action=edit&id=${workId}`)}>⚙️ 작품 설정</button>
+            <button className="wiki-btn" style={{ background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} onClick={() => navigate(`/edit?type=work&action=edit&id=${workId}`)}>
+              <Icon name="settings" lead /> 작품 설정
+            </button>
           </div>
         </div>
       )}

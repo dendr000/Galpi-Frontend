@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import styles from '../MacroToolbar.module.css';
 import { parseRankValue } from './rankUtils';
+import Icon from '../../../components/common/icons/Icon';
 
 export const RadarEditor = ({ selectedText, onInsert, onCancel }) => {
   console.log("[RadarEditor] 라이프사이클 마운트 트래킹");
@@ -50,14 +51,16 @@ export const RadarEditor = ({ selectedText, onInsert, onCancel }) => {
               <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                  <input className={styles.toolInput} value={f.label} onChange={(e) => { const n = [...formList]; n[i].label = e.target.value; setFormList(n); }} placeholder="스탯명" style={{ flex: 1 }} />
                  <input type="text" className={styles.toolInput} value={f.val} onChange={(e) => { const n = [...formList]; n[i].val = e.target.value; setFormList(n); }} placeholder="수치/등급" style={{ width: '80px', textAlign: 'center' }} />
-                 <button onClick={() => { console.log(`[RadarEditor] 항목 삭제: 인덱스 ${i}`); const n = [...formList]; n.splice(i, 1); setFormList(n); }} style={{ background: 'transparent', border: 'none', color: '#e53e3e', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}>✖</button>
+                 <button onClick={() => { console.log(`[RadarEditor] 항목 삭제: 인덱스 ${i}`); const n = [...formList]; n.splice(i, 1); setFormList(n); }} style={{ background: 'transparent', border: 'none', color: '#e53e3e', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}><Icon name="close" /></button>
               </div>
             ))}
           </div>
         </div>
 
         <div style={{ width: '280px', background: 'var(--table-bg-alt)', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)', boxSizing: 'border-box' }}>
-          <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)', marginBottom: '5px', marginTop: '10px' }}>📊 실시간 차트 프리뷰</div>
+          <div style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)', marginBottom: '5px', marginTop: '10px' }}>
+          <Icon name="bar-chart" lead /> 실시간 차트 프리뷰
+        </div>
           {chartData.length >= 3 ? (
             <div style={{ width: '100%', height: '220px' }}>
               <ResponsiveContainer width="100%" height="100%">

@@ -5,6 +5,7 @@
 import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { parseRankValue } from '../tools/rankUtils';
+import Icon from '../../../components/common/icons/Icon';
 
 const RadarCompareViewer = ({ dataStr }) => {
   console.log("[RadarCompareViewer] 다중 스탯 비교 차트 데이터 파싱 개시. 원본 데이터:", dataStr);
@@ -60,7 +61,9 @@ const RadarCompareViewer = ({ dataStr }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '25px 0', background: 'var(--surface-color)', padding: '25px 15px', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-      <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '10px', color: 'var(--text-primary)', letterSpacing: '1px' }}>⚔️ 스탯 전력 비교 매트릭스</div>
+      <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '10px', color: 'var(--text-primary)', letterSpacing: '1px' }}>
+        <Icon name="swap" lead /> 스탯 전력 비교 매트릭스
+      </div>
       <div style={{ width: '100%', height: '320px', maxWidth: '400px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="65%" data={chartData}>

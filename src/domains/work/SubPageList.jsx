@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { newPageUrl } from './newPageUrl';
+import Icon from '../../components/common/icons/Icon';
 
 const SubPageList = ({ wikiPages, pageId, workId, navigate, styles }) => {
   console.log("[SubPageList] 하위 문서 목록 렌더링 가동. 현재 부모 pageId:", pageId);
@@ -25,7 +26,9 @@ const SubPageList = ({ wikiPages, pageId, workId, navigate, styles }) => {
     <section id="sec-wiki-pages" className={styles.wikiSection}>
       <div className={`${styles.sectionHeader} gt-section-header`}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <h2 id="sec-subpages" className={`${styles.sectionHeaderTitle} gt-section-title auto-toc-target`}>🗂️ 하위 문서 목록</h2>
+          <h2 id="sec-subpages" className={`${styles.sectionHeaderTitle} gt-section-title auto-toc-target`}>
+            <Icon name="folder" lead /> 하위 문서 목록
+          </h2>
           <span className="gt-page-count" style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 'bold' }}>{childPages.length}개</span>
         </div>
         <button className="wiki-btn gt-btn-edit" style={{ background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', padding: '4px 10px', fontSize: '13px' }} onClick={handleNewDocClick}>
@@ -35,7 +38,9 @@ const SubPageList = ({ wikiPages, pageId, workId, navigate, styles }) => {
       <div className={`${styles.wikiPageGrid} gt-page-grid`}>
         {childPages.length > 0 ? childPages.map(page => (
           <div key={page.id} className={`${styles.wikiPageCard} gt-page-card`} onClick={() => handlePageClick(page.id)}>
-            <div className={`${styles.wikiPageTitle} gt-page-title`}>📄 {page.title}</div>
+            <div className={`${styles.wikiPageTitle} gt-page-title`}>
+              <Icon name="file" lead /> {page.title}
+            </div>
             <div className={`${styles.wikiPageDesc} gt-page-desc`}>
               {page.content ? page.content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...' : '내용이 없습니다.'}
             </div>

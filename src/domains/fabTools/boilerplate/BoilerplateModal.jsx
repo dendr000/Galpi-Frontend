@@ -33,7 +33,7 @@ const BoilerplateModal = ({ showToast }) => {
     if (draftHtml) {
       bpData.setBpInput(prev => ({ ...prev, content: draftHtml }));
       localStorage.removeItem('galpi-draft-bp');
-      if (showToast) showToast("✅ 선택된 영역이 템플릿 본문으로 로드되었습니다.");
+      if (showToast) showToast("선택된 영역이 템플릿 본문으로 로드되었습니다.");
     } else if (isEmptyRequest) {
       bpData.setBpInput({ title: '', content: '' }); 
       localStorage.removeItem('galpi-draft-bp-empty');

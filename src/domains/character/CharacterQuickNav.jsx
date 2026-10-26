@@ -3,6 +3,7 @@
 // 버전: v1.0.0
 
 import React from 'react';
+import Icon from '../../components/common/icons/Icon';
 
 const CharacterQuickNav = ({ characters, activeCharId, setActiveCharId, styles }) => {
   console.log("[CharacterQuickNav] 캐릭터 빠른 이동(퀵 네비) 컴포넌트 렌더링 시작");
@@ -16,7 +17,7 @@ const CharacterQuickNav = ({ characters, activeCharId, setActiveCharId, styles }
   return (
     <div className={`${styles.quickNavContainer} gt-quicknav`}>
       <div style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-        🏃 캐릭터 빠른 이동
+        <Icon name="bolt" lead /> 캐릭터 빠른 이동
       </div>
       <div className={styles.quickNavBtnList}>
         {characters.map(c => {

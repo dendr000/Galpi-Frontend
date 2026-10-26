@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api/axiosCore';
 import { IconEyeOff } from '../common/icons/DomainIcons';
 import { getIncludeHidden, setIncludeHidden } from './search/searchSettings';
+import Icon from '../common/icons/Icon';
 
 const RECENT_EXCLUDED_KEY = 'galpi-recent-excluded';
 const isRecentExcluded = (id) => {
@@ -103,7 +104,7 @@ const GlobalContextMenu = () => {
     currentMemoData.unshift({ 
       id: newMemoId, 
       folder: "기타",
-      title: '📌 ' + shortTitle, 
+      title: shortTitle, 
       content: text, 
       updatedAt: newMemoId, 
       sortOrder: -1 
@@ -154,7 +155,9 @@ const GlobalContextMenu = () => {
       onKeyDown={(e) => { if (e.key === 'Escape') setDeleteDialog(null); }}
     >
       <div style={{ background: 'var(--surface-color)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '24px', width: 'min(460px, 90vw)', boxShadow: '0 10px 40px rgba(0,0,0,0.35)' }}>
-        <div style={{ fontSize: '16px', fontWeight: 900, color: '#e53e3e', marginBottom: '10px' }}>⚠️ 현재 작품 영구 삭제</div>
+        <div style={{ fontSize: '16px', fontWeight: 900, color: '#e53e3e', marginBottom: '10px' }}>
+          <Icon name="warning" lead /> 현재 작품 영구 삭제
+        </div>
         <div style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-secondary)', marginBottom: '14px' }}>
           이 작품을 시스템에서 완전히 삭제합니다. <b style={{ color: '#e53e3e' }}>소속 등장인물도 함께 삭제</b>되며 되돌릴 수 없습니다.<br />
           삭제하려면 아래 칸에 <b style={{ color: 'var(--text-primary)' }}>{deleteKeyword}</b> 를 입력하세요.
@@ -186,19 +189,31 @@ const GlobalContextMenu = () => {
       position: 'fixed', top: menu.y, left: menu.x, background: 'var(--surface-color)', border: '1px solid var(--border-color)', 
       boxShadow: '0 4px 15px rgba(0,0,0,0.15)', borderRadius: '8px', padding: '6px 0', zIndex: 999999, minWidth: '200px', display: 'flex', flexDirection: 'column'
     }}>
-      <div className="context-item" onClick={() => { window.history.back(); setMenu(prev => ({...prev, isOpen: false})); }}>⬅️ 뒤로 가기</div>
-      <div className="context-item" onClick={() => { window.history.forward(); setMenu(prev => ({...prev, isOpen: false})); }}>➡️ 앞으로 가기</div>
-      <div className="context-item" onClick={() => { window.location.reload(); setMenu(prev => ({...prev, isOpen: false})); }}>🔄 페이지 새로고침</div>
+      <div className="context-item" onClick={() => { window.history.back(); setMenu(prev => ({...prev, isOpen: false})); }}>
+        <Icon name="arrow-left" lead /> 뒤로 가기
+      </div>
+      <div className="context-item" onClick={() => { window.history.forward(); setMenu(prev => ({...prev, isOpen: false})); }}>
+        <Icon name="arrow-right" lead /> 앞으로 가기
+      </div>
+      <div className="context-item" onClick={() => { window.location.reload(); setMenu(prev => ({...prev, isOpen: false})); }}>
+        <Icon name="refresh" lead /> 페이지 새로고침
+      </div>
       
       <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }}></div>
       
-      <div className="context-item" onClick={() => { window.scrollTo({top:0, behavior:'smooth'}); setMenu(prev => ({...prev, isOpen: false})); }}>🔼 화면 최상단으로</div>
-      <div className="context-item" onClick={() => { window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'}); setMenu(prev => ({...prev, isOpen: false})); }}>🔽 화면 최하단으로</div>
+      <div className="context-item" onClick={() => { window.scrollTo({top:0, behavior:'smooth'}); setMenu(prev => ({...prev, isOpen: false})); }}>
+        <Icon name="arrow-up" lead /> 화면 최상단으로
+      </div>
+      <div className="context-item" onClick={() => { window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'}); setMenu(prev => ({...prev, isOpen: false})); }}>
+        <Icon name="arrow-down" lead /> 화면 최하단으로
+      </div>
 
       {menu.selectedText && (
         <>
           <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }}></div>
-          <div className="context-item" onClick={addSelectionToMemo} style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>📝 선택 문구 새 메모로</div>
+          <div className="context-item" onClick={addSelectionToMemo} style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>
+            <Icon name="edit" lead /> 선택 문구 새 메모로
+          </div>
         </>
       )}
 
@@ -215,7 +230,9 @@ const GlobalContextMenu = () => {
       <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }}></div>
 
       <div className="context-item" onClick={toggleSavePrevention}>
-        {isSavePrevented ? '⛔ Ctrl+S 무시 켜짐 (끄기)' : '⚠️ Ctrl+S 무시 꺼짐 (켜기)'}
+        {isSavePrevented
+          ? <><Icon name="ban" lead /> Ctrl+S 무시 켜짐 (끄기)</>
+          : <><Icon name="warning" lead /> Ctrl+S 무시 꺼짐 (켜기)</>}
       </div>
 
       <div className="context-item" onClick={toggleIncludeHiddenInSearch}>
@@ -240,7 +257,7 @@ const GlobalContextMenu = () => {
             }
             window.dispatchEvent(new Event('galpi-trigger-secret-mode'));
           }}>
-            🕵️ 비밀 금고 열람 (필터링)
+            <Icon name="eye" lead /> 비밀 금고 열람 (필터링)
           </div>
         </>
       )}
@@ -249,7 +266,7 @@ const GlobalContextMenu = () => {
         <>
           <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }}></div>
           <div className="context-item secret-delete-item" style={{ color: '#e53e3e', fontWeight: 900 }} onClick={handleSecretDeleteWork}>
-            🗑️ 현재 작품 영구 삭제
+            <Icon name="trash" lead /> 현재 작품 영구 삭제
           </div>
         </>
       )}

@@ -3,6 +3,7 @@
 import React from 'react';
 import { FolderPlusIcon, EditIcon, XIcon, FolderIcon, LinkIcon } from '../../shared/components/MemoIcons';
 import FabMemoItem from './FabMemoItem';
+import Icon from '../../../../components/common/icons/Icon';
 
 const FabMemoTreeRenderer = ({ node, sidebarHooks, currentFolder, setCurrentFolder, handleCopyPath, activeMemoId, setActiveMemoId }) => {
   const isRoot = node.depth === -1;
@@ -30,7 +31,7 @@ const FabMemoTreeRenderer = ({ node, sidebarHooks, currentFolder, setCurrentFold
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '16px', opacity: 0.7 }}>
-                  {isChildExpanded ? '▼' : '▶'}
+                  <Icon name={isChildExpanded ? 'chevron-down' : 'chevron-right'} />
                 </span>
                 <FolderIcon />
                 <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

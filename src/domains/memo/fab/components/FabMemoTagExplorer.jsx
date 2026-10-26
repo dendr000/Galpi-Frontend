@@ -1,6 +1,7 @@
 // 파일 위치: src/domains/memo/fab/components/FabMemoTagExplorer.jsx
 import React, { useState } from 'react';
 import { TagIcon } from '../../shared/components/MemoIcons';
+import Icon from '../../../../components/common/icons/Icon';
 
 const FabMemoTagExplorer = ({ tagList = [], selectedTag, setSelectedTag }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +16,7 @@ const FabMemoTagExplorer = ({ tagList = [], selectedTag, setSelectedTag }) => {
           <TagIcon /> 태그 탐색기
         </div>
         <span style={{ fontSize: '10px', color: 'var(--text-secondary)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-          ▼
+          <Icon name="chevron-down" />
         </span>
       </div>
       

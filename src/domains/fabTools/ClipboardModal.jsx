@@ -1,12 +1,13 @@
 import React from 'react';
 import ModalOverlay from '../../components/common/ModalOverlay';
 import { useModalStore } from '../../store/useModalStore';
+import Icon from '../../components/common/icons/Icon';
 
 const ClipboardModal = ({ showToast }) => {
   const { closeModal, clipboardHistory, clearClipboard } = useModalStore();
 
   return (
-    <ModalOverlay title="📋 클립보드 히스토리" onClose={closeModal} actions={<button onClick={() => { clearClipboard(); }} style={{ border: '1px solid #e53e3e', color: '#e53e3e', background: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', padding: '4px 8px' }}>전체 삭제</button>}>
+    <ModalOverlay title={<span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="clipboard" /> 클립보드 히스토리</span>} onClose={closeModal} actions={<button onClick={() => { clearClipboard(); }} style={{ border: '1px solid #e53e3e', color: '#e53e3e', background: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', padding: '4px 8px' }}>전체 삭제</button>}>
       {clipboardHistory.length === 0 ? (
         <div className="modal-empty" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>스크랩하거나 복사한 텍스트 임시 파편 내역이 존재하지 않습니다.</div>
       ) : (
@@ -19,7 +20,7 @@ const ClipboardModal = ({ showToast }) => {
                 style={{ fontSize: '11px', padding: '4px 10px', background: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', cursor: 'pointer' }} 
                 onClick={() => { 
                   navigator.clipboard.writeText(text); 
-                  showToast("📋 클립보드 인프라에 재할당 완료!"); 
+                  showToast("클립보드 인프라에 재할당 완료!"); 
                   closeModal(); 
                 }}
               >

@@ -6,6 +6,7 @@ import { Folder, FileText, ChevronDown, ChevronRight, Menu, Network, Home } from
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import TreeContextMenu from './TreeContextMenu';
 import { newPageUrl, siblingParentId } from './newPageUrl';
+import Icon from '../../components/common/icons/Icon';
 
 const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [] }) => {
   const navigate = useNavigate();
@@ -107,7 +108,7 @@ const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [] }) => {
       
       <div className={styles.treeContent}>
         <div style={{ fontSize: '15px', fontWeight: 900, color: 'var(--primary-color)', marginBottom: '12px', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px' }}>
-          🗂️ 문서 트리
+          <Icon name="folder" lead /> 문서 트리
         </div>
         <div data-tree-body style={{ flex: 1, overflowY: 'auto' }} onContextMenu={(e) => openMenu(e, null)}>
           {/* 작품 첫 화면(최상위)으로 돌아가는 행: 하위 문서를 깊이 들어가 있어도 스크롤 없이 바로 이동한다 */}

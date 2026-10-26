@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Icon from '../../components/common/icons/Icon';
 
 const RelationGraph = ({ dataStr, isEditMode = false, onNodeClick, onChange }) => {
   const [data, setData] = useState({ nodes: [], edges: [], width: 800, height: 450 });
@@ -141,7 +142,7 @@ const RelationGraph = ({ dataStr, isEditMode = false, onNodeClick, onChange }) =
   return (
     <div style={{ margin: '20px 0', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden' }}>
       <div style={{ padding: '12px 20px', background: 'var(--surface-color)', borderBottom: '1px solid var(--border-color)', fontWeight: 900, color: 'var(--primary-color)' }}>
-        📊 인물 관계도 <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: '10px' }}>{isEditMode ? "(도형을 끌어 배치하세요)" : "(빈 공간을 드래그하여 시야 이동 가능)"}</span>
+        <Icon name="bar-chart" lead /> 인물 관계도 <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: '10px' }}>{isEditMode ? "(도형을 끌어 배치하세요)" : "(빈 공간을 드래그하여 시야 이동 가능)"}</span>
       </div>
       <div 
         style={{ width: '100%', overflow: 'hidden', padding: '20px 0', cursor: isPanning ? 'grabbing' : 'grab' }}

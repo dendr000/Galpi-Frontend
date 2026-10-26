@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { parseRankValue } from '../tools/rankUtils';
+import Icon from '../../../components/common/icons/Icon';
 
 const AlignmentViewer = ({ dataStr }) => {
   console.log("[AlignmentViewer] 성향 매트릭스 렌더링 개시. 원본 데이터:", dataStr);
@@ -29,7 +30,9 @@ const AlignmentViewer = ({ dataStr }) => {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '25px 0', background: 'var(--surface-color)', padding: '25px 15px', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-        <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '25px', color: 'var(--text-primary)', letterSpacing: '1px' }}>🧭 2D 성향 매트릭스</div>
+        <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '25px', color: 'var(--text-primary)', letterSpacing: '1px' }}>
+          <Icon name="compass" lead /> 2D 성향 매트릭스
+        </div>
         <svg width="100%" height="100%" viewBox={`-40 -40 ${size+80} ${size+80}`} style={{ maxWidth: '300px', overflow: 'visible', fontFamily: 'inherit' }}>
           {/* Background Grid */}
           <rect x="0" y="0" width={size} height={size} fill="var(--bg-color)" stroke="var(--border-color)" strokeWidth="1" rx="8" />

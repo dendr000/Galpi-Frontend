@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from '../../components/common/icons/Icon';
 
 const RadarChart = ({ dataStr }) => {
   if (!dataStr) return null;
@@ -62,7 +63,9 @@ const RadarChart = ({ dataStr }) => {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '25px 0', background: 'var(--surface-color)', padding: '25px 15px', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-        <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '15px', color: 'var(--text-primary)', letterSpacing: '1px' }}>📊 스탯 분석 차트</div>
+        <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '15px', color: 'var(--text-primary)', letterSpacing: '1px' }}>
+          <Icon name="bar-chart" lead /> 스탯 분석 차트
+        </div>
         <svg width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} style={{ maxWidth: '320px', overflow: 'visible', fontFamily: 'inherit' }}>
           {bgPolygons}
           {spokes}

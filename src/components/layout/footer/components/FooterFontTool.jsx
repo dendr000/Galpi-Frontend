@@ -6,6 +6,7 @@ import styles from '../Footer.module.css';
 import { FontIcon, CloseIcon, PlusIcon, SaveIcon } from './FooterIcons';
 import { useFontDict } from '../hooks/useFontDict';
 import FontDictRow from './FontDictRow';
+import Icon from '../../../common/icons/Icon';
 
 const FooterFontTool = ({ onClose }) => {
   const { dictList, isSaving, addRow, removeRow, updateRow, saveDict } = useFontDict(onClose);
@@ -36,7 +37,7 @@ const FooterFontTool = ({ onClose }) => {
       </div>
       <div className={styles['tool-body']}>
         <div style={{ margin: '0 0 12px 0', fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 'bold', lineHeight: '1.5' }}>
-          <div style={{ color: 'var(--text-primary)' }}>💡 폰트 파일을 렌더링할 한글명으로 1:1 매핑합니다.</div>
+          <div style={{ color: 'var(--text-primary)' }}><Icon name="lightbulb" lead /> 폰트 파일을 렌더링할 한글명으로 1:1 매핑합니다.</div>
           - 파일명 칸을 클릭하면 <span style={{ color: 'var(--primary-color)' }}>자동 복사</span> 됩니다. (읽기 전용)<br/>
           - <span style={{ color: 'var(--primary-color)' }}>Ctrl + S</span> 를 눌러 전체 사전을 즉시 저장할 수 있습니다.
         </div>

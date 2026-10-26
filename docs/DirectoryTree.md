@@ -38,6 +38,9 @@ src/
  │   ├── common/
  │   │   ├── BossBlindLayer.jsx                 # 보스키 트리거 감지 시 브라우저를 즉각 마스킹 처리하는 위장막 레이어
  │   │   ├── FindBar.jsx                        # Ctrl+F 페이지 찾기창(Electron exe 에는 기본 찾기 창이 없어 직접 제공)
+ │   │   ├── icons/
+ │   │   │   ├── Icon.jsx                       # 이모티콘 대신 쓰는 SVG 아이콘 컴포넌트(글자색과 글자 크기를 따름)
+ │   │   │   └── iconRegistry.js                # assets/icons/*.svg 를 이름으로 꺼내 쓰는 등록부와 문자열 HTML 용 iconHtml
  │   │   ├── ModalOverlay.jsx                   # 팝업 모달창 활성화 시 뒷배경을 어둡게 처리하는 공통 UI 레이어 컴포넌트
  │   │   ├── SettingModal.jsx                   # 사용자 뷰 설정 변경값을 스토어에 바인딩하는 시스템 환경설정 팝업
  │   │   └── TextPromptModal.jsx                # window.prompt 대신 쓰는 앱 안의 글자 입력 모달(Electron exe 는 prompt 미지원)

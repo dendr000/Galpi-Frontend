@@ -4,6 +4,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Edit3 } from 'lucide-react';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
+import Icon from '../../components/common/icons/Icon';
 
 const FloatingToc = ({ workId, pageId, activePage, tocList = [] }) => {
   const navigate = useNavigate();
@@ -27,7 +28,9 @@ const FloatingToc = ({ workId, pageId, activePage, tocList = [] }) => {
       
       <div className={styles.tocContent}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '12px' }}>
-          <span style={{ fontWeight: 900, color: 'var(--primary-color)' }}>📑 목차</span>
+          <span style={{ fontWeight: 900, color: 'var(--primary-color)' }}>
+            <Icon name="list" lead /> 목차
+          </span>
           <button 
             type="button" 
             className="wiki-btn" 

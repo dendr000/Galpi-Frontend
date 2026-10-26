@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import Icon from '../../components/common/icons/Icon';
 
 // ★ 알파벳 랭크 및 숫자 겸용 파싱 유틸리티
 const parseRankValue = (valStr) => {
@@ -59,7 +60,9 @@ const RadarChartViewer = ({ dataStr }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '25px 0', background: 'var(--surface-color)', padding: '25px 15px', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-      <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '15px', color: 'var(--text-primary)', letterSpacing: '1px' }}>📊 스탯 분석 차트</div>
+      <div style={{ fontWeight: 900, fontSize: '14px', marginBottom: '15px', color: 'var(--text-primary)', letterSpacing: '1px' }}>
+        <Icon name="bar-chart" lead /> 스탯 분석 차트
+      </div>
       <div style={{ width: '100%', height: '300px', maxWidth: '320px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>

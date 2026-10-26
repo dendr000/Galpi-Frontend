@@ -1,0 +1,8 @@
+<!-- Copyright (c) dendr000. MIT License. -->
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <g transform="rotate(45 12 12)">
+    <rect x="9" y="2" width="6" height="3" rx="1"/>
+    <rect x="9" y="6.5" width="6" height="9.5"/>
+    <path d="M9 16h6l-3 5.5z"/>
+  </g>
+</svg>

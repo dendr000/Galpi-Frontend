@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Icon from '../../../../components/common/icons/Icon';
 
 const MemoLinkPopover = ({ linkPopover, closeLinkPopover, applyLink, editExistingLink, deleteLink, timeoutRef }) => {
   const [urlValue, setUrlValue] = useState('');
@@ -70,7 +71,9 @@ const MemoLinkPopover = ({ linkPopover, closeLinkPopover, applyLink, editExistin
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ color: '#63b3ed', marginRight: '6px', flexShrink: 0 }}>🔗</span>
+          <span style={{ color: '#63b3ed', marginRight: '6px', flexShrink: 0 }}>
+            <Icon name="link" />
+          </span>
           <span>{linkPopover.url}</span>
         </div>
         {/* 불필요한 '클릭하여 수정/삭제' 문구 완전 제거됨 */}
@@ -97,8 +100,10 @@ const MemoLinkPopover = ({ linkPopover, closeLinkPopover, applyLink, editExistin
     >
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px', marginBottom: '10px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--primary-color)' }}>🔗 내부 링크 삽입 / 수정</span>
-          <button onClick={closeLinkPopover} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px', padding: 0 }}>✖</button>
+          <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--primary-color)' }}>
+            <Icon name="link" lead /> 내부 링크 삽입 / 수정
+          </span>
+          <button onClick={closeLinkPopover} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '14px', padding: 0 }}><Icon name="close" /></button>
         </div>
         
         <label style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 'bold', marginBottom: '4px' }}>표시할 텍스트</label>

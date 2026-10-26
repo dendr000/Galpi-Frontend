@@ -2,6 +2,7 @@
 // 기능 요약: 에디터 내 텍스트 노드에 투명 발판과 함께 마커를 꽂아 넣고, 텔레포트 스크롤을 제어하는 단독 엔진입니다.
 import { useState, useCallback } from 'react';
 import { askText } from '../../../../utils/askText';
+import { iconHtml } from '../../../../components/common/icons/iconRegistry';
 
 export const useMemoBookmark = ({ editorRef, updateCharCount, saveMemo }) => {
   const [isBookmarkModalOpen, setIsBookmarkModalOpen] = useState(false);
@@ -13,7 +14,7 @@ export const useMemoBookmark = ({ editorRef, updateCharCount, saveMemo }) => {
     const nodes = editorRef.current.querySelectorAll('.galpi-bookmark');
     const found = Array.from(nodes).map(node => ({
       id: node.id,
-      name: node.innerText.replace('🔖', '').trim(),
+      name: node.innerText.replace(/\u{1F516}/gu, '').trim(),
       element: node
     }));
     setBookmarks(found);
@@ -42,7 +43,7 @@ export const useMemoBookmark = ({ editorRef, updateCharCount, saveMemo }) => {
     const bmId = `bm_${safeName}_${Date.now()}`;
 
     // ★ 커서 튕김 방지용 투명 발판(&#8203;) 및 단단한 블록(contenteditable="false") 설정
-    const html = `&#8203;<span id="${bmId}" class="galpi-bookmark" contenteditable="false" style="color: var(--primary-color); background: rgba(59,91,219,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: bold; margin: 0 2px; user-select: none; cursor: default;">🔖 ${name.trim()}</span>&#8203;`;
+    const html = `&#8203;<span id="${bmId}" class="galpi-bookmark" contenteditable="false" style="color: var(--primary-color); background: rgba(59,91,219,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: bold; margin: 0 2px; user-select: none; cursor: default;">${iconHtml('bookmark', 'gi-lead')}${name.trim()}</span>&#8203;`;
 
     document.execCommand('insertHTML', false, html);
 

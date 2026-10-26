@@ -1,6 +1,7 @@
 // src/components/common/BossBlindLayer.jsx
 import React, { useEffect, useRef } from 'react';
 import useSettingStore from '../../store/useSettingStore';
+import Icon from './icons/Icon';
 
 const BossBlindLayer = () => {
   const { isBlindActive, blindTheme } = useSettingStore();
@@ -54,7 +55,7 @@ const BossBlindLayer = () => {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, background: blindTheme === 'blackout' ? '#000' : '#0b0f19' }}>
       {blindTheme !== 'blackout' && <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />}
-      <div style={{ position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)', color: 'rgba(255,255,255,0.25)', fontWeight: 'bold' }}>🔒 SECURITY BLIND ACTIVE</div>
+      <div style={{ position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)', color: 'rgba(255,255,255,0.25)', fontWeight: 'bold' }}><Icon name="lock" lead /> SECURITY BLIND ACTIVE</div>
     </div>
   );
 };

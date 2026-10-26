@@ -5,6 +5,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import styles from '../MacroToolbar.module.css';
+import Icon from '../../../components/common/icons/Icon';
 
 export const TimelineEditor = ({ selectedText, onInsert, onCancel }) => {
   console.log("[TimelineEditor] 라이프사이클 인프라 체크");
@@ -82,7 +83,7 @@ export const TimelineEditor = ({ selectedText, onInsert, onCancel }) => {
   return (
     <>
       <div className={styles.modalBody}>
-        <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: 'var(--text-secondary)' }}>사건을 시간 순서대로 작성하세요. <b>(☰)</b> 버튼을 끌어올려 순서를 바꿀 수 있습니다.</p>
+        <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: 'var(--text-secondary)' }}>사건을 시간 순서대로 작성하세요. <b>(<Icon name="menu" />)</b> 버튼을 끌어올려 순서를 바꿀 수 있습니다.</p>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="timeline-list">
             {(provided) => (
@@ -91,7 +92,7 @@ export const TimelineEditor = ({ selectedText, onInsert, onCancel }) => {
                   <Draggable key={f.id} draggableId={f.id} index={i}>
                     {(provided, snapshot) => (
                       <div ref={provided.innerRef} {...provided.draggableProps} style={{ ...provided.draggableProps.style, display: 'flex', gap: '10px', background: 'var(--bg-color)', padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px', alignItems: 'flex-start', boxShadow: snapshot.isDragging ? '0 5px 15px rgba(0,0,0,0.1)' : 'none', opacity: snapshot.isDragging ? 0.9 : 1 }}>
-                        <div {...provided.dragHandleProps} style={{ fontSize: '20px', color: 'var(--text-secondary)', cursor: 'grab', paddingTop: '5px', flexShrink: 0 }}>☰</div>
+                        <div {...provided.dragHandleProps} style={{ fontSize: '20px', color: 'var(--text-secondary)', cursor: 'grab', paddingTop: '5px', flexShrink: 0 }}><Icon name="menu" /></div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <input ref={el => dateInputRefs.current[i] = el} className={styles.toolInput} style={{ width: '140px', flex: 'none', fontWeight: 'bold' }} value={f.date} onChange={(e) => { const n = [...formList]; n[i].date = e.target.value; setFormList(n); }} placeholder="날짜 (예: 2026.06.27)" />
@@ -99,7 +100,7 @@ export const TimelineEditor = ({ selectedText, onInsert, onCancel }) => {
                           </div>
                           <textarea className={styles.toolInput} style={{ resize: 'vertical', minHeight: '40px', width: '100%', boxSizing: 'border-box' }} value={f.desc} onChange={(e) => { const n = [...formList]; n[i].desc = e.target.value; setFormList(n); }} onKeyDown={(e) => handleDescTab(e, i)} placeholder="사건 상세 내용" />
                         </div>
-                        <button style={{ border: 'none', background: 'transparent', color: '#e53e3e', fontSize: '16px', cursor: 'pointer', padding: '5px', flexShrink: 0 }} onClick={() => { const n = [...formList]; n.splice(i, 1); setFormList(n); }}>✖</button>
+                        <button style={{ border: 'none', background: 'transparent', color: '#e53e3e', fontSize: '16px', cursor: 'pointer', padding: '5px', flexShrink: 0 }} onClick={() => { const n = [...formList]; n.splice(i, 1); setFormList(n); }}><Icon name="close" /></button>
                       </div>
                     )}
                   </Draggable>

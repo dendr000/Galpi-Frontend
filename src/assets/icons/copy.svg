@@ -1,0 +1,5 @@
+<!-- Copyright (c) dendr000. MIT License. -->
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+  <path d="M6 2h10a2 2 0 0 1 2 2v2h-2V4H6v10h2v2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+  <path d="M12 8h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/>
+</svg>
