@@ -2,17 +2,40 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Folder, FileText, ChevronDown, ChevronRight, Menu, Network } from 'lucide-react';
+import { Folder, FileText, ChevronDown, ChevronRight, Menu, Network, Home } from 'lucide-react';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
+import TreeContextMenu from './TreeContextMenu';
+import { newPageUrl, siblingParentId } from './newPageUrl';
 
-const FloatingLeftTree = ({ workId, pageId, wikiPages = [] }) => {
+const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [] }) => {
   const navigate = useNavigate();
+  // 우클릭 메뉴: { x, y, page } (page 가 없으면 최상위 메뉴)
+  const [menu, setMenu] = useState(null);
 
   const [openNodes, setOpenNodes] = useState(() => JSON.parse(localStorage.getItem(`galpi-tree-open-${workId}`) || '[]'));
   const [iconPrefs, setIconPrefs] = useState(() => JSON.parse(localStorage.getItem(`galpi-tree-icons-${workId}`) || '{}'));
 
   const safeWikiPages = Array.isArray(wikiPages) ? wikiPages : [];
   const rootPages = safeWikiPages.filter(p => !p.parentId);
+
+  // Shift+우클릭은 앱 전체 메뉴(GlobalContextMenu)가 쓰므로 비켜 준다
+  const openMenu = (e, page) => {
+    if (e.shiftKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu({ x: e.clientX, y: e.clientY, page });
+  };
+
+  const menuItems = () => {
+    if (!menu) return [];
+    const { page } = menu;
+    if (!page) return [{ label: '최상위 문서 만들기', onSelect: () => navigate(newPageUrl(workId)) }];
+    return [
+      { label: '하위 문서 만들기', onSelect: () => navigate(newPageUrl(workId, page.id)) },
+      { label: '같은 위치에 문서 만들기', onSelect: () => navigate(newPageUrl(workId, siblingParentId(page))) },
+      { label: '문서 열기', onSelect: () => navigate(`/work/${workId}?pageId=${page.id}`) },
+    ];
+  };
 
   const toggleFolder = (e, id) => {
     e.stopPropagation();
@@ -59,6 +82,7 @@ const FloatingLeftTree = ({ workId, pageId, wikiPages = [] }) => {
                   className={`${styles.treeNodeRow} ${isActive ? styles.activePage : ''}`}
                   style={{ flex: 1, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                   onClick={() => navigate(`/work/${workId}?pageId=${page.id}`)}
+                  onContextMenu={(e) => openMenu(e, page)}
                 >
                   <div onClick={(e) => toggleIcon(e, page.id, hasChildren)} style={{ marginRight: '6px', display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }} title="클릭하여 아이콘 변경">
                     {currentIconType === 'folder' && <Folder size={14} fill="currentColor" />}
@@ -85,7 +109,20 @@ const FloatingLeftTree = ({ workId, pageId, wikiPages = [] }) => {
         <div style={{ fontSize: '15px', fontWeight: 900, color: 'var(--primary-color)', marginBottom: '12px', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px' }}>
           🗂️ 문서 트리
         </div>
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div data-tree-body style={{ flex: 1, overflowY: 'auto' }} onContextMenu={(e) => openMenu(e, null)}>
+          {/* 작품 첫 화면(최상위)으로 돌아가는 행: 하위 문서를 깊이 들어가 있어도 스크롤 없이 바로 이동한다 */}
+          <button
+            type="button"
+            className={`${styles.treeNodeRow} ${!pageId ? styles.activePage : ''}`}
+            aria-label={`${workTitle || '작품'} 첫 화면`}
+            aria-current={!pageId ? 'page' : undefined}
+            style={{ width: '100%', marginBottom: '6px', border: 'none', background: 'transparent', textAlign: 'left', fontSize: 'inherit', fontFamily: 'inherit' }}
+            onClick={() => navigate(`/work/${workId}`)}
+            onContextMenu={(e) => openMenu(e, null)}
+          >
+            <span style={{ marginRight: '6px', display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}><Home size={14} /></span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{workTitle || '작품'}</span>
+          </button>
           {rootPages.length > 0 ? (
             renderTree(rootPages)
           ) : (
@@ -99,6 +136,8 @@ const FloatingLeftTree = ({ workId, pageId, wikiPages = [] }) => {
       <div className={styles.treeHandle} title="문서 트리 열기">
         <Menu size={20} />
       </div>
+
+      {menu && <TreeContextMenu x={menu.x} y={menu.y} items={menuItems()} onClose={() => setMenu(null)} />}
       
     </div>
   );

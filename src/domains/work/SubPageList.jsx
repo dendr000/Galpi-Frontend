@@ -3,6 +3,7 @@
 // 버전: v1.0.0
 
 import React from 'react';
+import { newPageUrl } from './newPageUrl';
 
 const SubPageList = ({ wikiPages, pageId, workId, navigate, styles }) => {
   console.log("[SubPageList] 하위 문서 목록 렌더링 가동. 현재 부모 pageId:", pageId);
@@ -10,7 +11,7 @@ const SubPageList = ({ wikiPages, pageId, workId, navigate, styles }) => {
   const childPages = wikiPages.filter(p => pageId ? String(p.parentId) === String(pageId) : !p.parentId);
 
   const handleNewDocClick = () => {
-    const targetUrl = `/edit?type=page&action=new&workId=${workId}${pageId ? `&parentId=${pageId}` : ''}`;
+    const targetUrl = newPageUrl(workId, pageId);
     console.log(`[SubPageList] 새 문서 추가 라우팅 집행: ${targetUrl}`);
     navigate(targetUrl);
   };

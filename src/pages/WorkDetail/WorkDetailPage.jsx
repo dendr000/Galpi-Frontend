@@ -59,6 +59,7 @@ import { collectFilterGroups, filterChars, toggleFilterValue } from '../../domai
 import PageMemberList from '../../domains/character/PageMemberList';
 import ExportDialog from '../../domains/work/export/ExportDialog';
 import { useWorkExport } from '../../domains/work/export/useWorkExport';
+import { newPageUrl, siblingParentId } from '../../domains/work/newPageUrl';
 import RatingScaleTable from '../../domains/character/RatingScaleTable';
 import { parseRatingAxes, parseRatingScale } from '../../domains/character/ratings';
 
@@ -175,7 +176,7 @@ const WorkDetailPage = () => {
   return (
     <div className="main-content-wrap">
       {/* 1단계: 플로팅 사이드바 위젯 부착 구역 */}
-      <FloatingLeftTree workId={data.workId} pageId={data.pageId} wikiPages={data.wikiPages} />
+      <FloatingLeftTree workId={data.workId} workTitle={data.work.title} pageId={data.pageId} wikiPages={data.wikiPages} />
       <FloatingToc tocList={data.tocList} workId={data.workId} pageId={data.pageId} activePage={activePage} />
       <GenreCursor theme={genreTheme} zoneId="galpi-genre-zone" />
 
@@ -227,6 +228,8 @@ const WorkDetailPage = () => {
                   <h2 className={`${styles.sectionHeaderTitle} gt-section-title`} style={{ color: 'var(--primary-color)' }}>{activePage.title}</h2>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button className="wiki-btn gt-btn-edit" style={{ padding: '4px 10px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }} onClick={() => data.navigate(`/edit?type=page&action=edit&workId=${data.workId}&id=${activePage.id}`)}><IconPen size={13} /> 문서 편집</button>
+                    {/* 최상위로 돌아가지 않고 이 문서와 같은 위치(같은 상위 문서 아래)에 바로 새 문서를 만든다 */}
+                    <button type="button" aria-label="같은 위치에 새 문서" className="wiki-btn gt-btn-edit" style={{ padding: '4px 10px', fontSize: '13px', whiteSpace: 'nowrap' }} onClick={() => data.navigate(newPageUrl(data.workId, siblingParentId(activePage)))}>+ 같은 위치에 새 문서</button>
                     <button className="wiki-btn gt-btn-del" style={{ padding: '4px 10px', fontSize: '13px', background: 'transparent', color: '#e53e3e', border: '1px dashed #e53e3e' }} onClick={async () => {
                       if (window.confirm("⚠️ 경고: 이 하위 문서를 영구 삭제하시겠습니까?")) {
                         try {
