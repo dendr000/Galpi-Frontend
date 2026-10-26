@@ -1,8 +1,11 @@
 // Copyright (c) dendr000. MIT License.
-// 페이지 안 글자 찾기(Ctrl+F). Electron(exe)에는 브라우저의 기본 찾기 창이 없어서 Ctrl+F 가 아무 일도 안 하므로 직접 만든다.
+// 페이지 안 글자 찾기(Ctrl+F). Electron(exe)에는 브라우저의 기본 찾기 창이 없어서 Ctrl+F 가 아무 일도 하지 않으므로 직접 만든다.
 // 일반 브라우저에서는 기본 찾기가 있으니 끄고(enabled=false), exe 에서만 켠다.
-// 찾기는 window.find 로 하고 현재 일치 부분이 선택 표시로 보인다. 에디터는 자체 찾기가 먼저 Ctrl+F 를 처리한다.
+// 찾기는 findInPage.js 가 문서 글자를 훑어 하고, 일치 부분은 선택/포커스를 건드리지 않는 CSS Highlight 로 표시한다.
+// (예전에는 window.find 를 썼는데, 입력칸 자신에 걸리지 않게 창을 숨기느라 입력칸이 포커스를 잃어 한글 조합이 끊겼다.)
+// 에디터는 자체 찾기가 먼저 Ctrl+F 를 처리한다.
 import React, { useState, useEffect, useRef } from 'react';
+import { collectMatches, applyHighlights, clearHighlights, scrollToMatch, HIGHLIGHT_ALL, HIGHLIGHT_CURRENT } from './findInPage';
 
 export const isElectron = (ua = typeof navigator !== 'undefined' ? navigator.userAgent : '') => /Electron\//.test(ua || '');
 
@@ -13,10 +16,17 @@ const barStyle = {
 };
 const btnStyle = { padding: '4px 10px', borderRadius: '5px', border: '1px solid var(--border-color)', background: 'transparent', color: 'inherit', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer' };
 
-const FindBar = ({ enabled = isElectron(), find = (...a) => window.find(...a) }) => {
+// 일치 표시 색: 모든 일치는 연한 노랑, 현재 일치는 주황. 글자색을 검정으로 고정해 어두운 테마에서도 읽힌다.
+const HIGHLIGHT_CSS = `
+::highlight(${HIGHLIGHT_ALL}) { background-color: #ffe066; color: #000; }
+::highlight(${HIGHLIGHT_CURRENT}) { background-color: #ff922b; color: #000; }
+`;
+
+const FindBar = ({ enabled = isElectron() }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [missing, setMissing] = useState(false);
+  const [matches, setMatches] = useState([]);
+  const [index, setIndex] = useState(-1);
   const inputRef = useRef(null);
   const barRef = useRef(null);
 
@@ -42,57 +52,62 @@ const FindBar = ({ enabled = isElectron(), find = (...a) => window.find(...a) })
     if (open) { inputRef.current?.focus(); inputRef.current?.select(); }
   }, [open]);
 
+  // 검색어가 바뀔 때마다(한글 조합 중이어도) 다시 찾는다. 입력칸의 포커스는 건드리지 않는다.
+  useEffect(() => {
+    if (!open) { clearHighlights(); return; }
+    const found = collectMatches(document.body, query, barRef.current);
+    setMatches(found);
+    const first = found.length ? 0 : -1;
+    setIndex(first);
+    applyHighlights(found, first);
+    if (first === 0) scrollToMatch(found[0]);
+  }, [query, open]);
+
+  // 화면에서 사라질 때(닫기, 꺼짐) 표시도 함께 지운다.
+  useEffect(() => () => clearHighlights(), []);
+
   if (!enabled || !open) return null;
 
-  // fromStart: 입력하는 대로 찾을 때, 지금 선택된 일치 부분의 앞에서부터 다시 찾는다(글자를 늘려도 같은 자리에서 이어짐)
-  const run = (text, backwards, fromStart) => {
-    if (!text) { setMissing(false); return; }
-    if (fromStart) {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0) sel.collapseToStart();
-    }
-    // 브라우저의 찾기는 입력칸 안의 글자도 찾아서, 찾는 글자를 입력한 이 입력칸 자신에 걸려 "찾았다"고 나온다.
-    // 찾는 동안만 찾기창을 숨기고(화면은 다시 그려지지 않는다), 끝나면 되돌리고 입력칸에 포커스를 돌려준다.
-    const bar = barRef.current;
-    if (bar) bar.style.display = 'none';
-    let found = false;
-    try {
-      found = find(text, false, backwards, true);
-    } finally {
-      if (bar) bar.style.display = 'flex';
-      inputRef.current?.focus({ preventScroll: true });
-    }
-    setMissing(!found);
+  const step = (delta) => {
+    if (matches.length === 0) return;
+    const next = (index + delta + matches.length) % matches.length;
+    setIndex(next);
+    applyHighlights(matches, next);
+    scrollToMatch(matches[next]);
   };
 
-  const close = () => { setOpen(false); setMissing(false); };
+  const close = () => setOpen(false);
 
   const onKeyDown = (e) => {
     if (e.key === 'Escape') { close(); return; }
     if (e.nativeEvent?.isComposing || e.isComposing) return;
     if (e.key === 'Enter' || e.key === 'F3') {
       e.preventDefault();
-      run(query, e.shiftKey, false);
+      step(e.shiftKey ? -1 : 1);
     }
   };
 
+  const hasQuery = query.trim() !== '';
+  const status = !hasQuery ? '' : matches.length === 0 ? '찾는 글자가 없습니다' : `${index + 1} / ${matches.length}`;
+
   return (
     <div ref={barRef} role="search" aria-label="페이지에서 찾기" style={barStyle}>
+      <style>{HIGHLIGHT_CSS}</style>
       <input
         ref={inputRef}
         type="text"
         aria-label="페이지에서 찾기"
         value={query}
         placeholder="페이지에서 찾기"
-        onChange={(e) => { setQuery(e.target.value); run(e.target.value, false, true); }}
+        onChange={(e) => setQuery(e.target.value)}
         onKeyDown={onKeyDown}
         style={{ width: '200px', padding: '5px 8px', border: '1px solid var(--border-color)', borderRadius: '5px', background: 'var(--bg-color)', color: 'var(--text-primary)', userSelect: 'text' }}
       />
-      <span role="status" style={{ minWidth: '92px', fontSize: '12px', color: '#c92a2a', fontWeight: 700 }}>
-        {missing ? '찾는 글자가 없습니다' : ''}
+      <span role="status" style={{ minWidth: '92px', fontSize: '12px', color: matches.length === 0 && hasQuery ? '#c92a2a' : 'var(--text-secondary)', fontWeight: 700 }}>
+        {status}
       </span>
-      <button type="button" style={btnStyle} onClick={() => run(query, true, false)}>이전</button>
-      <button type="button" style={btnStyle} onClick={() => run(query, false, false)}>다음</button>
+      <button type="button" style={btnStyle} onClick={() => step(-1)}>이전</button>
+      <button type="button" style={btnStyle} onClick={() => step(1)}>다음</button>
       <button type="button" style={btnStyle} onClick={close}>닫기</button>
     </div>
   );
