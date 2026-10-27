@@ -27,17 +27,33 @@ export const getVisibleCharacters = (characters, formSwaps) => {
   return { baseChars, displayChars };
 };
 
+// 값이 여러 개인 캐릭터를 어느 그룹에 넣을지: all(값마다 모두), first(첫 번째 값만), last(마지막 값만).
+// 작품 메타(multiGroup)에 first, last 일 때만 저장하고 없으면 all 이다.
+export const MULTI_GROUP_MODES = ['all', 'first', 'last'];
+export const getMultiGroupMode = (meta) => (MULTI_GROUP_MODES.includes(meta?.multiGroup) ? meta.multiGroup : 'all');
+
+// 작품 설정 저장용: 편집기에서 고른 값을 메타에 넣고, all 이거나 비면 메타에서 지운다. 원본 메타는 바꾸지 않는다.
+export const applyMultiGroupMeta = (meta, workMeta) => {
+  const next = { ...meta };
+  const mode = workMeta?.multiGroupMode;
+  if (mode === 'first' || mode === 'last') next.multiGroup = mode; else delete next.multiGroup;
+  return next;
+};
+
 // 분류 속성(groupCriteria)으로 묶고 그룹 안을 정렬한다. 반환: { groupedChars, sortedGroupNames }
-// - 쉼표로 여러 값이면 여러 그룹에 들어가고, 값이 없거나 *로만 된 캐릭터는 "미분류"
+// - 쉼표로 여러 값이면 multiGroupMode 에 따라 여러 그룹(all) 또는 첫 번째(first), 마지막(last) 그룹에만 들어간다.
+//   *로 시작하는 값은 처음부터 빼고 센다. 값이 없거나 *로만 된 캐릭터는 "미분류"
 // - 그룹 안 수동 순서: 그룹 전용 드래그 순서 -> 기본 순서 -> 999. 속성 정렬(sortKey)을 고르면 그 위에 덮어쓴다
 // - 그룹 순서: groupOrderArray 에 있는 것이 먼저, 나머지는 뒤에 원래 순서대로
-export const buildCharacterGroups = ({ chars, allCharacters, groupCriteria, groupOrderArray, sortKey, sortDir }) => {
+export const buildCharacterGroups = ({ chars, allCharacters, groupCriteria, groupOrderArray, sortKey, sortDir, multiGroupMode = 'all' }) => {
   const groupedChars = {};
   chars.forEach((c) => {
     const rawVal = c[groupCriteria] || '미분류';
     const tags = String(rawVal).split(',').map((s) => s.trim()).filter(Boolean);
     let validTags = tags.filter((t) => !t.startsWith('*'));
     if (validTags.length === 0) validTags = ['미분류'];
+    if (multiGroupMode === 'first') validTags = validTags.slice(0, 1);
+    else if (multiGroupMode === 'last') validTags = validTags.slice(-1);
     validTags.forEach((tag) => {
       if (!groupedChars[tag]) groupedChars[tag] = [];
       if (!groupedChars[tag].some((exist) => exist.id === c.id)) groupedChars[tag].push(c);

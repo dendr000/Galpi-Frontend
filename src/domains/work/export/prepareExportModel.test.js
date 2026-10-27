@@ -183,3 +183,24 @@ describe('prepareExportModel 본문 안전', () => {
     expect(off.settingsHtml).not.toContain('data:image');
   });
 });
+
+describe('prepareExportModel 여러 값일 때 그룹 표시', () => {
+  const withMode = (mode) => ({
+    work: work({ description: meta({ multiGroup: mode }) }),
+    groupCriteria: '소속',
+    characters: [ch(1, { 소속: '북부, 사교' }), ch(2, { 소속: '사교' })],
+  });
+  const names = (m) => m.groups.map((g) => `${g.name}:${g.chars.map((c) => c.id).join('+')}`).sort();
+
+  it('first 면 첫 번째 값의 그룹에만 담는다', async () => {
+    expect(names(await run(withMode('first')))).toEqual(['북부:1', '사교:2']);
+  });
+
+  it('last 면 마지막 값의 그룹에만 담는다', async () => {
+    expect(names(await run(withMode('last')))).toEqual(['사교:1+2']);
+  });
+
+  it('설정이 없으면 모든 값의 그룹에 담는다', async () => {
+    expect(names(await run(withMode(undefined)))).toEqual(['북부:1', '사교:1+2']);
+  });
+});

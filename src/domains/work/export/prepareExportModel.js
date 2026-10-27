@@ -4,7 +4,7 @@
 import { extractMeta } from '../../../utils/markdownParser';
 import { sanitizeFilenameTitle } from '../../../utils/filenameSanitizer';
 import { renderMarkdownHtml } from '../../macro/utils/renderMarkdownHtml';
-import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray } from '../../character/characterGroups';
+import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode } from '../../character/characterGroups';
 import { parseRatingAxes, parseRatingScale, getRatings } from '../../character/ratings';
 import { isClassified } from '../../character/classified';
 import { getAffiliationMembers } from '../organization';
@@ -63,6 +63,7 @@ export const prepareExportModel = async ({
   const { groupedChars, sortedGroupNames } = buildCharacterGroups({
     chars: displayChars, allCharacters: characters, groupCriteria,
     groupOrderArray: getGroupOrderArray(meta, groupCriteria), sortKey, sortDir,
+    multiGroupMode: getMultiGroupMode(meta),
   });
 
   // 캐릭터 한 명의 내보내기 정보는 한 번만 만들고 여러 그룹이 함께 쓴다

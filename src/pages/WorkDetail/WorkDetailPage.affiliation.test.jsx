@@ -147,3 +147,29 @@ describe('WorkDetailPage 소속 문서 연결', () => {
     expect(state.data.setActiveCharId).toHaveBeenCalledWith(3);
   });
 });
+
+describe('WorkDetailPage 여러 값일 때 그룹 표시', () => {
+  const names = () => Object.entries(state.grid.groupedChars).map(([k, v]) => `${k}:${v.map((c) => c.id).join('+')}`).sort();
+  const withMode = (mode) => baseData({
+    groupCriteria: '소속',
+    work: { id: 91, title: '시험 작품', genre: '', description: `[META_DATA:${JSON.stringify(mode ? { multiGroup: mode } : {})}]\n개요` },
+  });
+
+  it('작품 설정이 없으면 모든 소속 그룹에 넣는다', () => {
+    state.data = withMode(undefined);
+    render(<WorkDetailPage />);
+    expect(names()).toEqual(['남부:3', '북부:1+2', '사교:2']);
+  });
+
+  it('first 면 첫 번째 소속 그룹에만 넣는다', () => {
+    state.data = withMode('first');
+    render(<WorkDetailPage />);
+    expect(names()).toEqual(['남부:3', '북부:1+2']);
+  });
+
+  it('last 면 마지막 소속 그룹에만 넣는다', () => {
+    state.data = withMode('last');
+    render(<WorkDetailPage />);
+    expect(names()).toEqual(['남부:3', '북부:1', '사교:2']);
+  });
+});

@@ -1,6 +1,6 @@
 // Copyright (c) dendr000. MIT License.
 import { describe, it, expect } from 'vitest';
-import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray } from './characterGroups';
+import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode, applyMultiGroupMeta } from './characterGroups';
 
 const dp = (obj) => JSON.stringify(obj);
 const ch = (id, over = {}) => ({ id, name: `c${id}`, 관계: '일반', ...over });
@@ -50,6 +50,52 @@ describe('buildCharacterGroups', () => {
     expect(ids(groupedChars['사교'])).toEqual([1]);
   });
 
+  describe('여러 값일 때 어느 그룹에 넣을지(multiGroupMode)', () => {
+    const chars = [ch(1, { 소속: 'A, B, C' }), ch(2, { 소속: 'B' }), ch(3, { 소속: '*비밀, D, E' })];
+    const names = (mode) => build(chars, { groupCriteria: '소속', multiGroupMode: mode });
+
+    it('all(기본)은 값마다 그룹에 넣는다', () => {
+      const { groupedChars } = names('all');
+      expect(ids(groupedChars['A'])).toEqual([1]);
+      expect(ids(groupedChars['C'])).toEqual([1]);
+      expect(ids(groupedChars['E'])).toEqual([3]);
+      expect(build(chars, { groupCriteria: '소속' }).sortedGroupNames).toEqual(names('all').sortedGroupNames);
+    });
+
+    it('first 는 첫 번째 값의 그룹에만 넣는다', () => {
+      const { groupedChars, sortedGroupNames } = names('first');
+      expect([...sortedGroupNames].sort()).toEqual(['A', 'B', 'D']);
+      expect(ids(groupedChars['A'])).toEqual([1]);
+      expect(ids(groupedChars['B'])).toEqual([2]);
+    });
+
+    it('last 는 마지막 값의 그룹에만 넣는다', () => {
+      const { groupedChars, sortedGroupNames } = names('last');
+      expect([...sortedGroupNames].sort()).toEqual(['B', 'C', 'E']);
+      expect(ids(groupedChars['C'])).toEqual([1]);
+      expect(ids(groupedChars['B'])).toEqual([2]);
+    });
+
+    it('*로 시작하는 값은 첫 번째, 마지막을 셀 때도 빼고 센다', () => {
+      expect(Object.keys(names('first').groupedChars)).toContain('D');
+      expect(Object.keys(names('first').groupedChars)).not.toContain('비밀');
+      expect(Object.keys(names('last').groupedChars)).not.toContain('D');
+    });
+
+    it('값이 하나뿐이거나 없는 캐릭터는 모드와 상관없이 그대로', () => {
+      const one = [ch(1, { 소속: 'A' }), ch(2, { 소속: '' }), ch(3, { 소속: '*x' })];
+      for (const mode of ['first', 'last']) {
+        const { groupedChars } = build(one, { groupCriteria: '소속', multiGroupMode: mode });
+        expect(ids(groupedChars['A'])).toEqual([1]);
+        expect(ids(groupedChars['미분류'])).toEqual([2, 3]);
+      }
+    });
+
+    it('알 수 없는 모드는 all 처럼 동작한다', () => {
+      expect(Object.keys(names('뭔가').groupedChars).sort()).toEqual(Object.keys(names('all').groupedChars).sort());
+    });
+  });
+
   it('값이 없거나 *로만 된 캐릭터는 "미분류"', () => {
     const { groupedChars } = build([ch(1, { 소속: '' }), ch(2, { 소속: '*비밀' })], { groupCriteria: '소속' });
     expect(ids(groupedChars['미분류'])).toEqual([1, 2]);
@@ -92,5 +138,28 @@ describe('getGroupOrderArray', () => {
   });
   it('다른 분류 기준은 기본 순서가 없다', () => {
     expect(getGroupOrderArray({}, '소속')).toEqual([]);
+  });
+});
+
+describe('getMultiGroupMode', () => {
+  it('작품 메타의 값이 유효하면 그대로, 아니면 all', () => {
+    expect(getMultiGroupMode({ multiGroup: 'first' })).toBe('first');
+    expect(getMultiGroupMode({ multiGroup: 'last' })).toBe('last');
+    expect(getMultiGroupMode({ multiGroup: 'all' })).toBe('all');
+    expect(getMultiGroupMode({ multiGroup: 'x' })).toBe('all');
+    expect(getMultiGroupMode({})).toBe('all');
+    expect(getMultiGroupMode(undefined)).toBe('all');
+  });
+});
+
+describe('applyMultiGroupMeta', () => {
+  it('first, last 는 메타에 넣고, all 이거나 비면 메타에서 지운다. 원본은 바꾸지 않는다', () => {
+    const base = { keep: 1, multiGroup: 'last' };
+    expect(applyMultiGroupMeta(base, { multiGroupMode: 'first' })).toEqual({ keep: 1, multiGroup: 'first' });
+    expect(applyMultiGroupMeta({ keep: 1 }, { multiGroupMode: 'last' })).toEqual({ keep: 1, multiGroup: 'last' });
+    expect(applyMultiGroupMeta(base, { multiGroupMode: 'all' })).toEqual({ keep: 1 });
+    expect(applyMultiGroupMeta(base, {})).toEqual({ keep: 1 });
+    expect(applyMultiGroupMeta(base, { multiGroupMode: 'x' })).toEqual({ keep: 1 });
+    expect(base).toEqual({ keep: 1, multiGroup: 'last' });
   });
 });

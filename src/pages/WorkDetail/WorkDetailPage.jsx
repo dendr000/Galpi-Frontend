@@ -53,7 +53,7 @@ import { useSelectCharFromUrl } from '../../domains/work/useSelectCharFromUrl';
 import { getAffiliationMembers } from '../../domains/work/organization';
 import { useCharacterSort } from '../../domains/character/useCharacterSort';
 import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
-import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray } from '../../domains/character/characterGroups';
+import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode } from '../../domains/character/characterGroups';
 import { useClassifiedMask } from '../../domains/character/useClassifiedMask';
 import { collectFilterGroups, filterChars, toggleFilterValue } from '../../domains/character/characterFilter';
 import PageMemberList from '../../domains/character/PageMemberList';
@@ -170,6 +170,7 @@ const WorkDetailPage = () => {
   const { groupedChars, sortedGroupNames } = buildCharacterGroups({
     chars: visibleChars, allCharacters: data.characters, groupCriteria: data.groupCriteria,
     groupOrderArray: getGroupOrderArray(parsedDesc.meta, data.groupCriteria), sortKey, sortDir,
+    multiGroupMode: getMultiGroupMode(parsedDesc.meta),
   });
   const sortKeys = collectSortKeys(baseChars);
 

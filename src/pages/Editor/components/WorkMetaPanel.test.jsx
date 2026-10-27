@@ -135,3 +135,24 @@ describe('WorkMetaPanel 등급 설정 칸', () => {
     expect(document.querySelector('textarea[aria-label="등급 판정 축"]').value).toBe('');
   });
 });
+
+describe('WorkMetaPanel 여러 값일 때 그룹 표시', () => {
+  const select = () => document.querySelector('select[aria-label="여러 값일 때 그룹 표시"]');
+
+  it('선택칸이 있고 모두, 첫 번째만, 마지막만 세 가지를 고를 수 있다', () => {
+    renderPanel(baseMeta({ multiGroupMode: 'first' }));
+    expect(select().value).toBe('first');
+    expect([...select().options].map((o) => o.value)).toEqual(['all', 'first', 'last']);
+  });
+
+  it('workMeta 에 값이 없는 예전 상태면 모두(all)로 보인다', () => {
+    renderPanel(baseMeta());
+    expect(select().value).toBe('all');
+  });
+
+  it('고르면 setWorkMeta 로 multiGroupMode 에 반영한다', () => {
+    const { setWorkMeta } = renderPanel(baseMeta());
+    fireEvent.change(select(), { target: { value: 'last' } });
+    expect(setWorkMeta).toHaveBeenCalledWith(expect.objectContaining({ multiGroupMode: 'last' }));
+  });
+});

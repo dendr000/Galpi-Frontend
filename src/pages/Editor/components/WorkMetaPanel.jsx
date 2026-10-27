@@ -188,6 +188,20 @@ const WorkMetaPanel = ({ workMeta, setWorkMeta }) => {
           />
         </div>
 
+        {/* 값이 여러 개인 캐릭터(소속 "A, B" 등)를 작품 페이지 그룹에 어떻게 보일지 */}
+        <div className={styles.propRow} style={{ gridColumn: '1 / -1' }}>
+          <label>여러 값일 때 그룹 표시<br/><span style={{fontSize:'10px', color:'var(--primary-color)'}}>쉼표로 값을 여러 개 쓴 캐릭터</span></label>
+          <select
+            aria-label="여러 값일 때 그룹 표시"
+            value={workMeta.multiGroupMode || 'all'}
+            onChange={e => setWorkMeta({...workMeta, multiGroupMode: e.target.value})}
+          >
+            <option value="all">모든 값의 그룹에 표시</option>
+            <option value="first">첫 번째 값의 그룹에만 표시</option>
+            <option value="last">마지막 값의 그룹에만 표시</option>
+          </select>
+        </div>
+
         {/* 등급 배지 설정: 판정 축(속성이름:약칭)과 등급 기준표(등급:명칭:기준) */}
         <div className={styles.propRow} style={{ gridColumn: '1 / -1', alignItems: 'flex-start' }}>
           <label>등급 판정 축<br/><span style={{fontSize:'10px', color:'var(--primary-color)'}}>속성이름:약칭 (한 줄에 하나)</span></label>

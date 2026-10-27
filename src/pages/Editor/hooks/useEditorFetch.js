@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import api from '../../../api/axiosCore';
 import { extractMeta } from '../../../utils/markdownParser';
 import { SYSTEM_PROPS } from '../constants/editorConstants';
+import { getMultiGroupMode } from '../../../domains/character/characterGroups';
 
 export const useEditorFetch = ({
   docType, docAction, targetId, targetWorkId,
@@ -58,7 +59,7 @@ export const useEditorFetch = ({
             setWorkMeta({
               creator: data.creator || '', genre: data.genre || '', status: data.status || '진행 전',
               alias: parsed.meta.alias || '', coverExt: parsed.meta.coverExt || '', charExt: parsed.meta.charExt || 'png',
-              groupOrderStr: groupOrderStr,
+              groupOrderStr: groupOrderStr, multiGroupMode: getMultiGroupMode(parsed.meta),
               ratingAxesStr: parsed.meta.ratingAxes || '', ratingScaleStr: parsed.meta.ratingScale || '',
               imgVariants: parsed.meta.imgVariants?.length > 0 ? parsed.meta.imgVariants : [''],
               originalMeta: parsed.meta

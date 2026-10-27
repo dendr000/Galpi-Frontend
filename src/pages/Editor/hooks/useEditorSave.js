@@ -4,6 +4,7 @@ import api from '../../../api/axiosCore';
 import { extractMeta } from '../../../utils/markdownParser';
 import { carryOverCharacterSystemProps } from '../../../domains/character/characterOrder';
 import { applyRatingMeta } from '../../../domains/character/ratings';
+import { applyMultiGroupMeta } from '../../../domains/character/characterGroups';
 
 export const useEditorSave = ({
   docType, docAction, targetId, targetWorkId, searchParams,
@@ -33,10 +34,10 @@ export const useEditorSave = ({
 
     try {
       if (docType === 'work') {
-        const meta = applyRatingMeta({
+        const meta = applyMultiGroupMeta(applyRatingMeta({
           ...workMeta.originalMeta,
           alias: workMeta.alias, charExt: workMeta.charExt || 'png', coverExt: workMeta.coverExt, overview: overviewText,
-        }, workMeta);
+        }, workMeta), workMeta);
 
         const validVariants = workMeta.imgVariants.filter(v => v.trim() !== '');
         if (validVariants.length > 0) meta.imgVariants = validVariants;
