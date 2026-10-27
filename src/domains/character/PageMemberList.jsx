@@ -1,13 +1,13 @@
 // Copyright (c) dendr000. MIT License.
 // 하위 문서(조직 소개 등) 아래에 그 문서 제목과 같은 소속의 인물을 카드로 모아 보여 주는 목록.
-// 카드를 누르면 작품 페이지에서 그 캐릭터가 선택된 상태로 열린다(?charId=).
+// 카드를 누르면 페이지를 옮기지 않고 그 캐릭터를 선택한다. 선택한 캐릭터는 오른쪽 정보 상자에 나온다(다시 누르면 해제).
 import React from 'react';
 import { sanitizeFilenameTitle } from '../../utils/filenameSanitizer';
 import { getPropValue } from './characterSort';
 import ClassifiedStamp from './ClassifiedStamp';
 import { NO_CLASSIFIED } from './classified';
 
-const PageMemberList = ({ members, workId, work, charExt, navigate, styles, sortKey, classified = NO_CLASSIFIED }) => {
+const PageMemberList = ({ members, work, charExt, activeCharId, onSelect, styles, sortKey, classified = NO_CLASSIFIED }) => {
   if (!members || members.length === 0) return null;
   const ext = String(charExt || 'png').replace(/^\./, '');
   const workTitle = sanitizeFilenameTitle(work?.title || '작품');
@@ -24,12 +24,19 @@ const PageMemberList = ({ members, workId, work, charExt, navigate, styles, sort
           const src = `/img/character/${encodeURIComponent(`${workTitle}_${sanitizeFilenameTitle(c.name)}.${ext}`)}`;
           const sortValue = sortKey ? getPropValue(c, sortKey) : '';
           const concealed = classified.isConcealed(c);
+          const selected = activeCharId === c.id;
+          const select = () => onSelect(selected ? null : c.id);
           return (
             <div
               key={c.id}
               id={`member-card-${c.id}`}
               className={`${styles.noteCard} gt-card`}
-              onClick={() => navigate(`/work/${workId}?charId=${c.id}`)}
+              role="button"
+              tabIndex={0}
+              aria-pressed={selected}
+              style={{ cursor: 'pointer', backgroundColor: selected ? 'var(--table-bg-alt)' : 'var(--surface-color)' }}
+              onClick={select}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } }}
             >
               <div className={`${styles.cardImgWrap} gt-card-img`}>
                 <img

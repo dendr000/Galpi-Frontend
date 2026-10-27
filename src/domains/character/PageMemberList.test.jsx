@@ -12,7 +12,7 @@ const members = [
 ];
 
 const renderList = (over = {}) => {
-  const props = { members, workId: '91', work: { title: '작품' }, charExt: 'png', navigate: vi.fn(), styles: {}, sortKey: '', ...over };
+  const props = { members, work: { title: '작품' }, charExt: 'png', activeCharId: null, onSelect: vi.fn(), styles: {}, sortKey: '', ...over };
   return { props, ...render(<PageMemberList {...props} />) };
 };
 
@@ -28,10 +28,31 @@ describe('PageMemberList', () => {
     expect(screen.getAllByRole('heading', { level: 4 }).map((h) => h.textContent)).toEqual(['존 왓슨', '셜록 홈즈']);
   });
 
-  it('카드를 누르면 작품 페이지에서 그 캐릭터가 선택되도록 charId 주소로 이동한다', () => {
+  it('카드를 누르면 페이지를 옮기지 않고 그 캐릭터를 선택한다(정보 상자에서 보도록)', () => {
     const { props } = renderList();
     fireEvent.click(screen.getByText('셜록 홈즈').closest('[id^="member-card-"]'));
-    expect(props.navigate).toHaveBeenCalledWith('/work/91?charId=1');
+    expect(props.onSelect).toHaveBeenCalledWith(1);
+  });
+
+  it('이미 선택된 카드를 다시 누르면 선택을 푼다', () => {
+    const { props } = renderList({ activeCharId: 1 });
+    fireEvent.click(screen.getByText('셜록 홈즈').closest('[id^="member-card-"]'));
+    expect(props.onSelect).toHaveBeenCalledWith(null);
+  });
+
+  it('선택된 카드는 표시한다(aria-pressed, 배경)', () => {
+    renderList({ activeCharId: 1 });
+    const on = document.getElementById('member-card-1');
+    const off = document.getElementById('member-card-4');
+    expect(on.getAttribute('aria-pressed')).toBe('true');
+    expect(off.getAttribute('aria-pressed')).toBe('false');
+    expect(on.style.backgroundColor).not.toBe(off.style.backgroundColor);
+  });
+
+  it('키보드(Enter)로도 선택할 수 있다', () => {
+    const { props } = renderList();
+    fireEvent.keyDown(document.getElementById('member-card-4'), { key: 'Enter' });
+    expect(props.onSelect).toHaveBeenCalledWith(4);
   });
 
   it('정렬 속성이 있으면 카드에 그 값을 함께 보여 준다', () => {

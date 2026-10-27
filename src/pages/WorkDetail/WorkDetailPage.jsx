@@ -244,7 +244,8 @@ const WorkDetailPage = () => {
                 <MarkdownRenderer rawText={activePage.content} onNodeClick={handleBacklink} />
                 <PageMemberList
                   members={sortCharsByProperty(getAffiliationMembers(data.characters, activePage.title), sortKey, sortDir)}
-                  workId={data.workId} work={data.work} charExt={charExt} navigate={data.navigate} styles={styles} sortKey={sortKey}
+                  work={data.work} charExt={charExt} styles={styles} sortKey={sortKey}
+                  activeCharId={data.activeCharId} onSelect={data.setActiveCharId}
                   classified={classified}
                 />
               </section>

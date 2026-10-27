@@ -128,11 +128,27 @@ describe('WorkDetailPage 소속 문서 연결', () => {
     expect(names).toEqual(['레온', '릴리']);
   });
 
-  it('인물 카드를 누르면 charId 주소로 이동한다', () => {
+  it('인물 카드를 누르면 페이지를 옮기지 않고 그 캐릭터를 선택한다', () => {
     state.data = baseData({ pageId: '7' });
     const { container } = render(<WorkDetailPage />);
     fireEvent.click(container.querySelector('#member-card-2'));
-    expect(state.data.navigate).toHaveBeenCalledWith('/work/91?charId=2');
+    expect(state.data.setActiveCharId).toHaveBeenCalledWith(2);
+    expect(state.data.navigate).not.toHaveBeenCalled();
+  });
+
+  it('하위 문서 화면에서도 선택된 캐릭터를 정보 상자에 보여 준다', () => {
+    state.data = baseData({ pageId: '7', activeCharId: 2 });
+    render(<WorkDetailPage />);
+    expect(state.infobox.char).toMatchObject({ id: 2, name: '레온' });
+  });
+
+  it('선택된 인물 카드는 표시되고, 다시 누르면 선택이 풀린다', () => {
+    state.data = baseData({ pageId: '7', activeCharId: 2 });
+    const { container } = render(<WorkDetailPage />);
+    expect(container.querySelector('#member-card-2').getAttribute('aria-pressed')).toBe('true');
+    expect(container.querySelector('#member-card-1').getAttribute('aria-pressed')).toBe('false');
+    fireEvent.click(container.querySelector('#member-card-2'));
+    expect(state.data.setActiveCharId).toHaveBeenCalledWith(null);
   });
 
   it('작품 첫 화면(하위 문서를 보지 않을 때)에는 소속 인물 목록을 그리지 않는다', () => {
