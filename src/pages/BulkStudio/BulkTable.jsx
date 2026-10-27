@@ -8,7 +8,7 @@ import { askColumnPosition } from './columnMovePrompt';
 import { IconChevronLeft, IconChevronRight } from '../../components/common/icons/DomainIcons';
 
 const BulkTable = ({ 
-  columns, rows, loading, tabMode, suggestions, 
+  columns, rows, loading, tabMode, suggestions, selectedWorkId,
   handleCellChange, toggleRowCheck, toggleAllChecks, removeRow, removeColumn, 
   changeColOrder, setActiveRowIdx, setBodyModal 
 }) => {
@@ -69,7 +69,12 @@ const BulkTable = ({
   const allChecked = rows.length > 0 && rows.every(r => r._checked);
 
   if (loading) return <div style={{ padding: '40px', textAlign: 'center', fontWeight: 'bold' }}>로딩 중...</div>;
-  if (rows.length === 0) return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>작품을 선택해 주세요.</div>;
+  if (rows.length === 0) {
+    const emptyMsg = selectedWorkId
+      ? "이 작품에는 아직 캐릭터가 없습니다. 위의 '붙여넣기로 추가'나 '행 추가'로 만들어 주세요."
+      : '작품을 선택해 주세요.';
+    return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>{emptyMsg}</div>;
+  }
 
   return (
     <>

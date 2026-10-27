@@ -16,7 +16,7 @@ export const BulkModals = ({
   const [targetCol, setTargetCol] = useState('ALL');
   const [bodyText, setBodyText] = useState('');
   const [pasteText, setPasteText] = useState('');
-  const [pasteMode, setPasteMode] = useState('grid'); // 'grid' | 'text'
+  const [pasteMode, setPasteMode] = useState('text'); // 'grid' | 'text' — 열 때마다 text(텍스트로 붙여넣기)부터 시작한다
 
   // 본문 모달 동기화
   useEffect(() => {
@@ -57,7 +57,7 @@ export const BulkModals = ({
   useEffect(() => {
     if (pasteModal.isOpen) {
       setPasteText('');
-      setPasteMode('grid');
+      setPasteMode('text');
       pasteGridRef.current?.loadFromRows(rows, columns);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,12 +158,14 @@ export const BulkModals = ({
                 <div style={{ display: 'flex', background: 'var(--bg-color)', borderRadius: '999px', padding: '3px', border: '1px solid var(--border-color)' }}>
                   <button
                     onClick={() => handlePasteModeChange('grid')}
+                    aria-pressed={pasteMode === 'grid'}
                     style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 12px', borderRadius: '999px', border: 'none', cursor: 'pointer', fontSize: '11.5px', fontWeight: 'bold', background: pasteMode === 'grid' ? 'var(--primary-color)' : 'transparent', color: pasteMode === 'grid' ? 'white' : 'var(--text-secondary)' }}
                   >
                     <IconTable size={12} /> 표로 입력
                   </button>
                   <button
                     onClick={() => handlePasteModeChange('text')}
+                    aria-pressed={pasteMode === 'text'}
                     style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 12px', borderRadius: '999px', border: 'none', cursor: 'pointer', fontSize: '11.5px', fontWeight: 'bold', background: pasteMode === 'text' ? 'var(--primary-color)' : 'transparent', color: pasteMode === 'text' ? 'white' : 'var(--text-secondary)' }}
                   >
                     텍스트로 붙여넣기

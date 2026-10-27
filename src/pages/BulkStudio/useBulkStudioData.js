@@ -146,12 +146,9 @@ export const useBulkStudioData = () => {
       if (formattedRows.length > 0) {
         let firstDp = {}; try { firstDp = JSON.parse(chars[0].dynamicProperties || chars[0]._rawDynamic || "{}"); } catch(e){}
         setLabels({ label1: firstDp._cardLabel1 || "나이", label2: firstDp._cardLabel2 || "등급, 소속, 능력" });
-      } else {
-        const nr = { id: `new_${Date.now()}`, name: '', _checked: false, pageBodyRaw: '', _sortOrderNum: 999, themeColor: '#3b5bdb', cardImgX: 50, cardImgY: 50, cardImgScale: 1 };
-        colArray.forEach(c => nr[c] = '');
-        nr['관계'] = "일반"; nr['성별'] = "여성"; nr['종족'] = "인간(人間)";
-        formattedRows.push(nr);
       }
+      // 캐릭터가 없는 작품은 빈 표로 시작한다. 예전에는 빈 "새 캐릭터" 행을 하나 넣어 줬지만,
+      // 대부분 "붙여넣기로 추가"로 한꺼번에 넣고 이 행은 매번 지워야 해서 뺐다("행 추가"로 만들 수 있다).
       // ★ 작품 페이지가 sortOrder 기준으로 정렬해서 보여주는데 여기선 그동안 정렬 없이
       // 백엔드가 준 순서(대개 id 순, 즉 동시 저장 시 완료된 순서) 그대로 표시했다 — 그래서
       // 붙여넣기로 여러 명을 한 번에 저장한 뒤 다시 들어오면 의도한 순서가 아니라 뒤섞인
