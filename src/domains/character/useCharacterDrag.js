@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react';
 import api from '../../api/axiosCore';
+import { getGroupTags } from './characterGroups';
 
-export const useCharacterDrag = (characters, setCharacters, groupCriteria) => {
+export const useCharacterDrag = (characters, setCharacters, groupCriteria, multiGroupMode = 'all') => {
   const draggedCharRef = useRef(null);
   const charactersRef = useRef([]);
 
@@ -25,12 +26,7 @@ export const useCharacterDrag = (characters, setCharacters, groupCriteria) => {
     const midX = rect.left + rect.width / 2;
 
     setCharacters(prev => {
-      const getTags = (c) => {
-        const rawVal = c[groupCriteria] || "미분류";
-        const tags = String(rawVal).split(',').map(s => s.trim()).filter(Boolean);
-        const validTags = tags.filter(t => !t.startsWith('*'));
-        return validTags.length === 0 ? ["미분류"] : validTags;
-      };
+      const getTags = (c) => getGroupTags(c, groupCriteria, multiGroupMode);
 
       const inGroup = prev.filter(c => getTags(c).includes(groupName))
                           .sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
@@ -76,12 +72,7 @@ export const useCharacterDrag = (characters, setCharacters, groupCriteria) => {
     draggedCharRef.current = null;
     if (!dragged) return;
 
-    const getTags = (c) => {
-      const rawVal = c[groupCriteria] || "미분류";
-      const tags = String(rawVal).split(',').map(s => s.trim()).filter(Boolean);
-      const validTags = tags.filter(t => !t.startsWith('*'));
-      return validTags.length === 0 ? ["미분류"] : validTags;
-    };
+    const getTags = (c) => getGroupTags(c, groupCriteria, multiGroupMode);
 
     const inGroup = charactersRef.current.filter(c => getTags(c).includes(groupName));
     const promises = [];

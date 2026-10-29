@@ -233,3 +233,29 @@ describe('CharacterGrid 머리말은 좁은 창에서 글자를 쪼개지 않는
     expect(right.style.flexShrink).toBe('0');
   });
 });
+
+describe('CharacterGrid 분류 기준 선택', () => {
+  const critSelect = () => screen.getByLabelText('분류 기준:');
+  const critLabels = () => Array.from(critSelect().querySelectorAll('option')).map((o) => o.textContent);
+
+  it('기본 다섯 개와 작품에 있는 다른 속성을 모두 보여 준다', () => {
+    renderGrid({ sortKeys: ['소속', '서열', '직책'] });
+    expect(critLabels()).toEqual(['관계별', '소속별', '등급별', '종족별', '성별별', '서열별', '직책별']);
+  });
+
+  it('정렬할 속성이 하나도 없어도 기본 다섯 개는 있다', () => {
+    renderGrid({ sortKeys: [] });
+    expect(critLabels()).toEqual(['관계별', '소속별', '등급별', '종족별', '성별별']);
+  });
+
+  it('고르면 그 속성 이름으로 setGroupCriteria 를 부른다', () => {
+    const { props } = renderGrid({ sortKeys: ['서열'] });
+    fireEvent.change(critSelect(), { target: { value: '서열' } });
+    expect(props.setGroupCriteria).toHaveBeenCalledWith('서열');
+  });
+
+  it('현재 분류 기준이 목록에 없는 속성이어도 선택 상태가 유지된다', () => {
+    renderGrid({ groupCriteria: '사라진속성', sortKeys: [] });
+    expect(critSelect().value).toBe('사라진속성');
+  });
+});

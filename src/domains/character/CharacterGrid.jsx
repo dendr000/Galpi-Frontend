@@ -12,6 +12,7 @@ import FilterChips from './FilterChips';
 import { hasActiveFilter } from './characterFilter';
 import { getRatings } from './ratings';
 import { NO_CLASSIFIED } from './classified';
+import { getGroupCriteriaOptions } from './characterGroups';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -81,18 +82,15 @@ const CharacterGrid = ({
             {charSectionNum}. 등장인물 목록
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-            <label style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>분류 기준:</label>
+            <label style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} htmlFor="char-group-select">분류 기준:</label>
             <select
+              id="char-group-select"
               value={groupCriteria}
               onChange={handleGroupCriteriaChange}
               className="gt-section-select"
               style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '12px', fontWeight: 'bold', color: 'var(--primary-color)', background: 'var(--surface-color)', outline: 'none', cursor: 'pointer' }}
             >
-              <option value="관계">관계별</option>
-              <option value="소속">소속별</option>
-              <option value="등급">등급별</option>
-              <option value="종족">종족별</option>
-              <option value="성별">성별별</option>
+              {getGroupCriteriaOptions(sortKeys, groupCriteria).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           {sortKeys.length > 0 && (

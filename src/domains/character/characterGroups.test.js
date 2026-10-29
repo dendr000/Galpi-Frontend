@@ -1,6 +1,6 @@
 // Copyright (c) dendr000. MIT License.
 import { describe, it, expect } from 'vitest';
-import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode, applyMultiGroupMeta } from './characterGroups';
+import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode, applyMultiGroupMeta, getGroupTags, getGroupCriteriaOptions } from './characterGroups';
 
 const dp = (obj) => JSON.stringify(obj);
 const ch = (id, over = {}) => ({ id, name: `c${id}`, 관계: '일반', ...over });
@@ -161,5 +161,75 @@ describe('applyMultiGroupMeta', () => {
     expect(applyMultiGroupMeta(base, {})).toEqual({ keep: 1 });
     expect(applyMultiGroupMeta(base, { multiGroupMode: 'x' })).toEqual({ keep: 1 });
     expect(base).toEqual({ keep: 1, multiGroup: 'last' });
+  });
+});
+
+describe('getGroupTags', () => {
+  it('쉼표로 나눈 값을 돌려주고 *로 시작하는 값은 뺀다', () => {
+    expect(getGroupTags({ 소속: '북부, *비밀, 사교' }, '소속')).toEqual(['북부', '사교']);
+  });
+  it('값이 없거나 *뿐이면 미분류', () => {
+    expect(getGroupTags({}, '소속')).toEqual(['미분류']);
+    expect(getGroupTags({ 소속: '*x' }, '소속')).toEqual(['미분류']);
+  });
+  it('first, last 는 첫 번째, 마지막 값 하나만', () => {
+    expect(getGroupTags({ 소속: 'A, B, C' }, '소속', 'first')).toEqual(['A']);
+    expect(getGroupTags({ 소속: 'A, B, C' }, '소속', 'last')).toEqual(['C']);
+  });
+  it('나이, 성별, 종족처럼 전용 필드에 든 기본 항목도 읽는다', () => {
+    expect(getGroupTags({ age: '20' }, '나이')).toEqual(['20']);
+    expect(getGroupTags({ gender: '여성' }, '성별')).toEqual(['여성']);
+    expect(getGroupTags({ species: '엘프' }, '종족')).toEqual(['엘프']);
+  });
+});
+
+describe('getGroupCriteriaOptions', () => {
+  const labels = (opts) => opts.map((o) => o.label);
+  const values = (opts) => opts.map((o) => o.value);
+
+  it('기본 다섯 개(관계, 소속, 등급, 종족, 성별)는 속성이 없어도 항상 맨 앞에 있다', () => {
+    const opts = getGroupCriteriaOptions([]);
+    expect(values(opts)).toEqual(['관계', '소속', '등급', '종족', '성별']);
+    expect(labels(opts)).toEqual(['관계별', '소속별', '등급별', '종족별', '성별별']);
+  });
+
+  it('작품 페이지에 있는 다른 속성은 전부 뒤에 "속성별"로 붙는다(처음 나온 순서)', () => {
+    const opts = getGroupCriteriaOptions(['소속', '서열', '나이', '직책', '성별']);
+    expect(values(opts)).toEqual(['관계', '소속', '등급', '종족', '성별', '서열', '나이', '직책']);
+    expect(labels(opts).slice(5)).toEqual(['서열별', '나이별', '직책별']);
+  });
+
+  it('같은 속성은 한 번만 나온다', () => {
+    const opts = getGroupCriteriaOptions(['소속', '소속', '직책', '직책']);
+    expect(values(opts).filter((v) => v === '소속')).toHaveLength(1);
+    expect(values(opts).filter((v) => v === '직책')).toHaveLength(1);
+  });
+
+  it('저장해 둔 분류 기준이 지금 없는 속성이어도 목록에 남겨 선택이 비지 않게 한다', () => {
+    const opts = getGroupCriteriaOptions(['직책'], '사라진속성');
+    expect(values(opts)).toContain('사라진속성');
+    expect(getGroupCriteriaOptions(['직책'], '직책').filter((o) => o.value === '직책')).toHaveLength(1);
+  });
+
+  it('목록이 없어도(undefined) 오류 없이 기본 다섯 개', () => {
+    expect(values(getGroupCriteriaOptions(undefined))).toEqual(['관계', '소속', '등급', '종족', '성별']);
+  });
+});
+
+describe('buildCharacterGroups 임의의 속성으로 묶기', () => {
+  it('직책 같은 사용자 속성으로도 묶는다', () => {
+    const chars = [ch(1, { 직책: '기사' }), ch(2, { 직책: '마법사' }), ch(3, { 직책: '기사' })];
+    const { displayChars } = getVisibleCharacters(chars, {});
+    const { groupedChars } = buildCharacterGroups({ chars: displayChars, allCharacters: chars, groupCriteria: '직책', groupOrderArray: [], sortKey: '', sortDir: 'asc' });
+    expect(ids(groupedChars['기사'])).toEqual([1, 3]);
+    expect(ids(groupedChars['마법사'])).toEqual([2]);
+  });
+
+  it('나이처럼 전용 필드(age)에 든 값으로도 묶는다', () => {
+    const chars = [{ id: 1, name: 'a', age: '20' }, { id: 2, name: 'b', age: '30' }, { id: 3, name: 'c', age: '20' }];
+    const { displayChars } = getVisibleCharacters(chars, {});
+    const { groupedChars } = buildCharacterGroups({ chars: displayChars, allCharacters: chars, groupCriteria: '나이', groupOrderArray: [], sortKey: '', sortDir: 'asc' });
+    expect(ids(groupedChars['20'])).toEqual([1, 3]);
+    expect(ids(groupedChars['30'])).toEqual([2]);
   });
 });

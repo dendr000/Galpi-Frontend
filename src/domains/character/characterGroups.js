@@ -1,7 +1,7 @@
 // Copyright (c) dendr000. MIT License.
 // 작품 페이지(와 내보내기)가 캐릭터를 보여 줄 때 쓰는 계산: 숨김/폼 스왑 반영, 분류 그룹 묶기와 정렬.
 import { getGroupSortOrder } from './characterOrder';
-import { sortCharsByProperty } from './characterSort';
+import { sortCharsByProperty, getPropValue } from './characterSort';
 
 const parseDp = (c) => {
   let dp = JSON.parse(c.dynamicProperties || c._rawDynamic || '{}');
@@ -40,6 +40,40 @@ export const applyMultiGroupMeta = (meta, workMeta) => {
   return next;
 };
 
+// 캐릭터 한 명이 분류 속성(criteria)으로 들어갈 그룹 이름들. 화면(buildCharacterGroups)과 카드 끌기(useCharacterDrag)가 같이 쓴다.
+// - 쉼표로 여러 값이면 mode 에 따라 모두(all), 첫 번째(first), 마지막(last) 값만. *로 시작하는 값은 처음부터 뺀다
+// - 값이 없거나 *로만 된 캐릭터는 "미분류". 나이, 성별, 종족은 전용 필드(age 등)에서도 읽는다
+export const getGroupTags = (char, criteria, mode = 'all') => {
+  const raw = getPropValue(char, criteria) || '미분류';
+  let tags = String(raw).split(',').map((s) => s.trim()).filter((t) => t && !t.startsWith('*'));
+  if (tags.length === 0) tags = ['미분류'];
+  if (mode === 'first') return tags.slice(0, 1);
+  if (mode === 'last') return tags.slice(-1);
+  return tags;
+};
+
+// 분류 기준 선택 목록. 예전부터 있던 다섯 개는 속성이 없어도 항상 맨 앞에 두고, 작품 페이지에 있는 나머지 속성(정렬 목록과 같은 출처)을
+// 그 뒤에 "속성별"로 붙인다. 저장해 둔 분류 기준이 지금 없는 속성이어도 선택이 비지 않게 목록 끝에 남긴다.
+const BASE_CRITERIA = [
+  { value: '관계', label: '관계별' },
+  { value: '소속', label: '소속별' },
+  { value: '등급', label: '등급별' },
+  { value: '종족', label: '종족별' },
+  { value: '성별', label: '성별별' },
+];
+export const getGroupCriteriaOptions = (propKeys, current) => {
+  const options = [...BASE_CRITERIA];
+  const seen = new Set(options.map((o) => o.value));
+  const add = (key) => {
+    if (typeof key !== 'string' || !key || seen.has(key)) return;
+    seen.add(key);
+    options.push({ value: key, label: `${key}별` });
+  };
+  (Array.isArray(propKeys) ? propKeys : []).forEach(add);
+  add(current);
+  return options;
+};
+
 // 분류 속성(groupCriteria)으로 묶고 그룹 안을 정렬한다. 반환: { groupedChars, sortedGroupNames }
 // - 쉼표로 여러 값이면 multiGroupMode 에 따라 여러 그룹(all) 또는 첫 번째(first), 마지막(last) 그룹에만 들어간다.
 //   *로 시작하는 값은 처음부터 빼고 센다. 값이 없거나 *로만 된 캐릭터는 "미분류"
@@ -48,13 +82,7 @@ export const applyMultiGroupMeta = (meta, workMeta) => {
 export const buildCharacterGroups = ({ chars, allCharacters, groupCriteria, groupOrderArray, sortKey, sortDir, multiGroupMode = 'all' }) => {
   const groupedChars = {};
   chars.forEach((c) => {
-    const rawVal = c[groupCriteria] || '미분류';
-    const tags = String(rawVal).split(',').map((s) => s.trim()).filter(Boolean);
-    let validTags = tags.filter((t) => !t.startsWith('*'));
-    if (validTags.length === 0) validTags = ['미분류'];
-    if (multiGroupMode === 'first') validTags = validTags.slice(0, 1);
-    else if (multiGroupMode === 'last') validTags = validTags.slice(-1);
-    validTags.forEach((tag) => {
+    getGroupTags(c, groupCriteria, multiGroupMode).forEach((tag) => {
       if (!groupedChars[tag]) groupedChars[tag] = [];
       if (!groupedChars[tag].some((exist) => exist.id === c.id)) groupedChars[tag].push(c);
     });

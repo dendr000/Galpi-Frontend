@@ -70,7 +70,9 @@ const WorkDetailPage = () => {
   const data = useWorkDetailData();
 
   // 커스텀 드래그 인터랙션 제어 훅 바인딩
-  const { handleCharDragStart, handleCharDragOver, handleCharDragEnd } = useCharacterDrag(data.characters, data.setCharacters, data.groupCriteria);
+  // (그룹에 보이는 캐릭터를 화면과 같은 기준으로 고르려고 "여러 값일 때 그룹 표시" 설정도 넘긴다)
+  const multiGroupMode = getMultiGroupMode(extractMeta(data.work?.description || '').meta);
+  const { handleCharDragStart, handleCharDragOver, handleCharDragEnd } = useCharacterDrag(data.characters, data.setCharacters, data.groupCriteria, multiGroupMode);
 
   // 본문의 [[이름]] 파란 링크: 같은 작품 캐릭터면 선택+스크롤, 다른 작품 제목이면 그 작품으로 이동
   const handleBacklink = useWorkBacklink({
