@@ -400,6 +400,21 @@ export const useBulkStudioData = () => {
     if (window.confirm("이 행을 삭제하시겠습니까?")) setRows(prev => prev.filter((_, i) => i !== rIdx));
   }, []);
 
+  // 체크한 행을 한 번에 지운다. removeRow 와 같이 화면에서만 지우고, 서버에서는 "일괄 저장"을 눌렀을 때
+  // (불러올 때 있었는데 지금 표에 없는 인물로) 지워진다. 지운 인원 수를 돌려준다(취소하거나 체크가 없으면 0).
+  const removeCheckedRows = () => {
+    const count = rows.filter(r => r._checked).length;
+    if (count === 0) {
+      alert("삭제할 캐릭터를 1명 이상 선택해 주세요.");
+      return 0;
+    }
+    if (!window.confirm(`선택한 ${count}명을 표에서 삭제할까요?\n"일괄 저장"을 눌러야 실제로 삭제되며, 작품을 다시 불러오면 되돌려집니다.`)) return 0;
+    // 지운 뒤에는 행 번호가 달라지므로 shift+클릭 범위 선택의 기준점을 비운다
+    lastCheckedRowIdx.current = null;
+    setRows(rows.filter(r => !r._checked));
+    return count;
+  };
+
   const addColumn = (colName) => {
     if(!colName || colName.trim() === "") return;
     const cleanName = colName.trim();
@@ -576,7 +591,7 @@ export const useBulkStudioData = () => {
     bodyModal, setBodyModal, findReplaceModal, setFindReplaceModal,
     pasteModal, setPasteModal,
     loadCharacters, handleCellChange, toggleRowCheck, toggleAllChecks,
-    addRow, removeRow, addColumn, removeColumn, changeColOrder, sortTable,
+    addRow, removeRow, removeCheckedRows, addColumn, removeColumn, changeColOrder, sortTable,
     applyBatchValue, executeFindReplace, importRowsFromText, importRowsFromGrid, handleSaveAll
   };
 };

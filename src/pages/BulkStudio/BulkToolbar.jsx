@@ -4,14 +4,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconArchive, IconCheck, IconClipboard } from '../../components/common/icons/DomainIcons';
+import Icon from '../../components/common/icons/Icon';
 import { askText } from '../../utils/askText';
 
 const BulkToolbar = ({
   works, selectedWorkId, loadCharacters, addRow, addColumn, columns,
   tabMode, setTabMode, sortTable, applyBatchValue, setFindReplaceModal, setPasteModal,
-  labels, setLabels, isPreviewOpen, setIsPreviewOpen
+  labels, setLabels, isPreviewOpen, setIsPreviewOpen,
+  rows = [], removeCheckedRows
 }) => {
   const navigate = useNavigate();
+  const checkedCount = rows.filter(r => r._checked).length;
   const [addCount, setAddCount] = useState(1);
   const [batchCol, setBatchCol] = useState('');
   const [batchVal, setBatchVal] = useState('');
@@ -104,6 +107,16 @@ const BulkToolbar = ({
           <input type="text" className="tb-input" value={batchVal} onChange={e => setBatchVal(e.target.value)} placeholder="적용할 값..." style={{ width: '120px' }} />
           <button className="icon-btn apply" onClick={() => applyBatchValue(batchCol, batchVal)} title="일괄 적용 실행" style={{ color: 'white', background: 'var(--primary-color)' }}>
             실행
+          </button>
+          <button
+            className="icon-btn"
+            onClick={() => removeCheckedRows()}
+            disabled={checkedCount === 0}
+            title="체크한 캐릭터를 표에서 삭제 (일괄 저장을 눌러야 실제로 삭제됩니다)"
+            style={checkedCount === 0 ? { opacity: 0.5, cursor: 'not-allowed' } : { color: 'white', background: '#e03131', borderColor: '#e03131' }}
+          >
+            <Icon name="trash" size={14} />
+            선택 삭제{checkedCount > 0 ? ` (${checkedCount})` : ''}
           </button>
         </div>
       </div>

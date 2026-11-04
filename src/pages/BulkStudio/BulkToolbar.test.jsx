@@ -43,3 +43,27 @@ describe('BulkToolbar - 새 속성(열) 추가 (prompt 가 없는 Electron 환�
     await waitFor(() => expect(props.addColumn).toHaveBeenCalledWith(null));
   });
 });
+
+describe('BulkToolbar 선택 삭제', () => {
+  const checked = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1, name: `인물${i + 1}`, _checked: true }));
+  const rowsWith = (checkedCount, total = 4) => [
+    ...checked(checkedCount),
+    ...Array.from({ length: total - checkedCount }, (_, i) => ({ id: 100 + i, name: `다른${i}`, _checked: false })),
+  ];
+
+  it('체크한 인원 수가 버튼에 보인다', () => {
+    const { getByRole } = renderToolbar({ rows: rowsWith(3), removeCheckedRows: vi.fn() });
+    expect(getByRole('button', { name: /선택 삭제/ }).textContent).toContain('3');
+  });
+
+  it('체크한 행이 없으면 버튼이 꺼져 있다', () => {
+    const { getByRole } = renderToolbar({ rows: rowsWith(0), removeCheckedRows: vi.fn() });
+    expect(getByRole('button', { name: /선택 삭제/ }).disabled).toBe(true);
+  });
+
+  it('누르면 선택 삭제를 실행한다', () => {
+    const { props, getByRole } = renderToolbar({ rows: rowsWith(2), removeCheckedRows: vi.fn() });
+    fireEvent.click(getByRole('button', { name: /선택 삭제/ }));
+    expect(props.removeCheckedRows).toHaveBeenCalledTimes(1);
+  });
+});
