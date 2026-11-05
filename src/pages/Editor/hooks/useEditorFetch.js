@@ -4,6 +4,7 @@ import api from '../../../api/axiosCore';
 import { extractMeta } from '../../../utils/markdownParser';
 import { SYSTEM_PROPS } from '../constants/editorConstants';
 import { getMultiGroupMode } from '../../../domains/character/characterGroups';
+import { formatGroupHideStr } from '../../../domains/character/groupHide';
 
 export const useEditorFetch = ({
   docType, docAction, targetId, targetWorkId,
@@ -59,7 +60,7 @@ export const useEditorFetch = ({
             setWorkMeta({
               creator: data.creator || '', genre: data.genre || '', status: data.status || '진행 전',
               alias: parsed.meta.alias || '', coverExt: parsed.meta.coverExt || '', charExt: parsed.meta.charExt || 'png',
-              groupOrderStr: groupOrderStr, multiGroupMode: getMultiGroupMode(parsed.meta),
+              groupOrderStr: groupOrderStr, groupHideStr: formatGroupHideStr(parsed.meta._groupHide), multiGroupMode: getMultiGroupMode(parsed.meta),
               ratingAxesStr: parsed.meta.ratingAxes || '', ratingScaleStr: parsed.meta.ratingScale || '',
               imgVariants: parsed.meta.imgVariants?.length > 0 ? parsed.meta.imgVariants : [''],
               originalMeta: parsed.meta

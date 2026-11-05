@@ -1,6 +1,6 @@
 // Copyright (c) dendr000. MIT License.
 // @vitest-environment jsdom
-// 작품 편집기: "여러 값일 때 그룹 표시"(multiGroup) 설정을 불러오고 저장하는 경로.
+// 작품 편집기: "여러 값일 때 그룹 표시"(multiGroup)와 "그룹에서 숨길 값"(_groupHide) 설정을 불러오고 저장하는 경로.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -74,5 +74,29 @@ describe('작품 편집기 불러오기: 여러 값일 때 그룹 표시', () =>
   it('설정이 없거나 잘못된 값이면 all', async () => {
     expect((await fetchWith('본문')).multiGroupMode).toBe('all');
     expect((await fetchWith('[META_DATA:{"multiGroup":"zzz"}]\n본문')).multiGroupMode).toBe('all');
+  });
+});
+
+describe('작품 편집기 저장: 그룹에서 숨길 값', () => {
+  it('편집 칸 내용을 메타의 _groupHide 에 저장한다', async () => {
+    const meta = await saveWith(baseMeta({ groupHideStr: '소속: 1조, 2조\n등급: D급' }));
+    expect(meta._groupHide).toEqual({ 소속: ['1조', '2조'], 등급: ['D급'] });
+  });
+
+  it('칸을 모두 지우면 예전에 저장된 값이 메타에서 지워지고 다른 항목은 남는다', async () => {
+    const meta = await saveWith(baseMeta({ groupHideStr: '', originalMeta: { _groupHide: { 소속: ['A'] }, keep: 1 } }));
+    expect(meta._groupHide).toBeUndefined();
+    expect(meta.keep).toBe(1);
+  });
+});
+
+describe('작품 편집기 불러오기: 그룹에서 숨길 값', () => {
+  it('메타의 값을 편집 칸 문자열로 채운다', async () => {
+    const m = await fetchWith('[META_DATA:{"_groupHide":{"소속":["1조","2조"]}}]\n본문');
+    expect(m.groupHideStr).toBe('소속: 1조, 2조\n');
+  });
+
+  it('설정이 없으면 빈 문자열', async () => {
+    expect((await fetchWith('본문')).groupHideStr).toBe('');
   });
 });

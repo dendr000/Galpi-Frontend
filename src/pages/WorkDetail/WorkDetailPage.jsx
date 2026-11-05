@@ -44,6 +44,7 @@ import CharacterGrid from '../../domains/character/CharacterGrid';
 import CharacterDetailSection from '../../domains/character/CharacterDetailSection';
 import CharacterQuickNav from '../../domains/character/CharacterQuickNav';
 import CharacterViewModal from '../../domains/character/CharacterViewModal';
+import { getGroupHideValues } from '../../domains/character/groupHide';
 import { getCharBodyText } from '../../domains/character/CharacterDetailSection';
 import BatchImageModal from '../../domains/character/BatchImageModal';
 
@@ -74,8 +75,10 @@ const WorkDetailPage = () => {
 
   // 커스텀 드래그 인터랙션 제어 훅 바인딩
   // (그룹에 보이는 캐릭터를 화면과 같은 기준으로 고르려고 "여러 값일 때 그룹 표시" 설정도 넘긴다)
-  const multiGroupMode = getMultiGroupMode(extractMeta(data.work?.description || '').meta);
-  const { handleCharDragStart, handleCharDragOver, handleCharDragEnd } = useCharacterDrag(data.characters, data.setCharacters, data.groupCriteria, multiGroupMode);
+  const workMetaForGroups = extractMeta(data.work?.description || '').meta;
+  const multiGroupMode = getMultiGroupMode(workMetaForGroups);
+  const hiddenGroupValues = getGroupHideValues(workMetaForGroups, data.groupCriteria);
+  const { handleCharDragStart, handleCharDragOver, handleCharDragEnd } = useCharacterDrag(data.characters, data.setCharacters, data.groupCriteria, multiGroupMode, hiddenGroupValues);
 
   // 본문의 [[이름]] 파란 링크: 같은 작품 캐릭터면 선택+스크롤, 다른 작품 제목이면 그 작품으로 이동
   const handleBacklink = useWorkBacklink({
@@ -180,7 +183,7 @@ const WorkDetailPage = () => {
   const { groupedChars, sortedGroupNames } = buildCharacterGroups({
     chars: visibleChars, allCharacters: data.characters, groupCriteria: data.groupCriteria,
     groupOrderArray: getGroupOrderArray(parsedDesc.meta, data.groupCriteria), sortKey, sortDir,
-    multiGroupMode: getMultiGroupMode(parsedDesc.meta),
+    multiGroupMode: getMultiGroupMode(parsedDesc.meta), hiddenValues: getGroupHideValues(parsedDesc.meta, data.groupCriteria),
   });
   const sortKeys = collectSortKeys(baseChars);
 

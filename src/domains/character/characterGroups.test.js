@@ -183,6 +183,58 @@ describe('getGroupTags', () => {
   });
 });
 
+describe('getGroupTags 숨길 값(hidden)', () => {
+  it('숨길 값은 그룹 이름에서 뺀다', () => {
+    expect(getGroupTags({ 소속: '북부, 1조, 사교' }, '소속', 'all', ['1조'])).toEqual(['북부', '사교']);
+  });
+
+  it('숨김을 먼저 적용하므로 첫 번째, 마지막은 보이는 값 중에서 고른다', () => {
+    expect(getGroupTags({ 소속: '1조, 북부, 사교' }, '소속', 'first', ['1조'])).toEqual(['북부']);
+    expect(getGroupTags({ 소속: '북부, 사교, 1조' }, '소속', 'last', ['1조'])).toEqual(['사교']);
+  });
+
+  it('값이 모두 숨겨지면 미분류로 간다(캐릭터가 사라지지 않는다)', () => {
+    expect(getGroupTags({ 소속: '1조, 2조' }, '소속', 'all', ['1조', '2조'])).toEqual(['미분류']);
+  });
+
+  it('미분류는 숨길 수 없다', () => {
+    expect(getGroupTags({}, '소속', 'all', ['미분류'])).toEqual(['미분류']);
+  });
+
+  it('숨길 값이 없거나 맞는 값이 없으면 그대로', () => {
+    expect(getGroupTags({ 소속: 'A, B' }, '소속', 'all', [])).toEqual(['A', 'B']);
+    expect(getGroupTags({ 소속: 'A, B' }, '소속', 'all', ['Z'])).toEqual(['A', 'B']);
+    expect(getGroupTags({ 소속: 'A, B' }, '소속', 'all')).toEqual(['A', 'B']);
+  });
+});
+
+describe('buildCharacterGroups 숨길 값(hiddenValues)', () => {
+  const chars = [
+    { id: 1, name: '가', 소속: '북부, 1조' },
+    { id: 2, name: '나', 소속: '1조' },
+    { id: 3, name: '다', 소속: '북부' },
+  ];
+  const run = (hiddenValues) => buildCharacterGroups({ chars, allCharacters: chars, groupCriteria: '소속', groupOrderArray: [], hiddenValues });
+
+  it('숨긴 값의 그룹은 만들지 않고, 그 값만 가진 캐릭터는 미분류에 둔다', () => {
+    const { groupedChars, sortedGroupNames } = run(['1조']);
+    expect([...sortedGroupNames].sort()).toEqual(['미분류', '북부'].sort());
+    expect(groupedChars['북부'].map((c) => c.id)).toEqual([1, 3]);
+    expect(groupedChars['미분류'].map((c) => c.id)).toEqual([2]);
+  });
+
+  it('여러 값 캐릭터가 중복해서 보이던 것이 줄어든다', () => {
+    const before = Object.values(run([]).groupedChars).flat().length;
+    const after = Object.values(run(['1조']).groupedChars).flat().length;
+    expect(before).toBe(4);
+    expect(after).toBe(3);
+  });
+
+  it('숨길 값을 주지 않으면 이전과 같다', () => {
+    expect(Object.keys(run(undefined).groupedChars).sort()).toEqual(['1조', '북부']);
+  });
+});
+
 describe('getGroupCriteriaOptions', () => {
   const labels = (opts) => opts.map((o) => o.label);
   const values = (opts) => opts.map((o) => o.value);

@@ -166,6 +166,15 @@ describe('CharacterViewModal 닫기', () => {
   });
 });
 
+describe('CharacterViewModal 하단 고정 푸터', () => {
+  it('화면 아래에 고정된 푸터(48px)가 띠를 덮지 않도록 아래쪽 여백을 푸터 높이 이상 둔다', () => {
+    setup();
+    const backdrop = screen.getByTestId('char-view-backdrop');
+    expect(backdrop.style.paddingBottom).toContain('calc');
+    expect(backdrop.style.paddingBottom).toMatch(/(^|[\s(])(4[89]|[5-9]\d)px/);
+  });
+});
+
 describe('CharacterViewModal 주변 캐릭터 띠', () => {
   const strip = () => screen.getByRole('navigation', { name: '주변 캐릭터' });
   const chip = (name) => Array.from(strip().querySelectorAll('button')).find((b) => b.textContent.includes(name));

@@ -41,11 +41,13 @@ export const applyMultiGroupMeta = (meta, workMeta) => {
 };
 
 // 캐릭터 한 명이 분류 속성(criteria)으로 들어갈 그룹 이름들. 화면(buildCharacterGroups)과 카드 끌기(useCharacterDrag)가 같이 쓴다.
-// - 쉼표로 여러 값이면 mode 에 따라 모두(all), 첫 번째(first), 마지막(last) 값만. *로 시작하는 값은 처음부터 뺀다
-// - 값이 없거나 *로만 된 캐릭터는 "미분류". 나이, 성별, 종족은 전용 필드(age 등)에서도 읽는다
-export const getGroupTags = (char, criteria, mode = 'all') => {
+// - 쉼표로 여러 값이면 mode 에 따라 모두(all), 첫 번째(first), 마지막(last) 값만. *로 시작하는 값과 hidden(작품 설정의
+//   "그룹에서 숨길 값")에 든 값은 그보다 먼저 뺀다(그래서 첫 번째, 마지막은 보이는 값 중에서 고른다)
+// - 값이 없거나 모두 빠진 캐릭터는 "미분류"(그래서 미분류는 숨길 수 없다). 나이, 성별, 종족은 전용 필드(age 등)에서도 읽는다
+export const getGroupTags = (char, criteria, mode = 'all', hidden = []) => {
   const raw = getPropValue(char, criteria) || '미분류';
-  let tags = String(raw).split(',').map((s) => s.trim()).filter((t) => t && !t.startsWith('*'));
+  const hide = new Set(Array.isArray(hidden) ? hidden : []);
+  let tags = String(raw).split(',').map((s) => s.trim()).filter((t) => t && !t.startsWith('*') && !hide.has(t));
   if (tags.length === 0) tags = ['미분류'];
   if (mode === 'first') return tags.slice(0, 1);
   if (mode === 'last') return tags.slice(-1);
@@ -76,13 +78,13 @@ export const getGroupCriteriaOptions = (propKeys, current) => {
 
 // 분류 속성(groupCriteria)으로 묶고 그룹 안을 정렬한다. 반환: { groupedChars, sortedGroupNames }
 // - 쉼표로 여러 값이면 multiGroupMode 에 따라 여러 그룹(all) 또는 첫 번째(first), 마지막(last) 그룹에만 들어간다.
-//   *로 시작하는 값은 처음부터 빼고 센다. 값이 없거나 *로만 된 캐릭터는 "미분류"
+//   *로 시작하는 값과 hiddenValues(숨길 값)는 처음부터 빼고 센다. 값이 없거나 모두 빠진 캐릭터는 "미분류"
 // - 그룹 안 수동 순서: 그룹 전용 드래그 순서 -> 기본 순서 -> 999. 속성 정렬(sortKey)을 고르면 그 위에 덮어쓴다
 // - 그룹 순서: groupOrderArray 에 있는 것이 먼저, 나머지는 뒤에 원래 순서대로
-export const buildCharacterGroups = ({ chars, allCharacters, groupCriteria, groupOrderArray, sortKey, sortDir, multiGroupMode = 'all' }) => {
+export const buildCharacterGroups = ({ chars, allCharacters, groupCriteria, groupOrderArray, sortKey, sortDir, multiGroupMode = 'all', hiddenValues = [] }) => {
   const groupedChars = {};
   chars.forEach((c) => {
-    getGroupTags(c, groupCriteria, multiGroupMode).forEach((tag) => {
+    getGroupTags(c, groupCriteria, multiGroupMode, hiddenValues).forEach((tag) => {
       if (!groupedChars[tag]) groupedChars[tag] = [];
       if (!groupedChars[tag].some((exist) => exist.id === c.id)) groupedChars[tag].push(c);
     });

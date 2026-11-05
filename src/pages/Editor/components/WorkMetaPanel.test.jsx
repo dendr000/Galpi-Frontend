@@ -156,3 +156,21 @@ describe('WorkMetaPanel 여러 값일 때 그룹 표시', () => {
     expect(setWorkMeta).toHaveBeenCalledWith(expect.objectContaining({ multiGroupMode: 'last' }));
   });
 });
+
+describe('WorkMetaPanel 그룹에서 숨길 값', () => {
+  const box = () => document.querySelector('textarea[aria-label="그룹에서 숨길 값"]');
+
+  it('입력 칸에 저장된 내용이 보이고, 없는 예전 상태면 빈 칸', () => {
+    renderPanel(baseMeta({ groupHideStr: '소속: 1조\n' }));
+    expect(box().value).toBe('소속: 1조\n');
+    cleanup();
+    renderPanel(baseMeta());
+    expect(box().value).toBe('');
+  });
+
+  it('쓰면 setWorkMeta 로 groupHideStr 에 반영한다', () => {
+    const { setWorkMeta } = renderPanel(baseMeta());
+    fireEvent.change(box(), { target: { value: '소속: 2조' } });
+    expect(setWorkMeta).toHaveBeenCalledWith(expect.objectContaining({ groupHideStr: '소속: 2조' }));
+  });
+});

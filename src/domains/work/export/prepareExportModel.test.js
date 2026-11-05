@@ -204,3 +204,15 @@ describe('prepareExportModel 여러 값일 때 그룹 표시', () => {
     expect(names(await run(withMode(undefined)))).toEqual(['북부:1', '사교:1+2']);
   });
 });
+
+describe('prepareExportModel 그룹에서 숨길 값', () => {
+  it('설정한 값은 내보내기 그룹에서도 빠지고, 그 값만 가진 캐릭터는 미분류에 담긴다', async () => {
+    const m = await run({
+      work: work({ description: meta({ _groupHide: { 소속: ['사교'] } }) }),
+      groupCriteria: '소속',
+      characters: [ch(1, { 소속: '북부, 사교' }), ch(2, { 소속: '사교' })],
+    });
+    const names = m.groups.map((g) => `${g.name}:${g.chars.map((c) => c.id).join('+')}`).sort();
+    expect(names).toEqual(['미분류:2', '북부:1']);
+  });
+});

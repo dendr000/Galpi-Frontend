@@ -16,10 +16,10 @@ const chars = () => [
 ];
 
 // 같은 그룹 안에서 from 카드를 to 카드 앞으로 끌었을 때 setCharacters 에 넘어간 갱신 함수를 적용한 결과
-const dragResult = (criteria, mode, groupName, fromId, toId, initial = chars()) => {
+const dragResult = (criteria, mode, groupName, fromId, toId, initial = chars(), hidden = []) => {
   let next = initial;
   const setCharacters = (fn) => { next = typeof fn === 'function' ? fn(next) : fn; };
-  const { result } = renderHook(() => useCharacterDrag(initial, setCharacters, criteria, mode));
+  const { result } = renderHook(() => useCharacterDrag(initial, setCharacters, criteria, mode, hidden));
   const from = initial.find((c) => c.id === fromId);
   const to = initial.find((c) => c.id === toId);
   const startEv = { dataTransfer: { setData: () => {}, effectAllowed: '' }, target: { style: {} } };
@@ -58,5 +58,20 @@ describe('useCharacterDrag 그룹 구성원', () => {
     ];
     const after = dragResult('직책', 'all', '기사', 2, 1, initial);
     expect(JSON.parse(after.find((c) => c.id === 2).dynamicProperties)._groupSortOrders['기사']).toBe(0);
+  });
+});
+
+describe('useCharacterDrag 숨길 값', () => {
+  it('숨긴 값의 그룹은 없는 그룹이라 끌어도 아무것도 바뀌지 않는다', () => {
+    const initial = chars();
+    const after = dragResult('소속', 'all', '사교', 2, 1, initial, ['사교']);
+    expect(after).toBe(initial);
+  });
+
+  it('숨기지 않은 그룹은 숨긴 값을 뺀 구성원으로 순서를 바꾼다', () => {
+    const after = dragResult('소속', 'all', '북부', 3, 1, chars(), ['사교']);
+    const orders = (id) => JSON.parse(after.find((c) => c.id === id).dynamicProperties || '{}')._groupSortOrders?.['북부'];
+    expect(orders(3)).toBe(0);
+    expect(orders(1)).toBe(1);
   });
 });

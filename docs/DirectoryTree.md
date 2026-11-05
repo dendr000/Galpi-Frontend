@@ -89,6 +89,7 @@ src/
  │   │   ├── CharacterInfobox.jsx               # 우측 영역에 상시 밀착하여 캐릭터 핵심 프로필 정보를 요약 표출하는 인포박스
  │   │   ├── CharacterQuickNav.jsx              # 상세 정보 하단에 배치되어 해당 캐릭터 카드로 초점을 강제 이동시키는 바
  │   │   ├── characterGroups.js                 # 숨김/폼 스왑 반영과 분류 그룹 묶기, 그룹 안 정렬을 계산하는 순수 로직
+ │   │   ├── groupHide.js                       # 작품 설정 "그룹에서 숨길 값"을 읽고 저장하는 로직
  │   │   ├── characterFilter.js                 # 소속, 등급 칩 필터의 칩 모으기와 걸러내기 순수 로직(그룹 안 OR, 그룹 사이 AND)
  │   │   ├── FilterChips.jsx                    # 캐릭터 목록 위의 소속, 등급 칩 필터 UI
  │   │   ├── classified.js                      # 캐릭터의 기밀 여부(기밀 속성) 판정과 기본 상태

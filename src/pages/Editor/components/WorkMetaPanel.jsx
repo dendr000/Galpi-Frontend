@@ -188,6 +188,18 @@ const WorkMetaPanel = ({ workMeta, setWorkMeta }) => {
           />
         </div>
 
+        {/* 그룹으로 만들지 않을 값: 소속이 너무 세분화돼 여러 값을 가진 캐릭터가 여러 번 보일 때 쓴다 */}
+        <div className={styles.propRow} style={{ gridColumn: '1 / -1', alignItems: 'flex-start' }}>
+          <label>그룹에서 숨길 값<br/><span style={{fontSize:'10px', color:'var(--primary-color)'}}>속성명: 값1, 값2... (한 줄에 하나)</span></label>
+          <textarea
+            rows="2"
+            aria-label="그룹에서 숨길 값"
+            value={workMeta.groupHideStr || ''}
+            onChange={e => setWorkMeta({...workMeta, groupHideStr: e.target.value})}
+            placeholder={"소속: 1조, 2조\n등급: D급"}
+          />
+        </div>
+
         {/* 값이 여러 개인 캐릭터(소속 "A, B" 등)를 작품 페이지 그룹에 어떻게 보일지 */}
         <div className={styles.propRow} style={{ gridColumn: '1 / -1' }}>
           <label>여러 값일 때 그룹 표시<br/><span style={{fontSize:'10px', color:'var(--primary-color)'}}>쉼표로 값을 여러 개 쓴 캐릭터</span></label>

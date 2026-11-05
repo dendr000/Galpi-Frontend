@@ -4,13 +4,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 
-const state = vi.hoisted(() => ({ data: null, grid: null, infobox: null }));
+const state = vi.hoisted(() => ({ data: null, grid: null, infobox: null, dragArgs: null }));
 const stub = vi.hoisted(() => (name) => () => <div data-stub={name} />);
 
 vi.mock('../../domains/work/useWorkDetailData', () => ({ useWorkDetailData: () => state.data }));
 vi.mock('../../domains/work/useWorkBacklink', () => ({ useWorkBacklink: () => () => {} }));
 vi.mock('../../domains/character/useCharacterDrag', () => ({
-  useCharacterDrag: () => ({ handleCharDragStart: () => {}, handleCharDragOver: () => {}, handleCharDragEnd: () => {} }),
+  useCharacterDrag: (...args) => (state.dragArgs = args, { handleCharDragStart: () => {}, handleCharDragOver: () => {}, handleCharDragEnd: () => {} }),
 }));
 vi.mock('../../components/common/GenreCursor', () => ({ default: stub('GenreCursor') }));
 vi.mock('../../domains/work/FloatingLeftTree', () => ({ default: stub('FloatingLeftTree') }));
@@ -187,5 +187,33 @@ describe('WorkDetailPage 여러 값일 때 그룹 표시', () => {
     state.data = withMode('last');
     render(<WorkDetailPage />);
     expect(names()).toEqual(['남부:3', '북부:1', '사교:2']);
+  });
+});
+
+describe('WorkDetailPage 그룹에서 숨길 값', () => {
+  const names = () => Object.entries(state.grid.groupedChars).map(([k, v]) => `${k}:${v.map((c) => c.id).join('+')}`).sort();
+  const withHide = (hide, criteria = '소속') => baseData({
+    groupCriteria: criteria,
+    work: { id: 91, title: '시험 작품', genre: '', description: `[META_DATA:${JSON.stringify({ _groupHide: hide })}]
+개요` },
+  });
+
+  it('설정한 값은 그룹을 만들지 않고, 그 값을 가진 캐릭터는 남은 값의 그룹에만 보인다', () => {
+    state.data = withHide({ 소속: ['사교'] });
+    render(<WorkDetailPage />);
+    expect(names()).toEqual(['남부:3', '북부:1+2']);
+  });
+
+  it('카드 끌기에도 같은 숨김 값을 넘겨 화면과 같은 그룹 기준으로 순서를 바꾼다', () => {
+    state.data = withHide({ 소속: ['사교'] });
+    render(<WorkDetailPage />);
+    expect(state.dragArgs[2]).toBe('소속');
+    expect(state.dragArgs[4]).toEqual(['사교']);
+  });
+
+  it('다른 분류 기준에 적은 숨김은 지금 기준에 영향을 주지 않는다', () => {
+    state.data = withHide({ 관계: ['사교'] });
+    render(<WorkDetailPage />);
+    expect(names()).toEqual(['남부:3', '북부:1+2', '사교:2']);
   });
 });

@@ -9,6 +9,8 @@ import { searchChars, getCharThemeColor } from './charSearch';
 import './CharacterViewModal.css';
 
 const SEARCH_LIMIT = 8;
+// 화면 아래에 고정된 푸터(높이 48px, z-index 8000)가 큰 창(z-index 3000) 아래쪽을 덮으므로 그만큼 위로 올려 둔다.
+const FOOTER_CLEARANCE_PX = 52;
 
 // 글자를 입력하는 곳에서는 방향키가 커서 이동이므로 가로채지 않는다.
 const isEditableTarget = (t) => {
@@ -124,7 +126,7 @@ const CharacterViewModal = ({ chars = [], activeId, onSelect, onClose, renderBod
       data-testid="char-view-backdrop"
       data-char-modal=""
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
-      style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3vh 3vw' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3vh 3vw', paddingBottom: `calc(3vh + ${FOOTER_CLEARANCE_PX}px)` }}
     >
       <div
         ref={panelRef}
