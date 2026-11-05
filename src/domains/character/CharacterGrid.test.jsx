@@ -1,8 +1,9 @@
 // Copyright (c) dendr000. MIT License.
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import CharacterGrid from './CharacterGrid';
+import { setCharViewSettings } from './charViewSettings';
 
 afterEach(cleanup);
 
@@ -257,5 +258,72 @@ describe('CharacterGrid 분류 기준 선택', () => {
   it('현재 분류 기준이 목록에 없는 속성이어도 선택 상태가 유지된다', () => {
     renderGrid({ groupCriteria: '사라진속성', sortKeys: [] });
     expect(critSelect().value).toBe('사라진속성');
+  });
+});
+
+describe('CharacterGrid 큰 창 열기', () => {
+  const secret = [
+    { id: 1, name: '릴리', _baseCharId: 1, 소속: '북부', 기밀: 'Y' },
+    { id: 2, name: '레온', _baseCharId: 2, 소속: '북부' },
+  ];
+  const makeClassified = (over = {}) => ({
+    has: true, mask: false, setMask: vi.fn(), reveal: vi.fn(),
+    isClassified: (c) => c.기밀 === 'Y', isConcealed: () => false, ...over,
+  });
+  const card = (id) => document.getElementById(`char-card-${id}`);
+  const openBtn = (id) => card(id).querySelector('button[aria-label="큰 창으로 보기"]');
+
+  beforeEach(() => { localStorage.clear(); });
+
+  it('카드마다 "큰 창으로 보기" 버튼이 있고, 누르면 그 캐릭터로 열며 선택은 건드리지 않는다', () => {
+    const onOpenModal = vi.fn();
+    const { props } = renderGrid({ onOpenModal });
+    fireEvent.click(openBtn(2));
+    expect(onOpenModal).toHaveBeenCalledWith(2);
+    expect(props.setActiveCharId).not.toHaveBeenCalled();
+  });
+
+  it('더블클릭하면 큰 창을 연다(설정 기본값)', () => {
+    const onOpenModal = vi.fn();
+    renderGrid({ onOpenModal });
+    fireEvent.doubleClick(card(1));
+    expect(onOpenModal).toHaveBeenCalledWith(1);
+  });
+
+  it('더블클릭의 두 번째 클릭(detail 2)은 선택을 해제하지 않는다', () => {
+    const { props } = renderGrid({ onOpenModal: vi.fn(), activeCharId: 1 });
+    fireEvent.click(card(1), { detail: 2 });
+    expect(props.setActiveCharId).not.toHaveBeenCalled();
+  });
+
+  it('첫 클릭(detail 1)은 평소처럼 선택한다', () => {
+    const { props } = renderGrid({ onOpenModal: vi.fn() });
+    fireEvent.click(card(1), { detail: 1 });
+    expect(props.setActiveCharId).toHaveBeenCalledWith(1);
+  });
+
+  it('설정에서 더블클릭 열기를 끄면 더블클릭으로 열지 않고, 클릭은 항상 선택/해제로 동작한다', () => {
+    setCharViewSettings({ dblClickModal: false });
+    const onOpenModal = vi.fn();
+    const { props } = renderGrid({ onOpenModal, activeCharId: 1 });
+    fireEvent.doubleClick(card(1));
+    expect(onOpenModal).not.toHaveBeenCalled();
+    fireEvent.click(card(1), { detail: 2 });
+    expect(props.setActiveCharId).toHaveBeenCalledWith(null);
+  });
+
+  it('가려진 기밀 카드는 큰 창 버튼이 없고 더블클릭으로도 열리지 않는다', () => {
+    const onOpenModal = vi.fn();
+    const classified = makeClassified({ mask: true, isConcealed: (c) => c.기밀 === 'Y' });
+    renderGrid({ groupedChars: { 일반: secret }, classified, onOpenModal });
+    expect(openBtn(1)).toBeNull();
+    expect(openBtn(2)).not.toBeNull();
+    fireEvent.doubleClick(card(1));
+    expect(onOpenModal).not.toHaveBeenCalled();
+  });
+
+  it('onOpenModal 이 없으면(다른 화면에서 쓸 때) 버튼을 그리지 않는다', () => {
+    renderGrid();
+    expect(openBtn(1)).toBeNull();
   });
 });

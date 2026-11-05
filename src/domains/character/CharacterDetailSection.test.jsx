@@ -2,7 +2,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, cleanup, fireEvent } from '@testing-library/react';
-import CharacterDetailSection from './CharacterDetailSection';
+import CharacterDetailSection, { getCharBodyText } from './CharacterDetailSection';
 
 afterEach(cleanup);
 
@@ -38,5 +38,18 @@ describe('CharacterDetailSection "그리드로" 버튼', () => {
   it('onBackToGrid 가 없으면 버튼을 그리지 않는다', () => {
     const { queryByRole } = render(<CharacterDetailSection activeChar={char} charSectionNum={1} styles={{}} />);
     expect(queryByRole('button', { name: /그리드로/ })).toBeNull();
+  });
+});
+
+describe('getCharBodyText', () => {
+  it('pageBody.rawText, pageBodyRaw, 저장된 JSON 순으로 본문을 찾는다', () => {
+    expect(getCharBodyText({ pageBody: { rawText: 'A' }, pageBodyRaw: 'B' })).toBe('A');
+    expect(getCharBodyText({ pageBodyRaw: 'B' })).toBe('B');
+    expect(getCharBodyText({ _rawDynamic: JSON.stringify({ pageBody: { rawText: 'C' } }) })).toBe('C');
+  });
+
+  it('본문이 없거나 JSON 이 깨졌으면 안내 문구', () => {
+    expect(getCharBodyText({})).toBe('등록된 본문 내용이 없습니다.');
+    expect(getCharBodyText({ _rawDynamic: '{깨짐' })).toBe('등록된 본문 내용이 없습니다.');
   });
 });

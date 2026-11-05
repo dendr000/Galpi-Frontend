@@ -2,7 +2,7 @@
 // 기능 요약: 전용 커스텀 데이터 훅으로부터 컴포넌트 라이프사이클 상태를 주입받아 도메인 단위 서브 모듈들을 조합하여 화면에 표출하는 순수 허브 레이아웃 파일
 // 버전: v3.1.0 (비즈니스 상태 로직 완전 격리 개편본)
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import './themes/wuxia.css';
 import './themes/wuxia-ink.css';
@@ -43,6 +43,8 @@ import CharacterInfobox from '../../domains/character/CharacterInfobox';
 import CharacterGrid from '../../domains/character/CharacterGrid';
 import CharacterDetailSection from '../../domains/character/CharacterDetailSection';
 import CharacterQuickNav from '../../domains/character/CharacterQuickNav';
+import CharacterViewModal from '../../domains/character/CharacterViewModal';
+import { getCharBodyText } from '../../domains/character/CharacterDetailSection';
 import BatchImageModal from '../../domains/character/BatchImageModal';
 
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
@@ -105,6 +107,9 @@ const WorkDetailPage = () => {
   });
   // 그리드 카드를 선택하면 아래 본문으로 이동한다(설정에서 끌 수 있음). 이름 바와 선택 해제에는 걸지 않는다.
   const selectFromGrid = useGridSelectScroll(data.setActiveCharId);
+  // 큰 창: 열 때 그 캐릭터를 선택해 두면 닫은 뒤 아래 본문, 인포박스와 어긋나지 않는다(여기서는 이동하지 않는다)
+  const [charModalOpen, setCharModalOpen] = useState(false);
+  const openCharModal = useCallback((id) => { data.setActiveCharId(id); setCharModalOpen(true); }, [data.setActiveCharId]);
 
   // GNB 팔레트 버튼이 테마를 순환시키면(별도 API 호출) 여기서도 즉시 반영되도록 이벤트를 듣는다
   useEffect(() => {
@@ -178,6 +183,18 @@ const WorkDetailPage = () => {
     multiGroupMode: getMultiGroupMode(parsedDesc.meta),
   });
   const sortKeys = collectSortKeys(baseChars);
+
+  // 큰 창에서 넘길 순서: 그리드에 보이는 그룹 순서 그대로, 여러 그룹에 든 캐릭터는 한 번만, 가려진 기밀 캐릭터는 뺀다
+  const modalChars = [];
+  const modalSeen = new Set();
+  sortedGroupNames.forEach((g) => (groupedChars[g] || []).forEach((c) => {
+    if (modalSeen.has(c.id) || classified.isConcealed(c)) return;
+    modalSeen.add(c.id);
+    modalChars.push(c);
+  }));
+  const renderInfobox = (char) => (
+    <CharacterInfobox char={char} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} ratingAxes={ratingAxes} ratingScale={ratingScale} classified={classified} />
+  );
 
   return (
     <div className="main-content-wrap">
@@ -300,6 +317,7 @@ const WorkDetailPage = () => {
                 charExt={charExt}
                 activeCharId={data.activeCharId}
                 setActiveCharId={selectFromGrid}
+                onOpenModal={openCharModal}
                 handleCharDragStart={handleCharDragStart}
                 handleCharDragOver={handleCharDragOver}
                 handleCharDragEnd={handleCharDragEnd}
@@ -334,10 +352,27 @@ const WorkDetailPage = () => {
           
           {/* 스마트 정보 박스 배치 구역 */}
           <aside className={styles.wikiAside}>
-            <CharacterInfobox char={activeChar} workId={data.workId} workTitle={data.work.title} charExt={charExt} imgVariants={imgVariants} setCharacters={data.setCharacters} setActiveCharId={data.setActiveCharId} characters={data.characters} cardVariants={data.cardVariants} setCardVariants={data.setCardVariants} formSwaps={data.formSwaps} setFormSwaps={data.setFormSwaps} wikiPages={data.wikiPages} onOpenPage={(id) => data.navigate(`/work/${data.workId}?pageId=${id}`)} ratingAxes={ratingAxes} ratingScale={ratingScale} classified={classified} />
+            {renderInfobox(activeChar)}
           </aside>
         </div>
       </div>
+
+      {charModalOpen && !activePage && (
+        <CharacterViewModal
+          chars={modalChars}
+          activeId={data.activeCharId}
+          onSelect={data.setActiveCharId}
+          onClose={() => setCharModalOpen(false)}
+          renderBody={(char) => (
+            <MarkdownRenderer
+              rawText={getCharBodyText(char)}
+              startH1={data.charSectionNum + 2}
+              onNodeClick={(name) => { setCharModalOpen(false); handleBacklink(name); }}
+            />
+          )}
+          renderInfobox={renderInfobox}
+        />
+      )}
 
       <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} onExport={runExport} hasClassified={classified.has} />
 

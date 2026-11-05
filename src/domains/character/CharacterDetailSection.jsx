@@ -6,16 +6,23 @@ import React from 'react';
 import MarkdownRenderer from '../../domains/macro/MarkdownRenderer';
 import Icon from '../../components/common/icons/Icon';
 
+const EMPTY_BODY = "등록된 본문 내용이 없습니다.";
+
+// 캐릭터의 본문 글(마크다운 원문). 본문 구역과 큰 창이 같이 쓴다.
+export const getCharBodyText = (char) => {
+  try {
+    return char.pageBody?.rawText || char.pageBodyRaw || (char._rawDynamic && JSON.parse(char._rawDynamic).pageBody?.rawText) || EMPTY_BODY;
+  } catch (e) {
+    console.warn(`[CharacterDetailSection] 본문 파싱 에러 발생. 기본값을 출력합니다.`, e);
+    return EMPTY_BODY;
+  }
+};
+
 const CharacterDetailSection = ({ activeChar, charSectionNum, styles, onBacklink, onBackToGrid }) => {
   if (!activeChar) return null;
   console.log(`[CharacterDetailSection] 캐릭터 마크다운 상세 정보 렌더링. 타겟 캐릭터: ${activeChar.name}`);
   
-  let rawText = "등록된 본문 내용이 없습니다.";
-  try {
-    rawText = activeChar.pageBody?.rawText || activeChar.pageBodyRaw || (activeChar._rawDynamic && JSON.parse(activeChar._rawDynamic).pageBody?.rawText) || "등록된 본문 내용이 없습니다.";
-  } catch(e) {
-    console.warn(`[CharacterDetailSection] 본문 파싱 에러 발생. 기본값을 출력합니다.`, e);
-  }
+  const rawText = getCharBodyText(activeChar);
 
   return (
     <section id="character-detail-section" className={styles.wikiSection}>

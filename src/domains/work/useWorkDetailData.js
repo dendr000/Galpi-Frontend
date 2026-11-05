@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../api/axiosCore';
 import { extractMeta } from '../../utils/markdownParser';
+import { queryTocHeadings } from './tocScan';
 
 export const useWorkDetailData = () => {
   const { workId } = useParams();
@@ -111,7 +112,7 @@ export const useWorkDetailData = () => {
     setTimeout(() => {
       console.log("[useWorkDetailData] 마크다운 뷰어 내 돔 엘리먼트 타겟 스캐닝 작동");
       let lastH1Num = 2;
-      const mdH1s = document.querySelectorAll('.markdown-body h1');
+      const mdH1s = queryTocHeadings('.markdown-body h1');
       mdH1s.forEach(h => {
         const match = h.innerText.match(/^(\d+)\./);
         if (match) {
@@ -125,7 +126,7 @@ export const useWorkDetailData = () => {
         return; 
       }
 
-      const headings = document.querySelectorAll('.auto-toc-target, .markdown-body h1, .markdown-body h2, .markdown-body h3');
+      const headings = queryTocHeadings('.auto-toc-target, .markdown-body h1, .markdown-body h2, .markdown-body h3');
       const tempToc = [];
       headings.forEach((h, index) => {
         if (!h.id) h.id = `galpi-auto-toc-${index}`;

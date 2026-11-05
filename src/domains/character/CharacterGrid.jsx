@@ -13,6 +13,9 @@ import { hasActiveFilter } from './characterFilter';
 import { getRatings } from './ratings';
 import { NO_CLASSIFIED } from './classified';
 import { getGroupCriteriaOptions } from './characterGroups';
+import { getCharViewSettings } from './charViewSettings';
+import Icon from '../../components/common/icons/Icon';
+import CharViewSettingsMenu from './CharViewSettingsMenu';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -47,7 +50,8 @@ const CharacterGrid = ({
   onFilterToggle = () => {},
   onFilterClear = () => {},
   filterShown = 0,            // 필터를 거친 뒤 보이는 인원과 전체 인원
-  filterTotal = 0
+  filterTotal = 0,
+  onOpenModal = null          // 있으면 카드에 "큰 창으로 보기" 버튼과 더블클릭 열기를 둔다
 }) => {
   console.log("[CharacterGrid] 등장인물 갤러리 그리드 컴포넌트 렌더링 개시");
 
@@ -123,6 +127,7 @@ const CharacterGrid = ({
               기밀 가리기
             </label>
           )}
+          <CharViewSettingsMenu />
         </div>
         <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
           <button
@@ -247,8 +252,14 @@ const CharacterGrid = ({
                           e.preventDefault(); 
                           e.stopPropagation();
                         } else {
+                          // 더블클릭의 두 번째 클릭은 선택을 해제하지 않는다(더블클릭 처리기가 큰 창을 연다)
+                          if (onOpenModal && e.detail > 1 && getCharViewSettings().dblClickModal) return;
                           setActiveCharId(activeCharId === c.id ? null : c.id);
                         }
+                      }}
+                      onDoubleClick={() => {
+                        if (!onOpenModal || concealed) return;
+                        if (getCharViewSettings().dblClickModal) onOpenModal(c.id);
                       }}
                       draggable={sortKey ? "false" : "true"}
                       onDragStart={(e) => { handleCharDragStart(e, c, gName); }}
@@ -271,6 +282,19 @@ const CharacterGrid = ({
                           alt={c.name}
                         />
                         {isSecret && <ClassifiedStamp style={{ position: 'absolute', top: '8px', right: '8px' }} />}
+                        {onOpenModal && !concealed && (
+                          <button
+                            type="button"
+                            aria-label="큰 창으로 보기"
+                            title="큰 창으로 보기"
+                            draggable={false}
+                            onClick={(e) => { e.stopPropagation(); onOpenModal(c.id); }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            style={{ position: 'absolute', top: '8px', left: '8px', width: '26px', height: '26px', padding: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--surface-color)', color: 'var(--text-primary)', opacity: 0.85, cursor: 'pointer' }}
+                          >
+                            <Icon name="expand" size={14} />
+                          </button>
+                        )}
                       </div>
 
                       {/* 이름 및 이름 옆 라벨 */}

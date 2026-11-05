@@ -78,6 +78,7 @@ src/
  │   │   ├── WorkCover.jsx                      # 작품 상세 상단 타이틀 이미지를 휠 확대 및 드래그 위치 제어하는 배너
  │   │   ├── TreeContextMenu.jsx                # 문서 트리 우클릭 메뉴(body 로 꺼내 그림, Esc 와 바깥 클릭으로 닫힘)
  │   │   ├── useWorkBacklink.js                 # [[이름]] 링크 클릭 시 캐릭터 선택+스크롤 또는 작품 이동을 처리하는 커스텀 훅
+ │   │   ├── tocScan.js                         # 목차용 제목 스캔에서 큰 창 안의 제목을 빼는 도우미
  │   │   ├── useSelectCharFromUrl.js            # 주소의 ?charId= 로 열리면 그 캐릭터를 선택하고 카드로 스크롤하는 훅
  │   │   └── useWorkDetailData.js               # 작품 상세 화면의 데이터 로드, 목차 스캔, 상태 관리를 전담하는 커스텀 훅
  │   ├── character/
@@ -95,6 +96,8 @@ src/
  │   │   ├── useClassifiedMask.js               # "기밀 가리기" 켜짐(작품별 저장)과 열람 기록을 가진 커스텀 훅
  │   │   ├── charViewSettings.js                # 본문 보기 설정(자동 이동, 더블클릭 큰 창)을 이 PC에 저장하고 읽는 로직
  │   │   ├── useGridSelectScroll.js             # 그리드 카드를 선택하면 본문으로, "그리드로"로 카드로 스크롤하는 훅
+ │   │   ├── CharacterViewModal.jsx             # 본문(왼쪽)과 인포박스(오른쪽)를 크게 보여 주고 방향키로 넘기는 큰 창
+ │   │   ├── CharViewSettingsMenu.jsx           # 목록 위 "보기 설정" 메뉴(자동 이동, 더블클릭 큰 창)
  │   │   ├── characterSort.js                   # 속성값(서열, 나이 등)으로 캐릭터를 정렬하는 순수 로직
  │   │   ├── PageMemberList.jsx                 # 하위 문서 아래에 같은 소속의 인물을 카드로 모아 보여 주는 목록
  │   │   ├── RatingBadges.jsx                   # 등급을 "R 3" 같은 작은 칩으로 보여 주는 조각
