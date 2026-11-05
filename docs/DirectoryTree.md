@@ -97,6 +97,8 @@ src/
  │   │   ├── charViewSettings.js                # 본문 보기 설정(자동 이동, 더블클릭 큰 창)을 이 PC에 저장하고 읽는 로직
  │   │   ├── useGridSelectScroll.js             # 그리드 카드를 선택하면 본문으로, "그리드로"로 카드로 스크롤하는 훅
  │   │   ├── CharacterViewModal.jsx             # 본문(왼쪽)과 인포박스(오른쪽)를 크게 보여 주고 방향키로 넘기는 큰 창
+ │   │   ├── CharacterViewModal.css             # 큰 창의 검색 상자, 주변 캐릭터 띠, 인포박스 배치 꾸밈
+ │   │   ├── charSearch.js                      # 큰 창 검색(이름 포함, 앞부분 일치 우선)과 캐릭터 테마 색 읽기
  │   │   ├── CharViewSettingsMenu.jsx           # 목록 위 "보기 설정" 메뉴(자동 이동, 더블클릭 큰 창)
  │   │   ├── characterSort.js                   # 속성값(서열, 나이 등)으로 캐릭터를 정렬하는 순수 로직
  │   │   ├── PageMemberList.jsx                 # 하위 문서 아래에 같은 소속의 인물을 카드로 모아 보여 주는 목록

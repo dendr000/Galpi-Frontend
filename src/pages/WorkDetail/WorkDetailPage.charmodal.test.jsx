@@ -91,6 +91,37 @@ describe('WorkDetailPage 캐릭터 큰 창', () => {
     expect(state.backlink).toHaveBeenCalledWith('세라');
   });
 
+  it('아래 주변 캐릭터 띠에 그리드와 같은 규칙의 이미지 주소가 들어가고, 가려진 기밀 캐릭터는 빠진다', () => {
+    localStorage.setItem('galpi-classified-mask-91', '1');
+    state.data = baseData({
+      activeCharId: 2,
+      work: { id: 91, title: '누구?', genre: '', description: '개요' },
+      characters: [
+        { id: 1, name: '릴리', 관계: '일반', 기밀: 'Y', pageBodyRaw: '릴리 본문' },
+        { id: 2, name: '레온/2세', 관계: '일반', pageBodyRaw: '그날 [[세라]]를 만났다.' },
+        { id: 3, name: '세라', 관계: '일반', pageBodyRaw: '세라 본문' },
+      ],
+    });
+    render(<WorkDetailPage />);
+    act(() => state.grid.onOpenModal(2));
+    const strip = screen.getByRole('navigation', { name: '주변 캐릭터' });
+    expect(strip.querySelectorAll('button')).toHaveLength(2);
+    const srcs = Array.from(strip.querySelectorAll('img')).map((i) => i.getAttribute('src'));
+    expect(srcs).toEqual([
+      '/img/character/' + encodeURIComponent('누구？_레온／2세.png'),
+      '/img/character/' + encodeURIComponent('누구？_세라.png'),
+    ]);
+  });
+
+  it('검색 상자로 찾은 캐릭터를 고르면 그 캐릭터로 넘어간다', () => {
+    state.data = baseData({ activeCharId: 2 });
+    render(<WorkDetailPage />);
+    act(() => state.grid.onOpenModal(2));
+    fireEvent.change(screen.getByRole('combobox', { name: '캐릭터 검색' }), { target: { value: '세' } });
+    fireEvent.mouseDown(screen.getByRole('option', { name: '세라' }));
+    expect(state.data.setActiveCharId).toHaveBeenLastCalledWith(3);
+  });
+
   it('하위 문서 화면에서는 큰 창을 그리지 않는다', () => {
     state.data = baseData({ pageId: '7', wikiPages: [{ id: 7, title: '북부', content: '소개' }] });
     render(<WorkDetailPage />);

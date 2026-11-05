@@ -165,3 +165,140 @@ describe('CharacterViewModal 닫기', () => {
     expect(props.onSelect).not.toHaveBeenCalled();
   });
 });
+
+describe('CharacterViewModal 주변 캐릭터 띠', () => {
+  const strip = () => screen.getByRole('navigation', { name: '주변 캐릭터' });
+  const chip = (name) => Array.from(strip().querySelectorAll('button')).find((b) => b.textContent.includes(name));
+
+  it('모든 캐릭터를 이미지와 이름으로 보여 주고, 지금 보는 캐릭터에 표시한다', () => {
+    setup({ getThumbSrc: (c) => `/img/${c.id}.png` });
+    expect(strip().querySelectorAll('button')).toHaveLength(3);
+    expect(chip('레온').getAttribute('aria-current')).toBe('true');
+    expect(chip('릴리').getAttribute('aria-current')).toBeNull();
+    expect(chip('세라').querySelector('img').getAttribute('src')).toBe('/img/3.png');
+  });
+
+  it('누르면 그 캐릭터로 넘어간다', () => {
+    const { props } = setup();
+    fireEvent.click(chip('세라'));
+    expect(props.onSelect).toHaveBeenCalledWith(3);
+  });
+
+  it('이미지를 못 불러오면 이미지를 숨기고 이름의 첫 글자를 대신 보여 준다', () => {
+    setup({ getThumbSrc: (c) => `/img/${c.id}.png` });
+    const img = chip('릴리').querySelector('img');
+    fireEvent.error(img);
+    expect(chip('릴리').querySelector('img')).toBeNull();
+    expect(chip('릴리').querySelector('[data-thumb-fallback]').textContent).toBe('릴');
+  });
+
+  it('이미지 주소를 주지 않으면 처음부터 첫 글자로 보여 준다', () => {
+    setup();
+    expect(chip('레온').querySelector('img')).toBeNull();
+    expect(chip('레온').querySelector('[data-thumb-fallback]').textContent).toBe('레');
+  });
+});
+
+describe('CharacterViewModal 캐릭터 검색', () => {
+  const box = () => screen.getByRole('combobox', { name: '캐릭터 검색' });
+  const type = (v) => fireEvent.change(box(), { target: { value: v } });
+  const options = () => screen.queryAllByRole('option');
+
+  it('입력하면 이름이 맞는 캐릭터가 목록으로 나온다', () => {
+    setup();
+    type('레');
+    expect(options().map((o) => o.textContent)).toEqual(['레온']);
+  });
+
+  it('일치하는 캐릭터가 없으면 안내 문구', () => {
+    setup();
+    type('없는이름');
+    expect(options()).toHaveLength(0);
+    expect(screen.getByText('일치하는 캐릭터가 없습니다')).toBeTruthy();
+  });
+
+  it('Enter 는 첫 결과로 이동하고 입력과 목록을 비운다', () => {
+    const { props } = setup({ chars: [...CHARS, { id: 4, name: '레나' }] });
+    type('레');
+    fireEvent.keyDown(box(), { key: 'Enter' });
+    expect(props.onSelect).toHaveBeenCalledWith(2);
+    expect(box().value).toBe('');
+    expect(options()).toHaveLength(0);
+  });
+
+  it('아래, 위 화살표로 고르고 Enter 로 이동한다', () => {
+    const { props } = setup({ chars: [...CHARS, { id: 4, name: '레나' }] });
+    type('레');
+    expect(options()[0].getAttribute('aria-selected')).toBe('true');
+    fireEvent.keyDown(box(), { key: 'ArrowDown' });
+    expect(options()[1].getAttribute('aria-selected')).toBe('true');
+    fireEvent.keyDown(box(), { key: 'ArrowDown' });
+    expect(options()[1].getAttribute('aria-selected')).toBe('true');
+    fireEvent.keyDown(box(), { key: 'ArrowUp' });
+    fireEvent.keyDown(box(), { key: 'ArrowUp' });
+    expect(options()[0].getAttribute('aria-selected')).toBe('true');
+    fireEvent.keyDown(box(), { key: 'ArrowDown' });
+    fireEvent.keyDown(box(), { key: 'Enter' });
+    expect(props.onSelect).toHaveBeenCalledWith(4);
+  });
+
+  it('한글 조합 중의 Enter 는 이동하지 않는다', () => {
+    const { props } = setup();
+    type('레');
+    fireEvent.keyDown(box(), { key: 'Enter', isComposing: true });
+    expect(props.onSelect).not.toHaveBeenCalled();
+  });
+
+  it('결과를 눌러도 이동한다', () => {
+    const { props } = setup();
+    type('세');
+    fireEvent.mouseDown(options()[0]);
+    expect(props.onSelect).toHaveBeenCalledWith(3);
+  });
+
+  it('입력칸의 Esc 는 입력부터 지우고, 비어 있을 때의 Esc 는 큰 창을 닫는다', () => {
+    const { props } = setup();
+    type('레');
+    fireEvent.keyDown(box(), { key: 'Escape' });
+    expect(box().value).toBe('');
+    expect(props.onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(box(), { key: 'Escape' });
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('입력칸 안의 좌우 방향키는 커서 이동이라 캐릭터를 넘기지 않는다', () => {
+    const { props } = setup();
+    type('레');
+    fireEvent.keyDown(box(), { key: 'ArrowRight' });
+    expect(props.onSelect).not.toHaveBeenCalled();
+  });
+
+  it('결과 상자의 빈 곳을 눌러도 입력칸이 포커스를 잃지 않는다(검색어가 안 지워진다)', () => {
+    setup();
+    box().focus();
+    type('없는이름');
+    const notPrevented = fireEvent.mouseDown(screen.getByText('일치하는 캐릭터가 없습니다'));
+    expect(notPrevented).toBe(false);
+  });
+
+  it('입력칸이 아닌 곳에서 / 를 누르면 검색 입력칸으로 커서가 간다', () => {
+    setup();
+    fireEvent.keyDown(window, { key: '/' });
+    expect(document.activeElement).toBe(box());
+  });
+
+  it('조합 중이거나 보조키와 함께 누른 / 는 무시한다', () => {
+    setup();
+    fireEvent.keyDown(window, { key: '/', isComposing: true });
+    fireEvent.keyDown(window, { key: '/', ctrlKey: true });
+    expect(document.activeElement).not.toBe(box());
+  });
+
+  it('입력칸에 커서가 있을 때 / 는 글자로 입력된다(가로채지 않는다)', () => {
+    setup();
+    box().focus();
+    const ev = new KeyboardEvent('keydown', { key: '/', cancelable: true, bubbles: true });
+    box().dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(false);
+  });
+});

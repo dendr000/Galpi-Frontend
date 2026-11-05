@@ -371,6 +371,7 @@ const WorkDetailPage = () => {
             />
           )}
           renderInfobox={renderInfobox}
+          getThumbSrc={(c) => `/img/character/${encodeURIComponent(sanitizeFilenameTitle(data.work.title || '작품') + '_' + sanitizeFilenameTitle(c.name) + '.' + charExt)}`}
         />
       )}
 
