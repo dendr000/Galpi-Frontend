@@ -50,6 +50,7 @@ import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
 import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
 import { useSelectCharFromUrl } from '../../domains/work/useSelectCharFromUrl';
+import { useGridSelectScroll, scrollToCharCard } from '../../domains/character/useGridSelectScroll';
 import { getAffiliationMembers } from '../../domains/work/organization';
 import { useCharacterSort } from '../../domains/character/useCharacterSort';
 import { collectSortKeys, sortCharsByProperty } from '../../domains/character/characterSort';
@@ -102,6 +103,8 @@ const WorkDetailPage = () => {
   useSelectCharFromUrl({
     loading: data.loading, charIdParam: data.charIdParam, characters: data.characters, setActiveCharId: data.setActiveCharId,
   });
+  // 그리드 카드를 선택하면 아래 본문으로 이동한다(설정에서 끌 수 있음). 이름 바와 선택 해제에는 걸지 않는다.
+  const selectFromGrid = useGridSelectScroll(data.setActiveCharId);
 
   // GNB 팔레트 버튼이 테마를 순환시키면(별도 API 호출) 여기서도 즉시 반영되도록 이벤트를 듣는다
   useEffect(() => {
@@ -296,7 +299,7 @@ const WorkDetailPage = () => {
                 work={data.work}
                 charExt={charExt}
                 activeCharId={data.activeCharId}
-                setActiveCharId={data.setActiveCharId}
+                setActiveCharId={selectFromGrid}
                 handleCharDragStart={handleCharDragStart}
                 handleCharDragOver={handleCharDragOver}
                 handleCharDragEnd={handleCharDragEnd}
@@ -319,7 +322,7 @@ const WorkDetailPage = () => {
 
             {/* 현재 활성화된 캐릭터의 상세 프로필 설정 문서 출력 */}
             {!activePage && activeChar && (
-              <CharacterDetailSection activeChar={activeChar} charSectionNum={data.charSectionNum} styles={styles} onBacklink={handleBacklink} />
+              <CharacterDetailSection activeChar={activeChar} charSectionNum={data.charSectionNum} styles={styles} onBacklink={handleBacklink} onBackToGrid={scrollToCharCard} />
             )}
 
             {/* 캐릭터 하단 스크롤 트랙용 퀵 네비게이터 바 조립 */}

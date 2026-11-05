@@ -93,6 +93,8 @@ src/
  │   │   ├── classified.js                      # 캐릭터의 기밀 여부(기밀 속성) 판정과 기본 상태
  │   │   ├── ClassifiedStamp.jsx                # 기밀 캐릭터에 붙이는 "기밀" 도장
  │   │   ├── useClassifiedMask.js               # "기밀 가리기" 켜짐(작품별 저장)과 열람 기록을 가진 커스텀 훅
+ │   │   ├── charViewSettings.js                # 본문 보기 설정(자동 이동, 더블클릭 큰 창)을 이 PC에 저장하고 읽는 로직
+ │   │   ├── useGridSelectScroll.js             # 그리드 카드를 선택하면 본문으로, "그리드로"로 카드로 스크롤하는 훅
  │   │   ├── characterSort.js                   # 속성값(서열, 나이 등)으로 캐릭터를 정렬하는 순수 로직
  │   │   ├── PageMemberList.jsx                 # 하위 문서 아래에 같은 소속의 인물을 카드로 모아 보여 주는 목록
  │   │   ├── RatingBadges.jsx                   # 등급을 "R 3" 같은 작은 칩으로 보여 주는 조각
