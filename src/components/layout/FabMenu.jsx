@@ -126,11 +126,12 @@ const FabMenu = () => {
         updatePopupState={bpCore.updatePopupState} 
       />
 
-      <div className="galpi-fab-wrap" style={{ position: 'fixed', bottom: '40px', right: '40px', zIndex: 9000, display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', gap: '15px' }}>
+      {/* 바깥 상자는 닫힌 메뉴 칸(투명)까지 포함해 위로 길게 차지하므로 클릭을 통과시키고, 팹 버튼과 열린 메뉴만 클릭을 받는다 */}
+      <div className="galpi-fab-wrap" style={{ position: 'fixed', bottom: '40px', right: '40px', zIndex: 9000, display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', gap: '15px', pointerEvents: 'none' }}>
         <button 
           id="galpi-fab-main"
           onClick={() => setIsOpen(!isOpen)} 
-          style={{ width: '60px', height: '60px', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', transition: '0.3s', outline: 'none' }}
+          style={{ width: '60px', height: '60px', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', transition: '0.3s', outline: 'none', pointerEvents: 'auto' }}
         >
           <img src="/img/svg/fab.svg" alt="메뉴" style={{ width: '100%', height: '100%', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.2))', transform: isOpen ? 'rotate(90deg) scale(1.05)' : 'none', transition: '0.3s' }} />
         </button>

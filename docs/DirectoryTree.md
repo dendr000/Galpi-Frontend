@@ -27,6 +27,8 @@ src/
  ├── utils/                                     # [순수 자바스크립트 유틸리티 함수]
  │   ├── askText.js                             # 글자 한 줄을 묻는 공용 함수(앱 안 입력 모달 사용, window.prompt 대체)
  │   ├── backlinkRouter.js                      # 설정 텍스트 간 동적 참조 관계 구문 분석 기반 경로 역추적 라우팅 유틸
+ │   ├── consoleGate.js                         # 콘솔 로그(log, debug, info)를 켜고 끄는 로직(개발 서버 켬, 배포 끔, 저장값 우선)
+ │   ├── installConsoleGate.js                  # 앱 시작 때 가장 먼저 불러와 로그 켜고 끄기를 적용하고 galpiDebug 를 만든다
  │   └── markdownParser.js                      # 마크다운 구문 파싱 및 최상단 프론트매터(Meta) JSON 추출 파서 엔진
  │
  ├── hooks/                                     # [애플리케이션 전역 커스텀 훅]
