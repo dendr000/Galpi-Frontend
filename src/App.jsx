@@ -12,6 +12,7 @@ import { getAppMaxWidth } from './utils/layoutWidth';
 import LoginPage from './pages/Login/LoginPage';
 
 import Gnb from './components/layout/Gnb';
+import MenuBar from './components/layout/menuBar/MenuBar';
 import BossBlindLayer from './components/common/BossBlindLayer';
 import SettingModal from './components/common/SettingModal';
 import SafeDeleteModal from './components/common/SafeDeleteModal';
@@ -92,6 +93,7 @@ function App() {
       <GlobalContextMenu /> 
       
       {!isBulkMode && <FabMenu />}
+      {!isBulkMode && !isEditorMode && !isMemoMode && <MenuBar setIsSettingOpen={setIsSettingOpen} />}
       {!isBulkMode && !isEditorMode && !isMemoMode && <Gnb setIsSettingOpen={setIsSettingOpen} />}     
       {!isBulkMode && <Footer />}
       

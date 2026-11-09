@@ -5,7 +5,7 @@
    두드러짐). sticky 헤더(약 61px)와 하단 고정 footer(약 49px, .galpi-app의 padding-bottom
    48px로 자리를 비워둠)를 뺀 나머지 뷰포트 높이만큼 최소 높이를 줘서, 내용이 짧아도 테마
    배경색이 footer까지 항상 이어지게 한다. */
-.wikiContainer { display: flex; flex-direction: column; padding: 20px 0; min-height: calc(100vh - 61px); box-sizing: border-box; }
+.wikiContainer { display: flex; flex-direction: column; padding: 20px 0; min-height: calc(100vh - var(--app-header-h)); box-sizing: border-box; }
 .wikiTitleArea { border-bottom: 2px solid var(--primary-color); margin-top: 30px; margin-bottom: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
 .wikiTitle { font-size: 32px; font-weight: 900; margin: 0; color: var(--text-primary); }
 

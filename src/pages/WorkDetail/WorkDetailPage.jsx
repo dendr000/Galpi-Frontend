@@ -51,6 +51,7 @@ import BatchImageModal from '../../domains/character/BatchImageModal';
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
 import useSettingStore from '../../store/useSettingStore';
 import { getWorkZoneLayout } from '../../utils/layoutWidth';
+import { MENU_ACTION_EVENT } from '../../components/layout/menuBar/menuActions';
 import { useWindowWidth } from '../../hooks/useWindowWidth';
 import { getPanelState } from '../../domains/work/panelLayout';
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
@@ -100,6 +101,12 @@ const WorkDetailPage = () => {
 
   // 공개용 HTML 내보내기: 옵션 창 열림 상태와, 지금 화면의 상태로 파일을 만들어 내려받는 함수
   const [exportOpen, setExportOpen] = useState(false);
+  // 상단 메뉴 바(파일 > 공개용 HTML 내보내기)가 보내는 동작 이벤트를 받아 내보내기 창을 연다
+  useEffect(() => {
+    const onMenuAction = (e) => { if (e.detail?.type === 'export-work') setExportOpen(true); };
+    window.addEventListener(MENU_ACTION_EVENT, onMenuAction);
+    return () => window.removeEventListener(MENU_ACTION_EVENT, onMenuAction);
+  }, []);
   const runExport = useWorkExport({
     work: data.work, characters: data.characters, wikiPages: data.wikiPages, formSwaps: data.formSwaps,
     groupCriteria: data.groupCriteria, sortKey, sortDir,

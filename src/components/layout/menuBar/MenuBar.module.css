@@ -1,0 +1,16 @@
+/* 파일 위치: src/components/layout/menuBar/MenuBar.module.css */
+/* 맨 위 얇은 메뉴 바(높이 28px). 위아래 고정 영역 계산은 global.css 의 --app-header-h 가 이 높이를 포함한다. */
+.bar { display: flex; align-items: center; gap: 2px; height: 28px; padding: 0 8px; box-sizing: border-box; background: var(--surface-color); border-bottom: 1px solid var(--border-color); font-size: 13px; }
+.wrap { position: relative; }
+.top { height: 24px; padding: 0 10px; border: none; border-radius: 4px; background: transparent; color: var(--text-primary); font-size: 13px; font-family: inherit; cursor: pointer; }
+.top:hover, .topOpen { background: var(--table-bg-alt); }
+.top:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -2px; }
+/* 모달(3000)보다 낮게 둬서 큰 창 위로 메뉴가 뜨지 않게 한다 */
+.menu { position: absolute; top: calc(100% + 2px); left: 0; z-index: 2500; min-width: 240px; padding: 4px 0; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow-md, 0 6px 20px rgba(0,0,0,0.18)); }
+.item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer; white-space: nowrap; user-select: none; }
+.item:hover, .item:focus { background: var(--table-bg-alt); outline: none; }
+.disabled { opacity: 0.4; cursor: default; }
+.disabled:hover { background: transparent; }
+.mark { display: inline-flex; width: 14px; justify-content: center; color: var(--primary-color); }
+.shortcut { margin-left: auto; padding-left: 24px; color: var(--text-secondary); font-size: 12px; }
+.sep { height: 1px; margin: 4px 0; background: var(--border-color); }

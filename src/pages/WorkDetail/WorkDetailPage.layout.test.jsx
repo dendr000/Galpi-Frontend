@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, act } from '@testing-library/react';
 
-const state = vi.hoisted(() => ({ data: null, left: null, toc: null }));
+const state = vi.hoisted(() => ({ data: null, left: null, toc: null, exportProps: null }));
 const stub = vi.hoisted(() => (name) => () => <div data-stub={name} />);
 
 vi.mock('../../domains/work/useWorkDetailData', () => ({ useWorkDetailData: () => state.data }));
@@ -23,9 +23,11 @@ vi.mock('../../domains/character/BatchImageModal', () => ({ default: stub('Batch
 vi.mock('../../domains/character/CharacterDetailSection', () => ({ default: stub('CharacterDetailSection') }));
 vi.mock('../../domains/character/CharacterGrid', () => ({ default: stub('CharacterGrid') }));
 vi.mock('../../domains/character/CharacterInfobox', () => ({ default: stub('CharacterInfobox') }));
+vi.mock('../../domains/work/export/ExportDialog', () => ({ default: (p) => { state.exportProps = p; return <div data-stub="ExportDialog" />; } }));
 
 import WorkDetailPage from './WorkDetailPage';
 import useSettingStore from '../../store/useSettingStore';
+import { dispatchMenuAction } from '../../components/layout/menuBar/menuActions';
 
 const baseData = () => ({
   loading: false, workId: '91', pageId: null, charIdParam: null, navigate: vi.fn(),
@@ -157,5 +159,33 @@ describe('WorkDetailPage 양옆 패널 붙이기', () => {
     expect(useSettingStore.getState().panelLeftOpen).toBe(true);
     act(() => setWindowWidth(1920));
     expect(state.left.docked).toBe(true);
+  });
+});
+
+describe('WorkDetailPage 상단 메뉴 연결', () => {
+  it('메뉴의 내보내기 동작 이벤트(export-work)를 받으면 내보내기 창이 열린다', () => {
+    render(<WorkDetailPage />);
+    expect(state.exportProps.open).toBe(false);
+    act(() => dispatchMenuAction('export-work'));
+    expect(state.exportProps.open).toBe(true);
+  });
+
+  it('다른 종류의 메뉴 동작 이벤트는 무시한다', () => {
+    render(<WorkDetailPage />);
+    act(() => dispatchMenuAction('something-else'));
+    expect(state.exportProps.open).toBe(false);
+  });
+
+  it('화면이 사라지면 메뉴 동작 이벤트 리스너를 해제한다(누수 방지)', () => {
+    const add = vi.spyOn(window, 'addEventListener');
+    const remove = vi.spyOn(window, 'removeEventListener');
+    const { unmount } = render(<WorkDetailPage />);
+    const added = add.mock.calls.filter(([type]) => type === 'galpi-menu-action').map(([, fn]) => fn);
+    expect(added.length).toBe(1);
+    unmount();
+    const removed = remove.mock.calls.filter(([type]) => type === 'galpi-menu-action').map(([, fn]) => fn);
+    expect(removed).toEqual(added);
+    add.mockRestore();
+    remove.mockRestore();
   });
 });

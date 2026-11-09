@@ -56,6 +56,14 @@ src/
  │       ├── FabMenu.jsx                        # 우측 하단 유틸리티 도구들을 호출하는 플로팅 액션 버튼(FAB) 레이아웃
  │       ├── GlobalContextMenu.jsx              # 마우스 우클릭 기본 동작을 차단하고 커스텀 컨텍스트 메뉴를 표출하는 모듈
  │       ├── Gnb.jsx                            # 최상단 상시 고정형 로고 및 글로벌 네비게이션 바
+ │       ├── menuBar/                           # 화면 맨 위 메뉴 바(파일, 편집, 보기, 설정) 모음
+ │       │   ├── MenuBar.jsx                    # 메뉴 바 화면, 열림 상태, 키보드 조작
+ │       │   ├── MenuBar.module.css             # 메뉴 바 전용 CSS 모듈(높이 28px, 열린 목록 겹침 순서 2500)
+ │       │   ├── MenuBar.test.jsx               # 메뉴 바 마우스, 키보드, 기존 기능 연결 시험
+ │       │   ├── menuDefinitions.js             # 메뉴 구성과 항목별 활성 조건, 실행 동작을 정하는 순수 함수
+ │       │   ├── menuDefinitions.test.js        # 메뉴 구성 시험
+ │       │   ├── menuActions.js                 # 메뉴 바와 상단 바가 함께 쓰는 공용 동작(다크 모드, 테마 순환, 찾기 열기)
+ │       │   └── menuActions.test.js            # 공용 동작 시험
  │       └── search/                            # 헤더 검색 추천
  │           ├── HeaderSearch.jsx               # 검색창과 추천 목록(키보드/클릭 이동)
  │           ├── searchSuggest.js               # 후보 만들기와 추천 순위 계산(순수 함수)
