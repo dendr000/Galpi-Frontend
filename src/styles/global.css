@@ -23,6 +23,15 @@ body {
 .main-content-wrap { flex: 1 0 auto; display: flex; flex-direction: column; }
 .fixed-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
 
+/* 작품 페이지 전체 폭 모드: 장르 테마 영역(#galpi-genre-zone)이 창 전체를 채워 테마 배경이 가장자리까지
+   이어지고, 안쪽 칼럼(.galpi-work-inner)만 읽기 폭(본문 960px + 간격 30px + 정보 상자 340px)을 가진다.
+   안쪽 칼럼은 예전 영역처럼 세로 flex 로 둬서 자식 간격과 높이 채움이 그대로 유지되게 한다. */
+#galpi-genre-zone.galpi-work-full { width: 100%; max-width: none; padding: 20px 24px; box-sizing: border-box; }
+.galpi-work-inner { display: flex; flex-direction: column; flex: 1 1 auto; width: 100%; max-width: 1330px; margin: 0 auto; min-width: 0; }
+/* 테마가 영역에 둥근 모서리(6px)를 주는데, 창 가장자리까지 닿는 전체 폭에서는 모서리를 각지게 한다.
+   장식 요소가 영역 밖으로 번지지 않도록 clip-path 는 모서리 없이 유지한다. */
+#galpi-genre-zone.galpi-work-full[data-genre-theme] { border-radius: 0 !important; clip-path: inset(0) !important; }
+
 .wiki-btn, .theme-btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
 .wiki-btn { background: var(--primary-color); color: white; margin-left: 5px; }
 .wiki-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: var(--shadow-sm); }

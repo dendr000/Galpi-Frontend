@@ -49,6 +49,8 @@ import { getCharBodyText } from '../../domains/character/CharacterDetailSection'
 import BatchImageModal from '../../domains/character/BatchImageModal';
 
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
+import useSettingStore from '../../store/useSettingStore';
+import { getWorkZoneLayout } from '../../utils/layoutWidth';
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
 import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
@@ -153,6 +155,10 @@ const WorkDetailPage = () => {
     return () => document.body.removeAttribute('data-footer-theme');
   }, [data.work?.genre, data.work?.description]);
 
+  // 폭 설정(전체 폭 / 본문 폭 제한)에 따라 테마 영역과 안쪽 칼럼의 클래스를 정한다
+  const layoutWidth = useSettingStore((s) => s.layoutWidth);
+  const zoneLayout = getWorkZoneLayout(layoutWidth);
+
   if (data.loading || !data.work) {
     return <div className="fixed-container" style={{ padding: '50px 20px', color: 'var(--text-secondary)', fontWeight:'bold' }}>데이터베이스 스캔 중...</div>;
   }
@@ -206,7 +212,9 @@ const WorkDetailPage = () => {
       <FloatingToc tocList={data.tocList} workId={data.workId} pageId={data.pageId} activePage={activePage} />
       <GenreCursor theme={genreTheme} zoneId="galpi-genre-zone" />
 
-      <div id="galpi-genre-zone" className={`wiki-container fixed-container ${styles.wikiContainer}`} data-genre-theme={genreTheme || undefined}>
+      <div id="galpi-genre-zone" className={`${zoneLayout.zoneClass} ${styles.wikiContainer}`} data-genre-theme={genreTheme || undefined}>
+      {/* 전체 폭 모드: 테마 영역은 창 전체를 채우고, 이 안쪽 칼럼만 읽기 폭을 가진다 */}
+      <div className={zoneLayout.innerClass}>
         
         {/* 2단계: 최상단 상향 링크 빵부스러기 경로 바 영역 */}
         {activePage && (
@@ -358,6 +366,7 @@ const WorkDetailPage = () => {
             {renderInfobox(activeChar)}
           </aside>
         </div>
+      </div>
       </div>
 
       {charModalOpen && !activePage && (

@@ -8,6 +8,7 @@ import { useHorizontalScroll } from './hooks/useHorizontalScroll';
 import { useGlobalModalFocusGuard } from './hooks/useGlobalModalFocusGuard';
 import useSettingStore from './store/useSettingStore';
 import useAuthStore from './store/useAuthStore';
+import { getAppMaxWidth } from './utils/layoutWidth';
 import LoginPage from './pages/Login/LoginPage';
 
 import Gnb from './components/layout/Gnb';
@@ -73,7 +74,7 @@ function App() {
       style={{ 
         '--markdown-font-size': `${fontSize}px`, 
         '--markdown-font-family': fontFamily === 'serif' ? "'Noto Serif KR', serif" : (fontFamily === 'monospace' ? "monospace" : "inherit"),
-        maxWidth: (isBulkMode || isEditorMode || isMemoMode) ? '100%' : (layoutWidth === 'full' ? '100%' : '1200px'),
+        maxWidth: getAppMaxWidth({ layoutWidth, isBulkMode, isEditorMode, isMemoMode }),
         margin: '0 auto',
         minHeight: '100vh',
         paddingBottom: isBulkMode ? '0' : '48px',

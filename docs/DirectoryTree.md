@@ -12,7 +12,8 @@ src/
  ├── store/                                     # [전역 상태 관리 스토어]
  │   ├── useAppStore.js                         # 클라이언트 비즈니스 뼈대를 통제하는 Zustand 기반 전역 핵심 상태 스토어
  │   ├── useModalStore.js                       # 레이어 팝업 및 기능 모달들의 동적 개폐 상태 전용 관리 스토어
- │   └── useSettingStore.js                     # 글꼴 크기, 서체 종류, 레이아웃 해상도 등 커스텀 외관 설정 저장 스토어
+ │   ├── useSettingStore.js                     # 글꼴 크기, 서체 종류, 레이아웃 해상도 등 커스텀 외관 설정 저장 스토어
+ │   └── useSettingStore.test.js                # 설정 저장소의 새 기본 폭과 옛 설정 한 번만 옮기기(마이그레이션) 시험
  │
  ├── styles/                                    # [전역 및 컴포넌트별 CSS 모음]
  │   ├── bulk.css                               # 스프레드시트형 캐릭터 속성 다중 원장 수정용 전용 CSS 스타일시트
@@ -29,6 +30,8 @@ src/
  │   ├── backlinkRouter.js                      # 설정 텍스트 간 동적 참조 관계 구문 분석 기반 경로 역추적 라우팅 유틸
  │   ├── consoleGate.js                         # 콘솔 로그(log, debug, info)를 켜고 끄는 로직(개발 서버 켬, 배포 끔, 저장값 우선)
  │   ├── installConsoleGate.js                  # 앱 시작 때 가장 먼저 불러와 로그 켜고 끄기를 적용하고 galpiDebug 를 만든다
+ │   ├── layoutWidth.js                         # 앱 폭 규칙(전체 폭/본문 폭 제한), 작품 영역 클래스, 저장된 설정 버전 옮기기
+ │   ├── layoutWidth.test.js                    # 폭 규칙과 설정 옮기기 시험
  │   └── markdownParser.js                      # 마크다운 구문 파싱 및 최상단 프론트매터(Meta) JSON 추출 파서 엔진
  │
  ├── hooks/                                     # [애플리케이션 전역 커스텀 훅]
@@ -177,7 +180,8 @@ src/
      │   └── NovelViewerPage.jsx                # 작성된 원고 열람 및 뷰어 커스텀 제어 페이지
      └── WorkDetail/
          ├── WorkDetail.module.css              # 작품 상세 정보 화면 전용 모듈 CSS 스타일시트
-         └── WorkDetailPage.jsx                 # 데이터 패치 및 도메인 UI 컴포넌트 총괄 조립 페이지
+         ├── WorkDetailPage.jsx                 # 데이터 패치 및 도메인 UI 컴포넌트 총괄 조립 페이지
+         └── WorkDetailPage.layout.test.jsx     # 작품 페이지 폭 규칙(전체 폭/본문 폭 제한) 시험
 ```
   
 Fab-Memo 관련 트리를 보려면 [이 링크](./domains/fab/memo.md)로 이동하세요.

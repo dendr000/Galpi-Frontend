@@ -76,8 +76,8 @@ const SettingModal = ({ isOpen, onClose }) => {
                 <label style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--text-primary)' }}>
                   레이아웃: 
                   <select style={inputStyle} value={layoutWidth} onChange={e => updateSetting('layoutWidth', e.target.value)}>
-                    <option value="center">집중 모드 (가운데 정렬)</option>
-                    <option value="full">전체 모드 (가로 100%)</option>
+                    <option value="full">전체 폭 (창을 가득 채움)</option>
+                    <option value="center">본문 폭 제한 (1200px, 가운데 정렬)</option>
                   </select>
                 </label>
                 <label style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--text-primary)' }}>
