@@ -10,6 +10,7 @@ const useSettingStore = create(
       fontSize: '14', lineHeight: '1.6', fontFamily: 'default', layoutWidth: 'full',
       isCustomCursor: false,
       cursorColor: '#3b5bdb', // ★ 커스텀 커서 색상 (기본값: 메인 파랑)
+      panelLeftOpen: true, panelRightOpen: true, // 작품 페이지 양옆 패널(문서 트리, 목차)을 본문 옆에 붙여 둘지. 창이 좁으면 값과 무관하게 접힌다
       isStarryBackground: false, // 분류(장르)와 무관하게 헤더 설정에서 켜는 전역 밤하늘 배경
       
       // --- 에디터 (Editor) ---

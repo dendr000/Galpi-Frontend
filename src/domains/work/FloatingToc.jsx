@@ -6,7 +6,8 @@ import { Menu, Edit3 } from 'lucide-react';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import Icon from '../../components/common/icons/Icon';
 
-const FloatingToc = ({ workId, pageId, activePage, tocList = [] }) => {
+// docked: 본문 옆에 붙은 고정 열로 그린다(onCollapse 로 접음). 아니면 접힌 손잡이 모드(onDock 이 있으면 손잡이를 눌러 다시 붙임).
+const FloatingToc = ({ workId, pageId, activePage, tocList = [], docked = false, onCollapse, onDock }) => {
   const navigate = useNavigate();
 
   const handleEditClick = () => {
@@ -20,17 +21,23 @@ const FloatingToc = ({ workId, pageId, activePage, tocList = [] }) => {
   const safeTocList = Array.isArray(tocList) ? tocList : [];
 
   return (
-    <div className={styles.floatingToc}>
+    <div
+      className={docked ? `${styles.dockedPanel} ${styles.dockedRight}` : styles.floatingToc}
+      {...(docked ? { role: 'complementary', 'aria-label': '목차' } : {})}
+    >
       
-      <div className={styles.tocHandle} title="목차 열기">
-        <Menu size={20} />
-      </div>
+      {!docked && (
+        <div className={styles.tocHandle} title={onDock ? '목차 고정' : '목차 열기'} onClick={onDock}>
+          <Menu size={20} />
+        </div>
+      )}
       
-      <div className={styles.tocContent}>
+      <div className={docked ? styles.dockedInner : styles.tocContent}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px', marginBottom: '12px' }}>
           <span style={{ fontWeight: 900, color: 'var(--primary-color)' }}>
             <Icon name="list" lead /> 목차
           </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <button 
             type="button" 
             className="wiki-btn" 
@@ -39,6 +46,12 @@ const FloatingToc = ({ workId, pageId, activePage, tocList = [] }) => {
           >
             <Edit3 size={12} /> 편집
           </button>
+          {docked && (
+            <button type="button" className={styles.panelCollapseBtn} aria-label="목차 접기" title="목차 접기" onClick={onCollapse}>
+              <Icon name="chevron-right" />
+            </button>
+          )}
+          </span>
         </div>
         
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>

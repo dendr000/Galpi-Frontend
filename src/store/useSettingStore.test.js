@@ -34,3 +34,26 @@ describe('useSettingStore 폭 설정', () => {
     expect(second.getState().layoutWidth).toBe('center');
   });
 });
+
+describe('useSettingStore 양옆 패널 열림 설정', () => {
+  it('기본은 둘 다 열림(붙일 수 있는 폭에서 붙음)', async () => {
+    const store = await load();
+    expect(store.getState().panelLeftOpen).toBe(true);
+    expect(store.getState().panelRightOpen).toBe(true);
+  });
+
+  it('접은 상태는 저장돼 다시 불러와도 유지된다', async () => {
+    const first = await load();
+    first.getState().updateSetting('panelLeftOpen', false);
+    const second = await load();
+    expect(second.getState().panelLeftOpen).toBe(false);
+    expect(second.getState().panelRightOpen).toBe(true);
+  });
+
+  it('이 값이 없던 옛 저장본을 불러와도 기본(열림)으로 채워진다', async () => {
+    localStorage.setItem('galpi-settings', JSON.stringify({ state: { layoutWidth: 'full', fontSize: '15' }, version: 1 }));
+    const store = await load();
+    expect(store.getState().panelLeftOpen).toBe(true);
+    expect(store.getState().fontSize).toBe('15');
+  });
+});

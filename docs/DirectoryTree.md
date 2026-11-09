@@ -37,6 +37,8 @@ src/
  ├── hooks/                                     # [애플리케이션 전역 커스텀 훅]
  │   ├── useBacklinkRouter.js                   # 문서 본문 내 백링크 태그 선택 시 라우터를 변환해주는 커스텀 액션 훅
  │   ├── useBossKey.js                          # 몰컴용 스위칭 화면 락 기능 단축키 바인딩 전역 커스텀 훅
+ │   ├── useWindowWidth.js                      # 창 폭(px)을 돌려주고 창 크기가 바뀌면 갱신하는 훅
+ │   ├── useWindowWidth.test.jsx                # 창 폭 훅 시험
  │   └── useHorizontalScroll.js                 # 마우스 수직 휠 입력을 컨테이너 가로 스크롤 벡터로 치환해주는 전역 훅
  │
  ├── components/                                # [공통 UI 컴포넌트 구역]
@@ -63,7 +65,11 @@ src/
  │   ├── work/
  │   │   ├── backlink.js                        # 본문 [[이름]] 링크가 가리키는 같은 작품 캐릭터/다른 작품을 찾는 순수 로직
  │   │   ├── FloatingLeftTree.jsx               # 하위 위키 문서들의 부모-자식 계층 구조를 시각화하는 플로팅 사이드 트리
+ │   │   ├── FloatingLeftTree.dock.test.jsx     # 문서 트리의 붙은 모드와 접힌 모드 시험
  │   │   ├── FloatingToc.jsx                    # 실시간 DOM 헤딩을 추적하여 부드러운 스크롤 이동을 지원하는 플로팅 목차
+ │   │   ├── FloatingToc.test.jsx               # 목차의 붙은 모드와 접힌 모드 시험
+ │   │   ├── panelLayout.js                     # 양옆 패널을 본문 옆에 붙일지 정하는 규칙(기준 폭 1650px)
+ │   │   ├── panelLayout.test.js                # 패널 붙이기 규칙 시험
  │   │   ├── InlineCategoryForm.jsx             # 장르 태그 배지를 실시간 비동기로 즉시 추가하는 인라인 전용 입력 폼
  │   │   ├── newPageUrl.js                      # 새 하위 문서 편집 주소(parentId 유무)와 "같은 위치" 상위 문서 번호를 계산하는 순수 함수
  │   │   ├── organization.js                    # 소속 값과 같은 제목의 하위 문서를 잇고 소속 인물을 모으는 순수 로직

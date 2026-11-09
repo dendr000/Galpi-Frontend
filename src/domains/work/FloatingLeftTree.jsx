@@ -8,7 +8,8 @@ import TreeContextMenu from './TreeContextMenu';
 import { newPageUrl, siblingParentId } from './newPageUrl';
 import Icon from '../../components/common/icons/Icon';
 
-const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [] }) => {
+// docked: 본문 옆에 붙은 고정 열로 그린다(onCollapse 로 접음). 아니면 접힌 손잡이 모드(onDock 이 있으면 손잡이를 눌러 다시 붙임).
+const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [], docked = false, onCollapse, onDock }) => {
   const navigate = useNavigate();
   // 우클릭 메뉴: { x, y, page } (page 가 없으면 최상위 메뉴)
   const [menu, setMenu] = useState(null);
@@ -104,11 +105,19 @@ const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [] }) => {
   };
 
   return (
-    <div className={styles.floatingLeftTree}>
+    <div
+      className={docked ? `${styles.dockedPanel} ${styles.dockedLeft}` : styles.floatingLeftTree}
+      {...(docked ? { role: 'complementary', 'aria-label': '문서 트리' } : {})}
+    >
       
-      <div className={styles.treeContent}>
-        <div style={{ fontSize: '15px', fontWeight: 900, color: 'var(--primary-color)', marginBottom: '12px', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px' }}>
-          <Icon name="folder" lead /> 문서 트리
+      <div className={docked ? styles.dockedInner : styles.treeContent}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '15px', fontWeight: 900, color: 'var(--primary-color)', marginBottom: '12px', borderBottom: '2px solid var(--border-color)', paddingBottom: '8px' }}>
+          <span><Icon name="folder" lead /> 문서 트리</span>
+          {docked && (
+            <button type="button" className={styles.panelCollapseBtn} aria-label="문서 트리 접기" title="문서 트리 접기" onClick={onCollapse}>
+              <Icon name="chevron-left" />
+            </button>
+          )}
         </div>
         <div data-tree-body style={{ flex: 1, overflowY: 'auto' }} onContextMenu={(e) => openMenu(e, null)}>
           {/* 작품 첫 화면(최상위)으로 돌아가는 행: 하위 문서를 깊이 들어가 있어도 스크롤 없이 바로 이동한다 */}
@@ -134,9 +143,11 @@ const FloatingLeftTree = ({ workId, workTitle, pageId, wikiPages = [] }) => {
         </div>
       </div>
 
-      <div className={styles.treeHandle} title="문서 트리 열기">
-        <Menu size={20} />
-      </div>
+      {!docked && (
+        <div className={styles.treeHandle} title={onDock ? '문서 트리 고정' : '문서 트리 열기'} onClick={onDock}>
+          <Menu size={20} />
+        </div>
+      )}
 
       {menu && <TreeContextMenu x={menu.x} y={menu.y} items={menuItems()} onClose={() => setMenu(null)} />}
       

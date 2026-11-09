@@ -51,6 +51,8 @@ import BatchImageModal from '../../domains/character/BatchImageModal';
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
 import useSettingStore from '../../store/useSettingStore';
 import { getWorkZoneLayout } from '../../utils/layoutWidth';
+import { useWindowWidth } from '../../hooks/useWindowWidth';
+import { getPanelState } from '../../domains/work/panelLayout';
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
 import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
@@ -159,6 +161,15 @@ const WorkDetailPage = () => {
   const layoutWidth = useSettingStore((s) => s.layoutWidth);
   const zoneLayout = getWorkZoneLayout(layoutWidth);
 
+  // 양옆 패널(왼쪽 문서 트리, 오른쪽 목차): 넓은 창에서는 본문 옆에 붙고, 좁은 창에서는 손잡이로 접힌다.
+  // 정보 상자는 장르 테마가 적용되는 영역 안(본문 옆)에 그대로 둔다.
+  // 접어 둔 선택(panelLeftOpen/panelRightOpen)은 설정에 저장되고, 창 폭 때문에 접힌 것은 저장하지 않는다.
+  const windowWidth = useWindowWidth();
+  const panelLeftOpen = useSettingStore((s) => s.panelLeftOpen);
+  const panelRightOpen = useSettingStore((s) => s.panelRightOpen);
+  const updateSetting = useSettingStore((s) => s.updateSetting);
+  const { canDock, leftDocked, rightDocked } = getPanelState({ width: windowWidth, leftOpen: panelLeftOpen, rightOpen: panelRightOpen });
+
   if (data.loading || !data.work) {
     return <div className="fixed-container" style={{ padding: '50px 20px', color: 'var(--text-secondary)', fontWeight:'bold' }}>데이터베이스 스캔 중...</div>;
   }
@@ -207,10 +218,16 @@ const WorkDetailPage = () => {
 
   return (
     <div className="main-content-wrap">
-      {/* 1단계: 플로팅 사이드바 위젯 부착 구역 */}
-      <FloatingLeftTree workId={data.workId} workTitle={data.work.title} pageId={data.pageId} wikiPages={data.wikiPages} />
-      <FloatingToc tocList={data.tocList} workId={data.workId} pageId={data.pageId} activePage={activePage} />
       <GenreCursor theme={genreTheme} zoneId="galpi-genre-zone" />
+
+      {/* 가로 배치: 왼쪽 문서 트리 | 테마 영역(본문) | 오른쪽 목차(+정보 상자). 패널이 접히면 손잡이만 화면 가장자리에 뜬다 */}
+      <div className="galpi-work-shell">
+      <FloatingLeftTree
+        workId={data.workId} workTitle={data.work.title} pageId={data.pageId} wikiPages={data.wikiPages}
+        docked={leftDocked}
+        onCollapse={() => updateSetting('panelLeftOpen', false)}
+        onDock={canDock ? () => updateSetting('panelLeftOpen', true) : undefined}
+      />
 
       <div id="galpi-genre-zone" className={`${zoneLayout.zoneClass} ${styles.wikiContainer}`} data-genre-theme={genreTheme || undefined}>
       {/* 전체 폭 모드: 테마 영역은 창 전체를 채우고, 이 안쪽 칼럼만 읽기 폭을 가진다 */}
@@ -367,6 +384,14 @@ const WorkDetailPage = () => {
           </aside>
         </div>
       </div>
+      </div>
+
+      <FloatingToc
+        tocList={data.tocList} workId={data.workId} pageId={data.pageId} activePage={activePage}
+        docked={rightDocked}
+        onCollapse={() => updateSetting('panelRightOpen', false)}
+        onDock={canDock ? () => updateSetting('panelRightOpen', true) : undefined}
+      />
       </div>
 
       {charModalOpen && !activePage && (
