@@ -4,6 +4,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { useHomeData } from './hooks/useHomeData';
+import useSettingStore from '../../store/useSettingStore';
+import { getPageContainerClass } from '../../utils/layoutWidth';
 import HeroSlider from './HeroSlider';
 import WorkCard from './WorkCard';
 import { IconBook, IconArchive } from '../../components/common/icons/DomainIcons';
@@ -11,6 +13,7 @@ import { IconViewGrid, IconViewSmall, IconViewList, IconViewShelf } from './comp
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const layoutWidth = useSettingStore((s) => s.layoutWidth);
   console.log("[HomePage] 메인 컴포넌트 렌더링 사이클 진입");
 
   const {
@@ -26,7 +29,7 @@ const HomePage = () => {
 
   return (
     <div className="main-content-wrap">
-      <div className="fixed-container">
+      <div className={getPageContainerClass(layoutWidth)}>
         
         {/* 1. 상단 무한 스와이프 캐러셀 배너 */}
         {!isLoading && <HeroSlider works={works} />}

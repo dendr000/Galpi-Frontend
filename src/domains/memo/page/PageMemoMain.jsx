@@ -46,7 +46,7 @@ const PageMemoMain = () => {
   }, [splitTabId, memos]);
 
   return (
-    <div style={{ overflow: 'hidden', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ overflow: 'hidden', height: 'calc(100vh - var(--app-menubar-h))', display: 'flex', flexDirection: 'column' }}>
       <style>{`
         .galpi-outer-select [contenteditable="false"] { opacity: 0.4; filter: grayscale(100%); transition: 0.2s; }
         .galpi-outer-select [contenteditable="false"] *::selection { background: transparent !important; color: inherit !important; }

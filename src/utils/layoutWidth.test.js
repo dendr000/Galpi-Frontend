@@ -1,6 +1,6 @@
 // Copyright (c) dendr000. MIT License.
 import { describe, it, expect } from 'vitest';
-import { getAppMaxWidth, getWorkZoneLayout, migrateSettings, SETTINGS_VERSION } from './layoutWidth';
+import { getAppMaxWidth, getWorkZoneLayout, getPageContainerClass, migrateSettings, SETTINGS_VERSION } from './layoutWidth';
 
 describe('getAppMaxWidth: 앱 최상위 칸의 최대 폭', () => {
   it('전체 폭(full)이면 100%', () => {
@@ -40,6 +40,21 @@ describe('getWorkZoneLayout: 작품 페이지 장르 테마 영역의 폭 규칙
 
   it('알 수 없는 값이면 전체 폭', () => {
     expect(getWorkZoneLayout(undefined).zoneClass).toContain('galpi-work-full');
+  });
+});
+
+describe('getPageContainerClass: 홈, 분류 같은 일반 화면 칸의 폭 규칙', () => {
+  it('전체 폭이면 1200px 제한을 푸는 fluid 클래스를 함께 쓴다', () => {
+    expect(getPageContainerClass('full')).toBe('fixed-container galpi-page-fluid');
+  });
+
+  it('본문 폭 제한이면 예전처럼 fixed-container 만 쓴다', () => {
+    expect(getPageContainerClass('center')).toBe('fixed-container');
+  });
+
+  it('알 수 없는 값이거나 비어 있으면 전체 폭', () => {
+    expect(getPageContainerClass('whatever')).toBe('fixed-container galpi-page-fluid');
+    expect(getPageContainerClass(undefined)).toBe('fixed-container galpi-page-fluid');
   });
 });
 

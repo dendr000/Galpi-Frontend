@@ -13,6 +13,7 @@ import LoginPage from './pages/Login/LoginPage';
 
 import Gnb from './components/layout/Gnb';
 import MenuBar from './components/layout/menuBar/MenuBar';
+import { getChromeVisibility } from './utils/appChrome';
 import BossBlindLayer from './components/common/BossBlindLayer';
 import SettingModal from './components/common/SettingModal';
 import SafeDeleteModal from './components/common/SafeDeleteModal';
@@ -41,6 +42,7 @@ function App() {
   const isBulkMode = location.pathname.startsWith('/bulk');
   const isEditorMode = location.pathname.startsWith('/edit');
   const isMemoMode = location.pathname.startsWith('/memo');
+  const chrome = getChromeVisibility(location.pathname);
 
   // 시크릿 게이트 — 세션 토큰이 없으면(로그아웃 상태거나 만료돼서 axios 인터셉터가 지웠거나)
   // 무슨 경로로 들어왔든 로그인 화면만 보여준다. 서버를 껐다 켜도, 브라우저를 새로 열어도
@@ -92,10 +94,10 @@ function App() {
       <BossBlindLayer />
       <GlobalContextMenu /> 
       
-      {!isBulkMode && <FabMenu />}
-      {!isBulkMode && !isEditorMode && !isMemoMode && <MenuBar setIsSettingOpen={setIsSettingOpen} />}
-      {!isBulkMode && !isEditorMode && !isMemoMode && <Gnb setIsSettingOpen={setIsSettingOpen} />}     
-      {!isBulkMode && <Footer />}
+      {chrome.showFab && <FabMenu />}
+      {chrome.showMenuBar && <MenuBar setIsSettingOpen={setIsSettingOpen} />}
+      {chrome.showGnb && <Gnb setIsSettingOpen={setIsSettingOpen} />}     
+      {chrome.showFooter && <Footer />}
       
       <Routes>
         <Route path="/" element={<Home />} />

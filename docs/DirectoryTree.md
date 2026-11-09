@@ -1,6 +1,7 @@
   ```bash
 src/
  ├── App.jsx                                    # 애플리케이션 최상위 라우팅 및 전역 환경설정 주입 코어 파일
+ ├── App.chrome.test.jsx                        # 화면별 앱 틀(메뉴 바, 상단 바 등) 연결 시험
  ├── main.jsx                                   # React 웹 애플리케이션 DOM 주입 및 서비스 구동 진입점 파일
  │
  ├── api/
@@ -16,6 +17,7 @@ src/
  │   └── useSettingStore.test.js                # 설정 저장소의 새 기본 폭과 옛 설정 한 번만 옮기기(마이그레이션) 시험
  │
  ├── styles/                                    # [전역 및 컴포넌트별 CSS 모음]
+ │   ├── appShellCss.test.js                    # 앱 틀 CSS 규칙(폭 제한 해제, 메뉴 바 높이 변수) 시험
  │   ├── bulk.css                               # 스프레드시트형 캐릭터 속성 다중 원장 수정용 전용 CSS 스타일시트
  │   ├── category.css                           # 장르 및 태그별 작품 목록 필터링 대시보드 전용 CSS 스타일시트
  │   ├── edit.css                               # 위키 보드 및 신규 작품 설정 작성 에디터 전용 CSS 스타일시트
@@ -26,6 +28,8 @@ src/
  │   └── novel-viewer.css                       # 가독성 극대화를 위한 웹소설 뷰어 템플릿 전용 CSS 스타일시트
  │
  ├── utils/                                     # [순수 자바스크립트 유틸리티 함수]
+ │   ├── appChrome.js                           # 화면(주소)별 앱 틀 표시 규칙(메뉴 바, 상단 바, 떠 있는 메뉴, 푸터)
+ │   ├── appChrome.test.js                      # 앱 틀 표시 규칙 시험
  │   ├── askText.js                             # 글자 한 줄을 묻는 공용 함수(앱 안 입력 모달 사용, window.prompt 대체)
  │   ├── backlinkRouter.js                      # 설정 텍스트 간 동적 참조 관계 구문 분석 기반 경로 역추적 라우팅 유틸
  │   ├── consoleGate.js                         # 콘솔 로그(log, debug, info)를 켜고 끄는 로직(개발 서버 켬, 배포 끔, 저장값 우선)

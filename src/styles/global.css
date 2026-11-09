@@ -22,10 +22,12 @@ body {
 }
 .main-content-wrap { flex: 1 0 auto; display: flex; flex-direction: column; }
 .fixed-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
+/* 전체 폭 설정일 때 fixed-container 의 1200px 제한을 푼다(홈, 분류). 반드시 위 규칙보다 뒤에 둔다. */
+.fixed-container.galpi-page-fluid { max-width: none; padding: 0 24px; }
 
 /* 앱 위아래 고정 영역 높이. 양옆 패널과 작품 영역 최소 높이 계산에 쓴다.
-   헤더 = 메뉴 바 28px + 상단 바 61px(각각 아래 선 포함). 메뉴 바가 없는 화면(편집기, 일괄, 메모)은 이 값을 쓰지 않는다. */
-:root { --app-header-h: 89px; --app-footer-h: 48px; }
+   헤더 = 메뉴 바 28px + 상단 바 61px(각각 아래 선 포함). 편집기, 일괄, 메모는 상단 바가 없고 메뉴 바만 있어서 --app-menubar-h(28px)를 쓴다. */
+:root { --app-header-h: 89px; --app-footer-h: 48px; --app-menubar-h: 28px; }
 
 /* 작품 페이지 가로 배치(왼쪽 패널, 본문 영역, 오른쪽 패널). 본문 영역이 남는 폭을 모두 쓴다. */
 .galpi-work-shell { display: flex; align-items: flex-start; width: 100%; flex: 1 1 auto; min-width: 0; }

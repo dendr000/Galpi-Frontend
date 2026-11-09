@@ -39,7 +39,7 @@
 .modeBadge { font-weight: 900; font-size: 15px; color: var(--primary-color); background: rgba(59,91,219,0.1); padding: 4px 10px; border-radius: 6px; }
 
 /* ★ 무한 확장을 위해 고정 height(100vh)를 min-height로 변경하고 overflow: hidden 철거 */
-.editorLayout { display: flex; min-height: calc(100vh - 60px); background: var(--bg-color); position: relative; }
+.editorLayout { display: flex; min-height: calc(100vh - 60px - var(--app-menubar-h)); background: var(--bg-color); position: relative; }
 
 /* ★ 내부 스크롤(overflow-y: auto) 철거 -> 콘텐츠가 길어지면 부모 창을 늘리도록 변경 */
 .writePane { flex: 1; display: flex; flex-direction: column; padding: 20px 30px; }
@@ -101,6 +101,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--app-menubar-h));
   background: var(--bg-color);
 }

@@ -162,3 +162,22 @@ describe('buildMenus: 항목을 고르면 기존 기능을 실행한다', () => 
     expect(c.actions.setSetting).toHaveBeenLastCalledWith('layoutWidth', 'full');
   });
 });
+
+describe('buildMenus: 작업 중 화면(편집기, 일괄, 메모)', () => {
+  const newWork = (pathname) => {
+    const menus = buildMenus({ pathname, search: '', settings: { layoutWidth: 'full', panelLeftOpen: true, panelRightOpen: true }, isDark: false, debugOn: false, canFind: true, actions: {} });
+    return menus[0].items.find((i) => i.id === 'new-work');
+  };
+
+  it('편집기, 일괄, 메모에서는 저장 안 한 내용을 잃지 않도록 새 작품(화면 이동)이 비활성이다', () => {
+    expect(newWork('/edit').disabled).toBe(true);
+    expect(newWork('/bulk').disabled).toBe(true);
+    expect(newWork('/memo').disabled).toBe(true);
+  });
+
+  it('홈, 분류, 작품 페이지에서는 새 작품이 활성이다', () => {
+    expect(newWork('/').disabled).toBeFalsy();
+    expect(newWork('/category').disabled).toBeFalsy();
+    expect(newWork('/work/3').disabled).toBeFalsy();
+  });
+});

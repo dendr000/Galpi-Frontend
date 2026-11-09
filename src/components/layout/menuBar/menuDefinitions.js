@@ -2,6 +2,7 @@
 // 상단 메뉴 바의 구성(파일, 편집, 보기, 설정)과 각 항목의 활성 조건, 실행 동작을 정한다.
 // 순수 함수라서 화면 없이 시험할 수 있다. 실제 동작(이동, 설정 변경 등)은 actions 로 받아 기존 기능을 그대로 부른다.
 import { newPageUrl } from '../../../domains/work/newPageUrl';
+import { isFocusScreen } from '../../../utils/appChrome';
 
 // 주소에서 작품 번호와(하위 문서를 보는 중이면) 문서 번호를 읽는다. 작품 페이지가 아니면 둘 다 null.
 export const parseWorkRoute = (pathname, search) => {
@@ -18,12 +19,14 @@ const sep = (id) => ({ kind: 'separator', id });
 export const buildMenus = ({ pathname, search, settings, isDark, debugOn, canFind, actions }) => {
   const { workId, pageId } = parseWorkRoute(pathname, search);
   const noWork = !workId;
+  // 편집기, 일괄, 메모에서는 저장 안 한 내용을 잃지 않도록 화면을 벗어나는 항목을 쓰지 않는다
+  const focus = isFocusScreen(pathname);
   const { layoutWidth, panelLeftOpen, panelRightOpen } = settings;
 
   return [
     {
       id: 'file', label: '파일', items: [
-        item('new-work', '새 작품', { onSelect: () => actions.navigate('/edit?type=work&action=new') }),
+        item('new-work', '새 작품', { disabled: focus, onSelect: () => actions.navigate('/edit?type=work&action=new') }),
         item('new-page', '새 문서', { disabled: noWork, onSelect: () => actions.navigate(newPageUrl(workId)) }),
         item('new-char', '새 캐릭터', { disabled: noWork, onSelect: () => actions.navigate(`/edit?type=char&action=new&workId=${workId}`) }),
         sep('file-sep-1'),

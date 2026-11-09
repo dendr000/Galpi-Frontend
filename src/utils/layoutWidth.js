@@ -22,6 +22,12 @@ export const getWorkZoneLayout = (layoutWidth) => (
     : { zoneClass: 'wiki-container fixed-container', innerClass: '' }
 );
 
+// 홈, 분류 같은 일반 화면 칸의 클래스.
+// full: 1200px 제한(fixed-container)을 galpi-page-fluid 가 풀어 창 폭을 채운다. center: 예전처럼 1200px.
+export const getPageContainerClass = (layoutWidth) => (
+  isFull(layoutWidth) ? 'fixed-container galpi-page-fluid' : 'fixed-container'
+);
+
 // 저장돼 있던 설정을 새 버전으로 옮긴다. 옛 기본값(center)만 한 번 full 로 바꾸고,
 // 이후 사용자가 직접 고른 값은 건드리지 않는다(zustand persist 의 migrate 에서 호출).
 export const migrateSettings = (persisted, version) => {
