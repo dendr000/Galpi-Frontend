@@ -31,7 +31,7 @@
 @media (max-width: 1199px) {
   .wikiAside:empty { display: none; }
 }
-.wikiAside { width: 340px; flex-shrink: 0; position: sticky; top: 90px; align-self: flex-start; box-sizing: border-box; }
+.wikiAside { width: 340px; flex-shrink: 0; position: sticky; top: calc(var(--app-header-h) + 29px); align-self: flex-start; box-sizing: border-box; }
 
 .wikiSection { margin-bottom: 40px; min-width: 0; flex: 1; max-width: 100%; box-sizing: border-box; }
 .sectionTitle { font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -180,7 +180,7 @@
    도입으로 더 이상 이 파일을 건드릴 필요가 없어졌다.) */
 
 /* 양옆 고정 패널(넓은 창에서 본문 옆에 붙는 문서 트리와 목차). 패널 안에서만 스크롤한다. */
-.dockedPanel { position: sticky; top: 0; align-self: flex-start; flex: 0 0 auto; height: calc(100vh - var(--app-header-h) - var(--app-footer-h)); overflow-y: auto; box-sizing: border-box; background: var(--surface-color); }
+.dockedPanel { position: sticky; top: var(--app-header-h); align-self: flex-start; flex: 0 0 auto; height: calc(100vh - var(--app-header-h) - var(--app-footer-h)); overflow-y: auto; box-sizing: border-box; background: var(--surface-color); }
 .dockedLeft { width: 260px; border-right: 1px solid var(--border-color); }
 .dockedRight { width: 260px; border-left: 1px solid var(--border-color); }
 .dockedInner { padding: 16px; box-sizing: border-box; min-width: 0; }

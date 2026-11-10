@@ -52,3 +52,34 @@ describe('메뉴 바가 붙는 화면의 높이 CSS', () => {
     expect(body).toMatch(/var\(--app-menubar-h\)/);
   });
 });
+
+describe('위쪽 고정(sticky) 요소가 메뉴 바와 겹치지 않는다', () => {
+  it('메뉴 바(.bar)는 스크롤해도 맨 위에 붙고 상단 바(1000)보다 위에 있다', () => {
+    const body = rule(read('components/layout/menuBar/MenuBar.module.css'), '.bar');
+    expect(body).toMatch(/position:\s*sticky/);
+    expect(body).toMatch(/top:\s*0/);
+    const z = /z-index:\s*(\d+)/.exec(body);
+    expect(z).not.toBeNull();
+    expect(Number(z[1])).toBeGreaterThan(1000);
+  });
+
+  it('상단 바(Gnb)는 메뉴 바 바로 아래(top: var(--app-menubar-h))에 붙는다', () => {
+    const src = read('components/layout/Gnb.jsx');
+    expect(src).toMatch(/position:\s*'sticky',\s*top:\s*'var\(--app-menubar-h\)'/);
+  });
+
+  it('작품 페이지 양옆 고정 패널은 위쪽 고정 영역(--app-header-h) 아래에 붙는다', () => {
+    const body = rule(read('pages/WorkDetail/WorkDetail.module.css'), '.dockedPanel');
+    expect(body).toMatch(/top:\s*var\(--app-header-h\)/);
+  });
+
+  it('작품 페이지 정보 상자(.wikiAside)도 위쪽 고정 영역 아래에 붙는다', () => {
+    const body = rule(read('pages/WorkDetail/WorkDetail.module.css'), '.wikiAside');
+    expect(body).toMatch(/top:\s*calc\(var\(--app-header-h\)/);
+  });
+
+  it('편집기 머리글(.editorHeader)은 메뉴 바 바로 아래에 붙는다', () => {
+    const body = rule(read('pages/Editor/EditorPage.module.css'), '.editorHeader');
+    expect(body).toMatch(/top:\s*var\(--app-menubar-h\)/);
+  });
+});
