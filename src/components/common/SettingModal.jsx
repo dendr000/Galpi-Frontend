@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import useSettingStore from '../../store/useSettingStore';
 import { IconGear, IconX, IconEye, IconKeyboard, IconLock } from './icons/SettingsIcon';
 import GateSettingsPanel from './GateSettingsPanel';
+import { AUTO_SAVE_OPTIONS } from '../../pages/Editor/hooks/autoSaveDelay';
 
 const SettingModal = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('appearance');
@@ -168,9 +169,7 @@ const SettingModal = ({ isOpen, onClose }) => {
                 <label style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--text-primary)' }}>
                   자동 저장: 
                   <select style={inputStyle} value={autoSaveInterval} onChange={e => updateSetting('autoSaveInterval', e.target.value)}>
-                    <option value="0">사용 안함</option>
-                    <option value="30">30초마다</option>
-                    <option value="60">1분마다</option>
+                    {AUTO_SAVE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </label>
               </div>

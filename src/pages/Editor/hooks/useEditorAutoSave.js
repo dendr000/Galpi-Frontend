@@ -1,5 +1,7 @@
 // 파일 위치: src/pages/Editor/hooks/useEditorAutoSave.js
 import { useEffect, useRef } from 'react';
+import useSettingStore from '../../../store/useSettingStore';
+import { getAutoSaveDelayMs } from './autoSaveDelay';
 
 export const useEditorAutoSave = ({
   docAction, loading, title, rawText, overviewText,
@@ -7,6 +9,7 @@ export const useEditorAutoSave = ({
   handleSave, setSaveStatus
 }) => {
   const autoSaveTimerRef = useRef(null);
+  const autoSaveInterval = useSettingStore((s) => s.autoSaveInterval);
   const isInitialMount = useRef(true);
 
   useEffect(() => {
@@ -24,7 +27,7 @@ export const useEditorAutoSave = ({
 
     autoSaveTimerRef.current = setTimeout(() => {
         handleSave(true);
-    }, 3000);
+    }, getAutoSaveDelayMs(autoSaveInterval));
 
     return () => clearTimeout(autoSaveTimerRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps

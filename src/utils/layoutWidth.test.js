@@ -82,7 +82,40 @@ describe('migrateSettings: 저장된 설정을 새 기본값으로 한 번만 �
     expect(migrateSettings(null, 0)).toEqual({});
   });
 
-  it('버전이 올라가 있다(1 이상)', () => {
-    expect(SETTINGS_VERSION).toBeGreaterThanOrEqual(1);
+  it('버전이 올라가 있다(2 이상)', () => {
+    expect(SETTINGS_VERSION).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('migrateSettings: 버전 2(줄 간격, 자동 저장 기본값 정리)', () => {
+  it('한 번도 적용된 적 없던 옛 줄 간격 기본값 1.6 은 실제로 쓰던 1.8 로 옮긴다', () => {
+    expect(migrateSettings({ lineHeight: '1.6' }, 1).lineHeight).toBe('1.8');
+  });
+
+  it('사용자가 고른 다른 줄 간격은 그대로 둔다', () => {
+    expect(migrateSettings({ lineHeight: '2.0' }, 1).lineHeight).toBe('2.0');
+  });
+
+  it('옛 자동 저장 "0"(사용 안함, 실제로는 3초로 저장되고 있었다)은 "3" 으로 옮긴다', () => {
+    expect(migrateSettings({ autoSaveInterval: '0' }, 1).autoSaveInterval).toBe('3');
+  });
+
+  it('사용자가 고른 30초, 60초는 그대로 둔다', () => {
+    expect(migrateSettings({ autoSaveInterval: '30' }, 1).autoSaveInterval).toBe('30');
+    expect(migrateSettings({ autoSaveInterval: '60' }, 1).autoSaveInterval).toBe('60');
+  });
+
+  it('버전 2 이후에 저장된 값은 건드리지 않는다', () => {
+    const saved = { lineHeight: '1.6', autoSaveInterval: '0' };
+    expect(migrateSettings(saved, 2)).toEqual(saved);
+  });
+
+  it('값이 없으면 키를 새로 만들지 않는다', () => {
+    expect(migrateSettings({ fontSize: '16' }, 1)).toEqual({ fontSize: '16' });
+  });
+
+  it('버전 0 에서도 폭 옮기기와 함께 한 번에 적용된다', () => {
+    expect(migrateSettings({ layoutWidth: 'center', lineHeight: '1.6', autoSaveInterval: '0' }, 0))
+      .toEqual({ layoutWidth: 'full', lineHeight: '1.8', autoSaveInterval: '3' });
   });
 });

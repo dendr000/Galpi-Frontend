@@ -83,3 +83,12 @@ describe('위쪽 고정(sticky) 요소가 메뉴 바와 겹치지 않는다', ()
     expect(body).toMatch(/top:\s*var\(--app-menubar-h\)/);
   });
 });
+
+describe('줄 간격 설정이 본문에 연결돼 있다', () => {
+  it('본문(.markdown-body)의 줄 간격은 설정 변수(--markdown-line-height)를 쓴다', () => {
+    const css = read('pages/WorkDetail/WorkDetail.module.css');
+    const m = /:global\(\.markdown-body\)\s*\{([^}]*)\}/.exec(css);
+    expect(m).not.toBeNull();
+    expect(m[1]).toMatch(/line-height:\s*var\(--markdown-line-height,\s*1\.8\)/);
+  });
+});

@@ -123,7 +123,7 @@
 /* 🌟 마크다운 전역 강제 렌더링 스타일 (여백 및 줄간격 복구) 🌟 */
 :global(.markdown-body) {
     font-size: 14px;
-    line-height: 1.8;
+    line-height: var(--markdown-line-height, 1.8);
     color: var(--text-primary);
     word-break: keep-all;
 }

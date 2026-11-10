@@ -62,7 +62,7 @@ function App() {
   }, []);
 
   const [isSettingOpen, setIsSettingOpen] = useState(false);
-  const { fontSize, layoutWidth, fontFamily, isStarryBackground } = useSettingStore();
+  const { fontSize, lineHeight, layoutWidth, fontFamily, isStarryBackground } = useSettingStore();
 
   useBossKey();
   useHorizontalScroll();
@@ -76,6 +76,7 @@ function App() {
       spellCheck={false}
       style={{ 
         '--markdown-font-size': `${fontSize}px`, 
+        '--markdown-line-height': lineHeight,
         '--markdown-font-family': fontFamily === 'serif' ? "'Noto Serif KR', serif" : (fontFamily === 'monospace' ? "monospace" : "inherit"),
         maxWidth: getAppMaxWidth({ layoutWidth, isBulkMode, isEditorMode, isMemoMode }),
         margin: '0 auto',

@@ -55,6 +55,7 @@ src/
  │   │   │   └── iconRegistry.js                # assets/icons/*.svg 를 이름으로 꺼내 쓰는 등록부와 문자열 HTML 용 iconHtml
  │   │   ├── ModalOverlay.jsx                   # 팝업 모달창 활성화 시 뒷배경을 어둡게 처리하는 공통 UI 레이어 컴포넌트
  │   │   ├── SettingModal.jsx                   # 사용자 뷰 설정 변경값을 스토어에 바인딩하는 시스템 환경설정 팝업
+ │   │   ├── SettingModal.test.jsx              # 환경 설정 창의 줄 간격, 자동 저장 연결 시험
  │   │   └── TextPromptModal.jsx                # window.prompt 대신 쓰는 앱 안의 글자 입력 모달(Electron exe 는 prompt 미지원)
  │   └── layout/
  │       ├── FabMenu.jsx                        # 우측 하단 유틸리티 도구들을 호출하는 플로팅 액션 버튼(FAB) 레이아웃
@@ -177,6 +178,11 @@ src/
      │   ├── EditorPage.module.css              # 에디터 작업 페이지 전용 모듈 CSS 스타일시트
      │   ├── creatorExt.js                      # 같은 제작자 작품들이 가장 많이 쓴 이미지 확장자 계산(순수 함수)
      │   ├── EditorSearch.jsx                   # 에디터 내부 실시간 링크 주입용 검색 컴포넌트
+     │   ├── hooks/
+     │   │   ├── autoSaveDelay.js               # 자동 저장 설정값을 지연 시간(밀리초)과 선택지로 바꾸는 순수 함수
+     │   │   ├── autoSaveDelay.test.js          # 자동 저장 지연 규칙 시험
+     │   │   ├── useEditorAutoSave.js           # 입력이 멈춘 뒤 설정한 시간이 지나면 저장하는 훅
+     │   │   └── useEditorAutoSave.test.jsx     # 자동 저장 시간, 저장하지 않는 경우 시험
      │   └── useEditorData.js                   # 비동기 서버 통신, 데이터 직렬화/파싱, 메타데이터 보존 및 예약어 필터링 훅
      ├── Home/
      │   ├── Home.module.css                    # 메인 대시보드 화면 전용 모듈 CSS 스타일시트
@@ -199,6 +205,7 @@ src/
      └── WorkDetail/
          ├── WorkDetail.module.css              # 작품 상세 정보 화면 전용 모듈 CSS 스타일시트
          ├── WorkDetailPage.jsx                 # 데이터 패치 및 도메인 UI 컴포넌트 총괄 조립 페이지
+         ├── WorkDetailPage.delete.test.jsx     # 하위 문서 삭제 버튼 시험(삭제 호출, 취소, 실패)
          └── WorkDetailPage.layout.test.jsx     # 작품 페이지 폭 규칙(전체 폭/본문 폭 제한) 시험
 ```
   

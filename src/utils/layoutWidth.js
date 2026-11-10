@@ -2,8 +2,9 @@
 // 앱 폭 규칙: 기본은 창 전체 폭(full), 사용자가 고르면 본문 폭 제한(center, 1200px).
 // 화면 컴포넌트가 폭 규칙을 한 곳에서 같이 쓰도록 순수 함수로 모아 둔다.
 
-// 설정 저장 형식의 버전. 기본값이 바뀔 때 올린다(1: 기본 폭을 center 에서 full 로 변경).
-export const SETTINGS_VERSION = 1;
+// 설정 저장 형식의 버전. 기본값이 바뀔 때 올린다.
+// 1: 기본 폭을 center 에서 full 로 변경. 2: 줄 간격 기본 1.8, 자동 저장 기본 3초(연결 안 돼 있던 옛 기본값 1.6, 0 정리).
+export const SETTINGS_VERSION = 2;
 
 const isFull = (layoutWidth) => layoutWidth !== 'center';
 
@@ -33,5 +34,10 @@ export const getPageContainerClass = (layoutWidth) => (
 export const migrateSettings = (persisted, version) => {
   const state = persisted && typeof persisted === 'object' ? { ...persisted } : {};
   if (version < 1 && state.layoutWidth === 'center') state.layoutWidth = 'full';
+  if (version < 2) {
+    // 옛 기본값은 어디에도 적용된 적이 없다. 본문이 실제로 쓰던 값과 편집기가 실제로 저장하던 시간으로 맞춘다.
+    if (state.lineHeight === '1.6') state.lineHeight = '1.8';
+    if (state.autoSaveInterval === '0') state.autoSaveInterval = '3';
+  }
   return state;
 };

@@ -49,6 +49,7 @@ import { getCharBodyText } from '../../domains/character/CharacterDetailSection'
 import BatchImageModal from '../../domains/character/BatchImageModal';
 
 // ★ 핵심 데이터 격리 처리용 통합 커스텀 데이터 훅 연결
+import api from '../../api/axiosCore';
 import useSettingStore from '../../store/useSettingStore';
 import { getWorkZoneLayout } from '../../utils/layoutWidth';
 import { MENU_ACTION_EVENT } from '../../components/layout/menuBar/menuActions';

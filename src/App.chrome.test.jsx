@@ -39,6 +39,7 @@ vi.mock('./pages/NovelViewer/NovelViewerPage', () => ({ default: stub('page-view
 vi.mock('./pages/NotFound/NotFoundPage', () => ({ default: stub('page-404') }));
 
 import App from './App';
+import useSettingStore from './store/useSettingStore';
 
 afterEach(cleanup);
 
@@ -71,5 +72,18 @@ describe('App: 화면별 앱 틀 연결', () => {
     expect(has('page-bulk')).toBe(true);
     expect(has('menubar')).toBe(true);
     expect(['gnb', 'fab', 'footer'].map(has)).toEqual([false, false, false]);
+  });
+});
+
+describe('App: 환경 설정이 화면 변수로 전달된다', () => {
+  it('줄 간격 설정이 --markdown-line-height 로 전달되고, 바꾸면 따라 바뀐다', () => {
+    useSettingStore.setState({ lineHeight: '2.1' });
+    const { container, rerender } = renderAt('/');
+    const root = container.querySelector('.galpi-app');
+    expect(root.style.getPropertyValue('--markdown-line-height')).toBe('2.1');
+    useSettingStore.setState({ lineHeight: '1.4' });
+    rerender(<MemoryRouter initialEntries={['/']}><App /></MemoryRouter>);
+    expect(container.querySelector('.galpi-app').style.getPropertyValue('--markdown-line-height')).toBe('1.4');
+    useSettingStore.setState({ lineHeight: '1.8' });
   });
 });

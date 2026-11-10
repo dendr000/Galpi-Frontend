@@ -57,3 +57,26 @@ describe('useSettingStore 양옆 패널 열림 설정', () => {
     expect(store.getState().fontSize).toBe('15');
   });
 });
+
+describe('useSettingStore 줄 간격, 자동 저장 기본값', () => {
+  it('기본 줄 간격은 본문이 원래 쓰던 1.8 이고, 기본 자동 저장은 3초다', async () => {
+    const store = await load();
+    expect(store.getState().lineHeight).toBe('1.8');
+    expect(store.getState().autoSaveInterval).toBe('3');
+  });
+
+  it('한 번도 적용된 적 없던 옛 기본값(1.6, 자동 저장 0)이 저장돼 있으면 새 기본값으로 옮겨진다', async () => {
+    localStorage.setItem('galpi-settings', JSON.stringify({ state: { lineHeight: '1.6', autoSaveInterval: '0', fontSize: '16' }, version: 1 }));
+    const store = await load();
+    expect(store.getState().lineHeight).toBe('1.8');
+    expect(store.getState().autoSaveInterval).toBe('3');
+    expect(store.getState().fontSize).toBe('16');
+  });
+
+  it('사용자가 고른 값(줄 간격 2.2, 자동 저장 30초)은 유지된다', async () => {
+    localStorage.setItem('galpi-settings', JSON.stringify({ state: { lineHeight: '2.2', autoSaveInterval: '30' }, version: 1 }));
+    const store = await load();
+    expect(store.getState().lineHeight).toBe('2.2');
+    expect(store.getState().autoSaveInterval).toBe('30');
+  });
+});
