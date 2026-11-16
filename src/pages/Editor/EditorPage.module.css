@@ -103,4 +103,5 @@
   flex-direction: column;
   min-height: calc(100vh - var(--app-menubar-h));
   background: var(--bg-color);
+  overflow-x: clip; /* hidden 은 스크롤 영역을 만들어 sticky 헤더를 깨뜨리므로 clip 을 쓴다 */
 }

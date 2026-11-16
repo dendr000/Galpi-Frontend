@@ -56,7 +56,7 @@ const EditorPage = () => {
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontWeight: 'bold' }}>에디터 로딩 중...</div>;
 
   return (
-    <div className={styles.editorFullBleed} style={{ overflowX: 'hidden' }}>
+    <div className={styles.editorFullBleed}>
 
       <EditorSearch editorRef={editorRef} rawText={rawText} setRawText={setRawText} />
       <MacroToolbar editorRef={editorRef} rawText={rawText} onInsert={handleMacroInsert} />

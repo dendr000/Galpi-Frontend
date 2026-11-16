@@ -92,3 +92,13 @@ describe('줄 간격 설정이 본문에 연결돼 있다', () => {
     expect(m[1]).toMatch(/line-height:\s*var\(--markdown-line-height,\s*1\.8\)/);
   });
 });
+
+describe('편집기 헤더 고정', () => {
+  it('편집기 루트는 overflow hidden 을 쓰지 않는다(스크롤 영역이 생기면 sticky 헤더가 따라 내려가지 않는다)', () => {
+    const jsx = readFileSync(resolve(__dirname, '..', 'pages/Editor/EditorPage.jsx'), 'utf-8');
+    expect(jsx).not.toMatch(/overflowX:\s*'hidden'/);
+    const body = rule(read('pages/Editor/EditorPage.module.css'), '.editorFullBleed');
+    expect(body).not.toMatch(/overflow(-x|-y)?:\s*(hidden|auto|scroll)/);
+    expect(body).toMatch(/overflow-x:\s*clip/);
+  });
+});

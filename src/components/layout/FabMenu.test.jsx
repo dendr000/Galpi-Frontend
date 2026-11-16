@@ -4,7 +4,9 @@
 import React from 'react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, cleanup, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom';
+
+const NavBtn = () => { const nav = useNavigate(); return <button id="go" onClick={() => nav('/b')} />; };
 
 vi.mock('../../api/axiosCore', () => ({ default: { get: vi.fn(() => Promise.resolve({ data: [] })) } }));
 vi.mock('../../utils/dictLocalDb', () => ({ seedDictIfNeeded: vi.fn(), resolveCycleReplacement: vi.fn() }));
@@ -48,5 +50,42 @@ describe('FabMenu 클릭 영역', () => {
     const menu = container.querySelector('.galpi-fab-menu');
     expect(menu.style.pointerEvents).toBe('auto');
     expect(container.querySelectorAll('.galpi-fab-item').length).toBeGreaterThan(0);
+  });
+});
+
+describe('FabMenu 열림 상태', () => {
+  it('처음에는 닫혀 있다', () => {
+    const { container } = setup();
+    const menu = container.querySelector('.galpi-fab-menu');
+    expect(menu.style.opacity).toBe('0');
+    expect(menu.style.pointerEvents).toBe('none');
+  });
+
+  it('열린 뒤 바깥을 누르면 닫힌다', () => {
+    const { container } = setup();
+    fireEvent.click(container.querySelector('#galpi-fab-main'));
+    expect(container.querySelector('.galpi-fab-menu').style.opacity).toBe('1');
+    fireEvent.mouseDown(document.body);
+    expect(container.querySelector('.galpi-fab-menu').style.opacity).toBe('0');
+  });
+
+  it('열린 메뉴 안을 누르면 닫히지 않는다', () => {
+    const { container } = setup();
+    fireEvent.click(container.querySelector('#galpi-fab-main'));
+    fireEvent.mouseDown(container.querySelector('.galpi-fab-item'));
+    expect(container.querySelector('.galpi-fab-menu').style.opacity).toBe('1');
+  });
+
+  it('화면(주소)이 바뀌면 닫힌다', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/a']}>
+        <FabMenu />
+        <Routes><Route path="*" element={<NavBtn />} /></Routes>
+      </MemoryRouter>
+    );
+    fireEvent.click(container.querySelector('#galpi-fab-main'));
+    expect(container.querySelector('.galpi-fab-menu').style.opacity).toBe('1');
+    fireEvent.click(container.querySelector('#go'));
+    expect(container.querySelector('.galpi-fab-menu').style.opacity).toBe('0');
   });
 });

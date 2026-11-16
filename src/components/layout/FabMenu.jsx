@@ -32,6 +32,15 @@ const FabMenu = () => {
   const searchParams = new URLSearchParams(location.search);
   const currentWorkId = searchParams.get('workId') || searchParams.get('id') || location.pathname.match(/\/work\/(\d+)/)?.[1] || 'global';
 
+  // 항상 닫힌 채로 시작하고, 화면을 옮기거나 바깥을 누르면 스스로 닫는다(끄는 수고를 없앤다)
+  useEffect(() => { setIsOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const closeOnOutside = (e) => { if (!e.target.closest?.('.galpi-fab-wrap')) setIsOpen(false); };
+    document.addEventListener('mousedown', closeOnOutside);
+    return () => document.removeEventListener('mousedown', closeOnOutside);
+  }, [isOpen]);
+
   const [globalBpList, setGlobalBpList] = useState([]);
   const [toastMsg, setToastMsg] = useState('');
 
