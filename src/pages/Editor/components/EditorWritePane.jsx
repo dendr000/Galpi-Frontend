@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styles from '../EditorPage.module.css';
 import EditorToolbar from './EditorToolbar';
 import BacklinkDropdown from './BacklinkDropdown';
+import SyntaxCheckBar from './SyntaxCheckBar';
 
 const EditorWritePane = ({
   docType, title, setTitle, rawText, setRawText, editorRef, handleEditorKeyDown, fontList, backlinkCandidates
@@ -208,6 +209,8 @@ const EditorWritePane = ({
         onChange={handleTextChange}
         onKeyDown={handleLocalKeyDown}
       />
+
+      <SyntaxCheckBar text={rawText} editorRef={editorRef} />
     </div>
   );
 };

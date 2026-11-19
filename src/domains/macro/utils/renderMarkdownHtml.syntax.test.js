@@ -251,3 +251,81 @@ describe('본문에 직접 쓴 위험한 HTML', () => {
     expect(d.querySelector('.wiki-footnote').getAttribute('data-content')).toBe('뜻');
   });
 });
+
+describe('코드 안의 매크로 예시', () => {
+  it('코드 블록 안의 로그탭과 스포일러 예시는 그대로 글자로 남는다', () => {
+    const d = dom(renderMarkdownHtml('```\n[로그탭:노랑]\n내용\n[/로그탭]\n[스포일러]비밀[/스포일러]\n```'));
+    expect(d.querySelector('.galpi-log-tab-wrapper')).toBeNull();
+    expect(d.querySelector('.galpi-spoiler')).toBeNull();
+    const code = d.querySelector('pre code').textContent;
+    expect(code).toContain('[로그탭:노랑]');
+    expect(code).toContain('[스포일러]비밀[/스포일러]');
+  });
+
+  it('인라인 코드 안의 [스탯:...] 예시도 위젯이 되지 않는다', () => {
+    const d = dom(renderMarkdownHtml('문법은 `[게이지:HP,50,100]` 처럼 쓴다'));
+    expect(d.querySelector('code').textContent).toBe('[게이지:HP,50,100]');
+  });
+
+  it('코드 밖의 로그탭은 코드 블록이 함께 있어도 동작한다', () => {
+    const d = dom(renderMarkdownHtml('```\n[로그탭:빨강]x[/로그탭]\n```\n\n[로그탭:노랑]진짜[/로그탭]'));
+    expect(d.querySelectorAll('.galpi-log-tab-wrapper').length).toBe(1);
+  });
+});
+
+describe('| a | b | 표', () => {
+  it('구분선(|---|)이 있는 표는 표가 된다', () => {
+    const html = renderMarkdownHtml('| 이름 | 설명 |\n|---|---|\n| 리안 | 주인공 |\n| 세이 | 조력자 |');
+    const d = dom(html);
+    expect(d.querySelectorAll('tr').length).toBe(3);
+    expect(cellsOf(html).map((c) => c.textContent)).toEqual(['이름', '설명', '리안', '주인공', '세이', '조력자']);
+    expect(html).not.toContain('<del');
+    expect(d.querySelector('.galpi-ext-quote')).toBeNull();
+  });
+
+  it('구분선이 없는 | 글 줄은 인용문 그대로다', () => {
+    const d = dom(renderMarkdownHtml('| 첫 줄 |\n| 둘째 줄'));
+    expect(d.querySelector('table')).toBeNull();
+    expect(d.querySelector('.galpi-ext-quote')).not.toBeNull();
+  });
+
+  it('구분선 정렬 표기(:---:)와 바깥 | 가 없는 형식도 읽는다', () => {
+    const html = renderMarkdownHtml('| a | b |\n|:--:|--:|\n| 1 | 2 |');
+    expect(cellsOf(html).map((c) => c.textContent)).toEqual(['a', 'b', '1', '2']);
+  });
+});
+
+describe('각주 목록', () => {
+  it('각주가 있으면 본문 맨 아래에 번호 순서대로 내용이 모인다', () => {
+    const d = dom(renderMarkdownHtml('첫째[* 하나] 둘째[* 둘\n줄]'));
+    const items = Array.from(d.querySelectorAll('.galpi-footnote-list li'));
+    expect(items.map((li) => li.getAttribute('value'))).toEqual(['1', '2']);
+    expect(items[0].textContent).toBe('하나');
+    expect(items[1].innerHTML).toContain('<br>');
+  });
+
+  it('각주가 없으면 목록을 만들지 않는다', () => {
+    expect(dom(renderMarkdownHtml('그냥 글')).querySelector('.galpi-footnote-list')).toBeNull();
+  });
+
+  it('각주 안의 < 는 글자로 남고 태그가 되지 않는다', () => {
+    const d = dom(renderMarkdownHtml('글[* <b>굵게</b> 그대로]'));
+    expect(d.querySelector('.galpi-footnote-list li b')).toBeNull();
+    expect(d.querySelector('.galpi-footnote-list li').textContent).toContain('<b>굵게</b>');
+  });
+});
+
+describe('긴 표', () => {
+  const rows = (n) => ['||번호||이름||', ...Array.from({ length: n }, (_, i) => `||${i}||이름${i}||`)].join('\n');
+
+  it('행이 많은 표는 스크롤 상자 안에서 헤더가 고정되도록 표시된다', () => {
+    const d = dom(renderMarkdownHtml(rows(30)));
+    expect(d.querySelector('.gt-table-long')).not.toBeNull();
+  });
+
+  it('행이 적은 표는 그대로다', () => {
+    const d = dom(renderMarkdownHtml(rows(3)));
+    expect(d.querySelector('table')).not.toBeNull();
+    expect(d.querySelector('.gt-table-long')).toBeNull();
+  });
+});

@@ -23,7 +23,12 @@ const getTooltip = () => {
 
 const showTooltip = (target) => {
   const tooltip = getTooltip();
-  tooltip.innerHTML = target.getAttribute('data-content');
+  // 내용은 글자로만 넣는다(HTML 로 해석하면 각주에 쓴 태그가 실행될 수 있다). 줄바꿈 표시(<br>)만 줄바꿈으로 바꾼다.
+  tooltip.textContent = '';
+  (target.getAttribute('data-content') || '').split(/<br\s*\/?>/i).forEach((part, i) => {
+    if (i > 0) tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(part));
+  });
   tooltip.style.display = 'block';
 
   const rect = target.getBoundingClientRect();

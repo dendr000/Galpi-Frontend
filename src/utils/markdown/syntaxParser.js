@@ -28,6 +28,14 @@ const applyCellStyle = (cell) => cell
     .replace(ITALIC_CELL, '<em>$1</em>')
     .replace(STRIKE, STRIKE_HTML);
 
+// 행이 많은 표는 스크롤 상자 안에서 헤더 줄이 위에 붙어 있도록 표시한다.
+const LONG_TABLE_ROWS = 15;
+const closeTable = (buf) => {
+    const rowCount = buf.filter((x) => x.startsWith('<tr')).length;
+    if (rowCount > LONG_TABLE_ROWS) buf[0] = buf[0].replace('<div style=', '<div class="gt-table-long" style=');
+    return `${buf.join('')}</tbody></table></div>\n`;
+};
+
 // 표의 행: ||칸||칸|| 형태. 맨 끝의 || 를 빼먹어도(||칸||칸) 칸 구분이 있으면 행으로 본다.
 const isTableRow = (line) => {
     const t = line.trim();
@@ -42,7 +50,7 @@ const COLOR_NAMES = new Set(['red', 'blue', 'black', 'white', 'green', 'yellow',
     'magenta', 'navy', 'teal', 'gold', 'silver', 'lime', 'indigo', 'violet', 'crimson', 'coral', 'maroon', 'olive', 'aqua', 'skyblue',
     'tomato', 'salmon', 'khaki', 'beige', 'ivory', 'lavender', 'turquoise', 'orchid', 'plum', 'tan', 'sienna', 'chocolate', 'hotpink']);
 const isColorToken = (k) => /^#[0-9a-f]{3,8}$/i.test(k) || COLOR_NAMES.has(k.toLowerCase());
-const isColorKey = (key) => (key.toLowerCase().startsWith('bg-') ? isColorToken(key.slice(3)) : isColorToken(key));
+export const isColorKey = (key) => (key.toLowerCase().startsWith('bg-') ? isColorToken(key.slice(3)) : isColorToken(key));
 // 안쪽 대괄호는 두 겹까지 허용한다([red:[[링크]] 님], [red:[blue:x]]).
 const COLOR_RE = /\[([a-zA-Z0-9#-]+):((?:[^[\]]|\[(?:[^[\]]|\[[^[\]]*\])*\])*)\]/g;
 
@@ -51,6 +59,27 @@ const colorSpan = (colorKey, content) => {
     if (k === 'red') color = '#e53e3e'; else if (k === 'blue') color = 'var(--primary-color)'; else if (k === 'black') color = 'var(--text-primary)'; else if (k === 'white') color = '#ffffff';
     else if (k.startsWith('bg-')) { color = 'var(--text-primary)'; bg = k.replace('bg-', '') === 'yellow' ? 'rgba(253, 224, 71, 0.6)' : k.replace('bg-', ''); }
     return `<span style="color:${color}; background-color:${bg}; font-weight:bold; border-radius:2px; padding:0 2px;">${content}</span>`;
+};
+
+// 마크다운 표(| a | b | 와 |---|---| 구분선)를 갈피 표(||a||b||)로 바꾼다. 구분선이 없는 | 줄은 인용문이므로 건드리지 않는다.
+const GFM_ROW = /^\s*\|.*\|\s*$/;
+const GFM_SEP = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+const gfmToWiki = (text) => {
+    const lines = text.split('\n');
+    const out = [];
+    for (let i = 0; i < lines.length; i++) {
+        const isHeader = GFM_ROW.test(lines[i]) && !lines[i].trim().startsWith('||')
+            && i + 1 < lines.length && GFM_SEP.test(lines[i + 1]) && lines[i + 1].includes('|');
+        if (!isHeader) { out.push(lines[i]); continue; }
+        const toRow = (l) => `||${l.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim()).join('||')}||`;
+        out.push(toRow(lines[i]));
+        i += 1; // 구분선은 버린다
+        while (i + 1 < lines.length && GFM_ROW.test(lines[i + 1]) && !lines[i + 1].trim().startsWith('||')) {
+            i += 1;
+            out.push(toRow(lines[i]));
+        }
+    }
+    return out.join('\n');
 };
 
 export const parseWikiText = (text) => {
@@ -63,6 +92,8 @@ export const parseWikiText = (text) => {
         .replace(/```[\s\S]*?```/g, hold)
         .replace(/`[^`\n]+`/g, hold)
         .replace(/\[RELATION_GRAPH\][\s\S]*?\[\/RELATION_GRAPH\]/g, hold);
+
+    preText = gfmToWiki(preText);
 
     preText = preText.replace(/\[META_DATA:/g, '▤META_START▤:');
 
@@ -157,7 +188,7 @@ export const parseWikiText = (text) => {
             tableBuffer.push('</tr>');
             continue;
         } else {
-            if (inTable) { tableBuffer.push('</tbody></table></div>\n'); newLines.push(tableBuffer.join('')); inTable = false; tableBuffer = []; }
+            if (inTable) { newLines.push(closeTable(tableBuffer)); inTable = false; tableBuffer = []; }
         }
 
         if (line.match(/^\|[ \t]*(.*)/) && !trimmed.startsWith('||')) {
@@ -167,7 +198,7 @@ export const parseWikiText = (text) => {
             newLines.push(line);
         }
     }
-    if (inTable) { tableBuffer.push('</tbody></table></div>\n'); newLines.push(tableBuffer.join('')); }
+    if (inTable) { newLines.push(closeTable(tableBuffer)); }
     if (inQuote) { newLines.push(`\n<div class="galpi-ext-quote">${quoteBuffer.join('<br>')}</div>\n`); }
     preText = newLines.join('\n');
 

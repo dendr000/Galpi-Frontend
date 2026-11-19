@@ -33,6 +33,9 @@ src/
  │   ├── askText.js                             # 글자 한 줄을 묻는 공용 함수(앱 안 입력 모달 사용, window.prompt 대체)
  │   ├── backlinkRouter.js                      # 설정 텍스트 간 동적 참조 관계 구문 분석 기반 경로 역추적 라우팅 유틸
  │   ├── consoleGate.js                         # 콘솔 로그(log, debug, info)를 켜고 끄는 로직(개발 서버 켬, 배포 끔, 저장값 우선)
+ │   ├── markdown/
+ │   │   ├── lintWikiText.js                    # 본문 문법 실수(닫히지 않은 블록, 표 칸 수, 제목 단계)를 찾는 검사기
+ │   │   └── lintWikiText.test.js               # 문법 검사기 시험
  │   ├── installConsoleGate.js                  # 앱 시작 때 가장 먼저 불러와 로그 켜고 끄기를 적용하고 galpiDebug 를 만든다
  │   ├── layoutWidth.js                         # 앱 폭 규칙(전체 폭/본문 폭 제한), 작품 영역 클래스, 저장된 설정 버전 옮기기
  │   ├── layoutWidth.test.js                    # 폭 규칙과 설정 옮기기 시험
@@ -186,6 +189,9 @@ src/
      │   ├── EditorPage.jsx                     # 통합 설정 에디터 작업 및 문서 작성 UI 렌더링 페이지
      │   ├── EditorPage.module.css              # 에디터 작업 페이지 전용 모듈 CSS 스타일시트
      │   ├── creatorExt.js                      # 같은 제작자 작품들이 가장 많이 쓴 이미지 확장자 계산(순수 함수)
+     │   ├── components/
+     │   │   ├── SyntaxCheckBar.jsx             # 편집기 아래 문법 확인 줄(건수, 목록, 줄로 이동)
+     │   │   └── SyntaxCheckBar.test.jsx        # 문법 확인 줄 시험
      │   ├── EditorSearch.jsx                   # 에디터 내부 실시간 링크 주입용 검색 컴포넌트
      │   ├── hooks/
      │   │   ├── autoSaveDelay.js               # 자동 저장 설정값을 지연 시간(밀리초)과 선택지로 바꾸는 순수 함수

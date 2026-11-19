@@ -1,5 +1,10 @@
 // 매크로(각주, 백링크, 접기, 인용, 게이지, 대화) 전용 CSS. 화면에는 injectMacroStyles 가 주입하고, 공개용 내보내기는 이 문자열을 그대로 넣는다.
 export const MACRO_STYLE_CSS = `
+        .galpi-footnote-list { margin: 28px 0 8px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary); }
+        .galpi-footnote-title { font-weight: 900; margin-bottom: 6px; color: var(--text-primary); }
+        .galpi-footnote-list ol { margin: 0; padding-left: 1.6em; line-height: 1.7; }
+        .gt-table-long { max-height: 70vh; overflow: auto !important; }
+        .gt-table-long tr:first-child > th { position: sticky; top: 0; z-index: 1; }
         .wiki-footnote { position: relative; display: inline-block; transition: background-color 0.2s; cursor: help; color: var(--primary-color); font-weight: bold; }
         .wiki-footnote:hover { background-color: var(--table-bg-alt); border-radius: 4px; }
         .wiki-backlink { color: var(--primary-color); font-weight: 900; text-decoration: none; border-bottom: 2px solid rgba(59,91,219,0.3); padding: 0 3px; transition: 0.2s; cursor: pointer; border-radius: 2px; }

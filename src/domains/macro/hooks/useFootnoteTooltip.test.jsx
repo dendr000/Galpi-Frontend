@@ -67,3 +67,14 @@ describe('각주 말풍선', () => {
     expect(shown()).toBe(false);
   });
 });
+
+describe('각주 말풍선 내용', () => {
+  it('각주에 쓴 HTML 은 태그로 해석되지 않고 글자로 보인다', () => {
+    const Evil = () => { useFootnoteTooltip(); return <sup className="wiki-footnote" data-content={'<img src=x onerror=alert(1)>끝'}>[1]</sup>; };
+    const { container } = render(<Evil />);
+    fireEvent.mouseOver(container.querySelector('.wiki-footnote'));
+    const tip = document.getElementById('wiki-footnote-tooltip');
+    expect(tip.querySelector('img')).toBeNull();
+    expect(tip.textContent).toBe('<img src=x onerror=alert(1)>끝');
+  });
+});

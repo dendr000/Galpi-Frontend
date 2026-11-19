@@ -27,11 +27,26 @@ const REL_CLOSE = '\uE021';
 const REL_RE = new RegExp(`(?:<p>)?${REL_OPEN}(\\d+)${REL_CLOSE}(?:<\\/p>)?`, 'g');
 const LOGTAB_RE = new RegExp(`(?:<p>)?${LOGTAB_OPEN}(\\d+)${LOGTAB_CLOSE}(?:<\\/p>)?`, 'g');
 
-const stripTags = (s) => s.replace(/<[^>]*>?/gm, '');
+const CODE_OPEN = '';
+const CODE_CLOSE = '';
+const CODE_RE = new RegExp(`${CODE_OPEN}(\\d+)${CODE_CLOSE}`, 'g');
+
+// 코드 안의 글은 매크로 문법이 아니라 예시이므로, 처리하는 동안 자리표시자로 바꿔 두었다가 되돌린다.
+const shieldCode = (text, codeRe) => {
+  const held = [];
+  const shielded = text.replace(codeRe, (m) => { held.push(m); return `${CODE_OPEN}${held.length - 1}${CODE_CLOSE}`; });
+  const restore = (t) => t.replace(CODE_RE, (m, i) => held[Number(i)]);
+  return { shielded, restore };
+};
+const MD_CODE_RE = /```[\s\S]*?```|`[^`\n]+`/g;
+const HTML_CODE_RE = /<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>/g;
+
+const stripTags =(s) => s.replace(/<[^>]*>?/gm, '');
 
 // 위젯 매크로를 HTML 로 바꾼다. 본문과 로그탭 안쪽 둘 다 같은 규칙을 쓴다.
 const applyMacros = (html, options) => {
-  let out = html;
+  const { shielded, restore } = shieldCode(html, HTML_CODE_RE);
+  let out = shielded;
   out = out.replace(/(?:<p>)?\[스포일러\]([\s\S]*?)\[\/스포일러\](?:<\/p>)?/g, (m, content) => createSpoilerHtml(content));
   out = out.replace(/(?:<p>)?\[(대화|우대화):\s*(.*?)(?:\((.*?)\))?:\s*\]?([\s\S]*?)\[\/(?:대화|우대화)\](?:<br\s*\/?>)?(?:<\/p>)?/g,
     (m, type, name, expr, msg) => createChatHtml(type, name, expr, msg, options));
@@ -42,7 +57,18 @@ const applyMacros = (html, options) => {
   out = out.replace(/(?:<p>)?\[게이지:(.*?)\](?:<\/p>)?/g, (m, p1) => createBarGraphHtml(stripTags(p1)));
   out = out.replace(/(?:<p>)?\[TIMELINE\]([\s\S]*?)\[\/TIMELINE\](?:<\/p>)?/g, (m, content) => createTimelineHtml(content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>?/gm, '')));
   out = out.replace(/(?:<p>)?\[RELATION_GRAPH\]([\s\S]*?)\[\/RELATION_GRAPH\](?:<\/p>)?/g, (m, content) => createRelationGraphHtml(stripTags(content)));
-  return out;
+  return restore(out);
+};
+
+// 각주가 있으면 본문 맨 아래에 번호 순서로 모아 보여 준다. 내용은 파서가 이미 이스케이프해 둔 것이다.
+const FOOTNOTE_RE = /<sup class="wiki-footnote" data-content="([^"]*)"[^>]*>\[(\d+)\]<\/sup>/g;
+const buildFootnoteList = (html) => {
+  const items = [];
+  // 속성값으로 돌아온 내용은 < 가 그대로 들어 있으므로(줄바꿈 표시 <br> 제외) 글자로 다시 이스케이프한다.
+  const safe = (c) => c.split(/<br\s*\/?>/i).map((t) => t.replace(/</g, '&lt;').replace(/>/g, '&gt;')).join('<br>');
+  html.replace(FOOTNOTE_RE, (m, content, num) => { items.push(`<li value="${num}">${safe(content)}</li>`); return m; });
+  if (!items.length) return '';
+  return `<div class="galpi-footnote-list"><div class="galpi-footnote-title">각주</div><ol>${items.join('')}</ol></div>`;
 };
 
 // options: { workTitle, charExt } 대화 매크로의 아바타 이미지 주소를 만들 때 쓴다.
@@ -62,10 +88,11 @@ ${REL_OPEN}${relations.length - 1}${REL_CLOSE}
 
   // 로그탭은 본문을 따로 마크다운으로 바꿔서(굵게, 색, 링크, 표, 줄바꿈 유지) 끼워 넣는다.
   const logTabs = [];
-  const parsedText = parseWikiText(source).replace(/\[로그탭:([^\]\n]*)\]([\s\S]*?)\[\/로그탭\]/g, (m, name, body) => {
-    logTabs.push({ name: name.trim(), body });
+  const wiki = shieldCode(parseWikiText(source), MD_CODE_RE);
+  const parsedText = wiki.restore(wiki.shielded.replace(/\[로그탭:([^\]\n]*)\]([\s\S]*?)\[\/로그탭\]/g, (m, name, body) => {
+    logTabs.push({ name: name.trim(), body: wiki.restore(body) });
     return `\n\n${LOGTAB_OPEN}${logTabs.length - 1}${LOGTAB_CLOSE}\n\n`;
-  });
+  }));
 
   let rawHtml = applyMacros(md.parse(parsedText), options);
   rawHtml = rawHtml.replace(LOGTAB_RE, (m, i) => {
@@ -76,5 +103,6 @@ ${REL_OPEN}${relations.length - 1}${REL_CLOSE}
   rawHtml = rawHtml.replace(REL_RE, (m, i) => createRelationGraphHtml(relations[Number(i)].trim()));
 
   // 본문에 직접 쓴 HTML 의 스크립트와 이벤트 속성은 화면에서도 실행되지 않게 지운다.
-  return sanitizeExportHtml(processMarkdownHtml(rawHtml, startH1));
+  const body = processMarkdownHtml(rawHtml, startH1);
+  return sanitizeExportHtml(body + buildFootnoteList(body));
 };
