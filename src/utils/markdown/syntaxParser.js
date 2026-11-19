@@ -1,13 +1,65 @@
 // 파일 위치: src/utils/markdown/syntaxParser.js
 import { injectMacroStyles } from './styleInjector';
 
+// 코드와 관계도 JSON 은 갈피 문법을 적용하지 않는다. 처리하는 동안 자리표시자로 바꿔 두었다가 마지막에 되돌린다.
+const PH_OPEN = '';
+const PH_CLOSE = '';
+const PH_RE = new RegExp(`${PH_OPEN}(\\d+)${PH_CLOSE}`, 'g');
+
+// 인라인 서식. 글자나 숫자에 붙은 기호(3~5명, max_hp_value, 10--20)는 서식의 시작으로 보지 않는다.
+const BOLD_TILDE = /(?<![\p{L}\p{N}~])~(?!\s)([^~\n]+?)(?<!\s)~/gu;
+const ITALIC_CELL = /(?<![\p{L}\p{N}_])_(?!\s)(.+?)(?<!\s)_/gu;
+const STRIKE = /(?<![\\\p{L}\p{N}])--(?!\s)(.+?)(?<!\s)--/gu;
+const ITALIC_LINE = /(^|\s)_([^\s_][^_]*[^\s_]|[^\s_])_(\s|[.,!?]|$)/g;
+
+const STRIKE_HTML = '<del style="opacity:0.6;">$1</del>';
+
+// 표 밖 한 줄의 서식
+const applyLineStyle = (line) => line
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(ITALIC_LINE, '$1<em>$2</em>$3')
+    .replace(STRIKE, STRIKE_HTML);
+
+// 표 셀 하나의 서식. 표 편집기는 굵게를 ~내용~ 으로, 줄바꿈을 [br] 로 저장한다.
+const applyCellStyle = (cell) => cell
+    .replace(/\s*\[br\]\s*/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(BOLD_TILDE, '<strong>$1</strong>')
+    .replace(ITALIC_CELL, '<em>$1</em>')
+    .replace(STRIKE, STRIKE_HTML);
+
+const isTableRow = (line) => {
+    const t = line.trim();
+    return t.length >= 4 && t.startsWith('||') && t.endsWith('||');
+};
+
+// 색 문법에 쓸 수 있는 이름. 그 밖의 [영문:내용] 은 [HP: 100/100] 같은 일반 글자라 건드리지 않는다.
+const COLOR_NAMES = new Set(['red', 'blue', 'black', 'white', 'green', 'yellow', 'orange', 'purple', 'pink', 'gray', 'grey', 'brown', 'cyan',
+    'magenta', 'navy', 'teal', 'gold', 'silver', 'lime', 'indigo', 'violet', 'crimson', 'coral', 'maroon', 'olive', 'aqua', 'skyblue',
+    'tomato', 'salmon', 'khaki', 'beige', 'ivory', 'lavender', 'turquoise', 'orchid', 'plum', 'tan', 'sienna', 'chocolate', 'hotpink']);
+const isColorToken = (k) => /^#[0-9a-f]{3,8}$/i.test(k) || COLOR_NAMES.has(k.toLowerCase());
+const isColorKey = (key) => (key.toLowerCase().startsWith('bg-') ? isColorToken(key.slice(3)) : isColorToken(key));
+// 안쪽 대괄호는 두 겹까지 허용한다([red:[[링크]] 님], [red:[blue:x]]).
+const COLOR_RE = /\[([a-zA-Z0-9#-]+):((?:[^[\]]|\[(?:[^[\]]|\[[^[\]]*\])*\])*)\]/g;
+
+const colorSpan = (colorKey, content) => {
+    let color = colorKey; let bg = "transparent"; const k = colorKey.toLowerCase();
+    if (k === 'red') color = '#e53e3e'; else if (k === 'blue') color = 'var(--primary-color)'; else if (k === 'black') color = 'var(--text-primary)'; else if (k === 'white') color = '#ffffff';
+    else if (k.startsWith('bg-')) { color = 'var(--text-primary)'; bg = k.replace('bg-', '') === 'yellow' ? 'rgba(253, 224, 71, 0.6)' : k.replace('bg-', ''); }
+    return `<span style="color:${color}; background-color:${bg}; font-weight:bold; border-radius:2px; padding:0 2px;">${content}</span>`;
+};
+
 export const parseWikiText = (text) => {
     if (!text) return "";
     injectMacroStyles(); // 글로벌 CSS 안전 주입
-    let preText = text;
 
-    preText = preText.replace(/\[RELATION_GRAPH\]/g, '▤REL_START▤');
-    preText = preText.replace(/\[\/RELATION_GRAPH\]/g, '▤REL_END▤');
+    const stash = [];
+    const hold = (m) => { stash.push(m); return `${PH_OPEN}${stash.length - 1}${PH_CLOSE}`; };
+    let preText = text
+        .replace(/```[\s\S]*?```/g, hold)
+        .replace(/`[^`\n]+`/g, hold)
+        .replace(/\[RELATION_GRAPH\][\s\S]*?\[\/RELATION_GRAPH\]/g, hold);
+
     preText = preText.replace(/\[META_DATA:/g, '▤META_START▤:');
 
     preText = preText.replace(/\[폰트:(.*?):([\s\S]*?)\]/g, (match, fontName, content) => {
@@ -26,15 +78,19 @@ export const parseWikiText = (text) => {
         return `<div style="margin: 10px 0;">${indented}</div>`;
     });
 
-    preText = preText.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    preText = preText.replace(/(^|\s)_([^\s_][^_]*[^\s_]|[^\s_])_(\s|[.,!?]|$)/g, '$1<em>$2</em>$3');
-    preText = preText.replace(/(^|[^\\])--(?!\s)(.+?)(?<!\s)--/gm, '$1<del style="opacity:0.6;">$2</del>');
-    preText = preText.replace(/\[([a-zA-Z0-9#-]+):([\s\S]*?)\]/g, (match, colorKey, content) => {
-        let color = colorKey; let bg = "transparent"; let k = colorKey.toLowerCase();
-        if (k === 'red') color = '#e53e3e'; else if (k === 'blue') color = 'var(--primary-color)'; else if (k === 'black') color = 'var(--text-primary)'; else if (k === 'white') color = '#ffffff';
-        else if (k.startsWith('bg-')) { color = 'var(--text-primary)'; bg = k.replace('bg-', '') === 'yellow' ? 'rgba(253, 224, 71, 0.6)' : k.replace('bg-', ''); }
-        return `<span style="color:${color}; background-color:${bg}; font-weight:bold; border-radius:2px; padding:0 2px;">${content}</span>`;
-    });
+    // 표의 줄은 건드리지 않는다(칸 단위로 아래에서 처리). 표 밖 줄만 서식을 적용한다.
+    preText = preText.split('\n').map((l) => (isTableRow(l) ? l : applyLineStyle(l))).join('\n');
+
+    // 색: 안쪽부터 바꿔 가며 중첩을 풀고, 색 이름이 아닌 [영문:내용] 은 그대로 둔다.
+    for (let i = 0; i < 6; i++) {
+        let changed = false;
+        preText = preText.replace(COLOR_RE, (match, colorKey, content) => {
+            if (!isColorKey(colorKey)) return match;
+            changed = true;
+            return colorSpan(colorKey, content);
+        });
+        if (!changed) break;
+    }
 
     let lines = preText.split('\n');
     let inQuote = false; let quoteBuffer = [];
@@ -44,10 +100,10 @@ export const parseWikiText = (text) => {
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i]; let trimmed = line.trim();
 
-        if (trimmed.startsWith('||') && trimmed.endsWith('||') && !trimmed.match(/->|=>|→/)) {
+        if (isTableRow(line)) {
             if (inQuote) { newLines.push(`\n<div class="galpi-ext-quote">${quoteBuffer.join('<br>')}</div>\n`); inQuote = false; quoteBuffer = []; }
-            if (!inTable) { 
-                inTable = true; 
+            if (!inTable) {
+                inTable = true;
                 tableBuffer.push('<div style="overflow-x:auto; margin: 15px 0;"><table class="gt-table" style="width:100%; border-collapse:collapse; background:var(--surface-color); font-size:13px; border-radius:8px; border-style:hidden; box-shadow:0 0 0 1px var(--border-color), 0 2px 8px rgba(0,0,0,0.02);"><tbody>');
             }
             let cells = trimmed.substring(2, trimmed.length - 2).split('||');
@@ -82,17 +138,11 @@ export const parseWikiText = (text) => {
                 // 위치만 보고 무조건 th로 되돌리지 않는다.
                 let isHeaderCell = (isHeaderRow && !noRowHeader) || headCol;
 
-                // ★ 표 매크로 에디터(markdownTableParser.js)가 굵게를 ~내용~ 으로 저장하는데,
-                // 여기서 이 기호를 처리하지 않아 렌더링 시 물결표가 그대로 노출되던 버그를 수정.
-                // 셀 전체를 감싼 경우뿐 아니라 문장 중 일부만 감싼 경우도 똑같이 처리한다.
-                // 굵게(바깥) → 기울임 → 취소선(안쪽) 순으로 풀어야 에디터가 중첩 저장한 순서와 맞는다.
-                cellContent = cellContent.replace(/~(.+?)~/g, '<strong>$1</strong>');
-                cellContent = cellContent.replace(/_(.+?)_/g, '<em>$1</em>');
-                cellContent = cellContent.replace(/--(.+?)--/g, '<del style="opacity:0.6;">$1</del>');
+                cellContent = applyCellStyle(cellContent);
 
                 let bg = isHeaderCell ? 'background:var(--table-bg-alt); font-weight:900; color:var(--primary-color);' : 'color:var(--text-primary);';
                 let tag = isHeaderCell ? 'th' : 'td';
-                
+
                 let attrs = '';
                 if (colSpan > 1) attrs += ` colspan="${colSpan}"`;
                 if (rowSpan > 1) attrs += ` rowspan="${rowSpan}"`;
@@ -116,8 +166,6 @@ export const parseWikiText = (text) => {
     if (inQuote) { newLines.push(`\n<div class="galpi-ext-quote">${quoteBuffer.join('<br>')}</div>\n`); }
     preText = newLines.join('\n');
 
-   preText = preText.replace(/▤REL_START▤/g, '[RELATION_GRAPH]');
-    preText = preText.replace(/▤REL_END▤/g, '[\/RELATION_GRAPH]');
     preText = preText.replace(/▤META_START▤:/g, '[META_DATA:');
 
     // ★ 누락되었던 백링크 [[문서명]] 파싱 정규식 추가
@@ -131,5 +179,5 @@ export const parseWikiText = (text) => {
         return `<sup class="wiki-footnote" data-content="${escaped}" style="cursor:help; color:var(--primary-color); font-weight:bold;">[${num}]</sup>`;
     });
 
-    return preText;
+    return preText.replace(PH_RE, (m, i) => stash[Number(i)]);
 };

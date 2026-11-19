@@ -95,25 +95,31 @@ export const createBarGraphHtml = (dataStr) => {
   } catch(e) { return `<div style="color:#e53e3e; font-size:12px;">[게이지 렌더링 오류]</div>`; }
 };
 
-export const createChatHtml = (type, name, expr, msg) => {
+// options: { workTitle, charExt } 가 있으면 그 작품의 캐릭터 이미지(작품명_이름_표정.확장자)를 아바타로 쓴다. 없으면 이미지 없이 빈 원만 그린다.
+export const createChatHtml = (type, name, expr, msg, options = {}) => {
   const isRight = type === '우대화';
   const alignClass = isRight ? 'flex-end' : 'flex-start';
   const bgColor = isRight ? 'var(--primary-color)' : 'var(--surface-color)';
   const color = isRight ? '#ffffff' : 'var(--text-primary)';
-  const workTitle = typeof window !== 'undefined' && window.currentWorkData?.title ? window.currentWorkData.title : '작품명';
-  
-  const safeWorkTitle = sanitizeFilenameTitle(workTitle);
-  const safeName = sanitizeFilenameTitle(name.trim());
-  const safeExpr = expr ? sanitizeFilenameTitle(expr.trim()) : '';
-  const imgName = expr ? `${safeWorkTitle}_${safeName}_${safeExpr}.png` : `${safeWorkTitle}_${safeName}.png`;
-  const avatarHtml = `<div style="width:42px; height:42px; border-radius:50%; background-color:var(--table-bg-alt); background-image:url('/img/character/${imgName}'); background-size:cover; background-position:center; border:2px solid var(--border-color); flex-shrink:0; box-shadow:0 2px 5px rgba(0,0,0,0.1);"></div>`;
+
+  let avatarStyle = 'background-color:var(--table-bg-alt);';
+  if (options.workTitle) {
+    const ext = String(options.charExt || 'png').replace(/^\./, '');
+    const safeName = sanitizeFilenameTitle(name.trim());
+    const safeExpr = expr ? sanitizeFilenameTitle(expr.trim()) : '';
+    const imgName = `${sanitizeFilenameTitle(options.workTitle)}_${safeName}${safeExpr ? `_${safeExpr}` : ''}.${ext}`;
+    avatarStyle += ` background-image:url('/img/character/${encodeURIComponent(imgName)}'); background-size:cover; background-position:center;`;
+  }
+  const avatarHtml = `<div style="width:42px; height:42px; border-radius:50%; ${avatarStyle} border:2px solid var(--border-color); flex-shrink:0; box-shadow:0 2px 5px rgba(0,0,0,0.1);"></div>`;
+  // 마크다운이 줄바꿈을 <br> 로 바꿔 두므로, 말풍선 맨 앞뒤의 <br> 는 빈 줄이 되지 않게 걷어낸다.
+  const message = msg.trim().replace(/^(?:<br\s*\/?>\s*)+|(?:\s*<br\s*\/?>)+$/gi, '').replace(/\n/g, '<br>');
 
   const bubbleClass = isRight ? 'gt-macro-accent-bg' : 'gt-macro-box';
   return `<div class="galpi-ext-chat-room" style="display:flex; gap:12px; align-items:flex-start; margin:15px 0; flex-direction:${isRight ? 'row-reverse' : 'row'};">
     ${avatarHtml}
     <div style="display:flex; flex-direction:column; align-items:${alignClass}; max-width:80%;">
       <div class="gt-macro-ink-soft" style="font-size:12px; font-weight:900; color:var(--text-secondary); margin-bottom:4px;">${name.trim()}${expr ? ` <span style="font-weight:normal; opacity:0.7;">(${expr.trim()})</span>` : ''}</div>
-      <div class="${bubbleClass}" style="background:${bgColor}; color:${color}; padding:10px 14px; border-radius:12px; border:1px solid var(--border-color); font-size:14px; line-height:1.6; word-break:break-all;">${msg.trim().replace(/\n/g, '<br>')}</div>
+      <div class="${bubbleClass}" style="background:${bgColor}; color:${color}; padding:10px 14px; border-radius:12px; border:1px solid var(--border-color); font-size:14px; line-height:1.6; word-break:break-all;">${message}</div>
     </div>
   </div>`;
 };
@@ -151,7 +157,8 @@ export const createTimelineHtml = (innerText) => {
   return validCount > 0 ? html : "";
 };
 
-export const createLogTabHtml = (activeTab, innerText) => {
+// isHtml: 본문이 이미 HTML(마크다운 변환 결과)이면 줄바꿈 변환 없이 그대로 넣는다.
+export const createLogTabHtml = (activeTab, innerText, isHtml = false) => {
   const tabs = [
     { name: '내용', color: '#495057', bg: '#f8f9fa', border: '#ced4da' },
     { name: '파랑', color: '#1864ab', bg: '#e7f5ff', border: '#74c0fc' },
@@ -185,7 +192,7 @@ export const createLogTabHtml = (activeTab, innerText) => {
   });
   tabsHtml += `</div>`;
 
-  const contentFormatted = innerText.trim().replace(/\n/g, '<br>');
+  const contentFormatted = isHtml ? innerText.trim() : innerText.trim().replace(/\n/g, '<br>');
   let contentHtml = `<div class="gt-macro-ink" style="border: 2px solid ${active.border}; border-top: none; background: ${active.bg}20; padding: 20px; border-radius: 0 0 8px 8px; font-size: 14px; line-height: 1.7; color: var(--text-primary); margin-bottom: 25px; box-shadow: var(--shadow-sm);">${contentFormatted}</div>`;
 
   return `<div class="galpi-log-tab-wrapper" style="margin: 25px 0;">${tabsHtml}${contentHtml}</div>`;

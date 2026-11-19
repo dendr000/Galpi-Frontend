@@ -25,6 +25,8 @@ export const MACRO_STYLE_CSS = `
         .galpi-ext-msg.right { align-self: flex-end; align-items: flex-end; }
         .galpi-ext-msg.right .galpi-ext-msg-name { margin-left: 0; margin-right: 5px; }
         .galpi-ext-msg.right .galpi-ext-msg-bubble { background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); border-top-left-radius: 14px; border-top-right-radius: 4px; }
+        .galpi-log-tab-wrapper p { margin: 0 0 10px; }
+        .galpi-log-tab-wrapper p:last-child { margin-bottom: 0; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     `;
 

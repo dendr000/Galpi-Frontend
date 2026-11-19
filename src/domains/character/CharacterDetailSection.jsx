@@ -18,7 +18,7 @@ export const getCharBodyText = (char) => {
   }
 };
 
-const CharacterDetailSection = ({ activeChar, charSectionNum, styles, onBacklink, onBackToGrid }) => {
+const CharacterDetailSection = ({ activeChar, charSectionNum, styles, onBacklink, onBackToGrid, workTitle, charExt }) => {
   if (!activeChar) return null;
   console.log(`[CharacterDetailSection] 캐릭터 마크다운 상세 정보 렌더링. 타겟 캐릭터: ${activeChar.name}`);
   
@@ -42,7 +42,7 @@ const CharacterDetailSection = ({ activeChar, charSectionNum, styles, onBacklink
           </button>
         )}
       </div>
-      <MarkdownRenderer rawText={rawText} startH1={charSectionNum + 2} onNodeClick={onBacklink} />
+      <MarkdownRenderer rawText={rawText} startH1={charSectionNum + 2} onNodeClick={onBacklink} workTitle={workTitle} charExt={charExt} />
     </section>
   );
 };

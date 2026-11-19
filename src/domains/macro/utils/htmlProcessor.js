@@ -5,6 +5,9 @@
 // - 제목 단위로 본문을 분할하여 위키 특유의 문서 박스 형태인 '.md-box' 컨테이너로 감싸 렌더링 부하를 격리합니다.
 // - 문서 내 목차(TOC) 생성을 위한 고유 ID(galpi-toc-target)를 각 헤딩 요소에 자동 주입합니다.
 
+// 아직 나오지 않은 윗단계(0)는 번호에서 뺀다. (# 없이 ## 로 시작하면 0.1. 대신 1.)
+const joinNumber = (...parts) => `${parts.filter((n) => n > 0).join('.')}.`;
+
 export const processMarkdownHtml = (rawHtml, startH1 = 1) => {
   let counters = { h1: startH1 - 1, h2: 0, h3: 0 };
   const parser = new DOMParser();
@@ -34,7 +37,7 @@ export const processMarkdownHtml = (rawHtml, startH1 = 1) => {
           counters.h2 = parseInt(match[2], 10);
       } else {
           counters.h2++;
-          numStr = `${counters.h1}.${counters.h2}.`;
+          numStr = joinNumber(counters.h1, counters.h2);
       }
       counters.h3 = 0;
     } else if (tag === 'h3') {
@@ -45,7 +48,7 @@ export const processMarkdownHtml = (rawHtml, startH1 = 1) => {
           counters.h3 = parseInt(match[3], 10);
       } else {
           counters.h3++;
-          numStr = `${counters.h1}.${counters.h2}.${counters.h3}.`;
+          numStr = joinNumber(counters.h1, counters.h2, counters.h3);
       }
     }
 

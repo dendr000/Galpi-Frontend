@@ -151,7 +151,10 @@ src/
  │   │   ├── RelationEditor.jsx                 # 인물 간 화살표 방향 및 텍스트 링크 가중치 설정용 보조 편집 패널
  │   │   ├── RelationGraph.jsx                  # SVG 오비탈 궤도 연산을 통해 전체 등장인물 상호 관계망을 그리는 엔진
  │   │   ├── Timeline.jsx                       # 연도 및 사건 데이터셋을 하향식 일직선 타임라인 레이아웃으로 그리는 모듈
- │   │   └── TimelineViewer.jsx                 # 연대기 스크립트 감지 시 그래픽스 타임라인 패널로 트랜스파일해주는 위젯
+ │   │   ├── TimelineViewer.jsx                 # 연대기 스크립트 감지 시 그래픽스 타임라인 패널로 트랜스파일해주는 위젯
+ │   │   └── utils/
+ │   │       ├── renderMarkdownHtml.js              # 본문 문법을 화면용 HTML 로 바꾸는 파이프라인(로그탭, 관계도 보관 포함)
+ │   │       └── renderMarkdownHtml.syntax.test.js  # 본문 문법 오류 재현 시험(물결표, 표 칸, 코드, 색, 로그탭, 제목 번호, 대화)
  │   └── fabTools/
  │       ├── BoilerplateModal.jsx               # 자주 쓰이는 문서 템플릿 및 설정 상용구를 즉시 붙여넣는 유틸리티 팝업
  │       ├── ClipboardModal.jsx                 # 시스템 멀티 클립보드 복사 이력을 역추적하여 데이터 보존을 돕는 모달

@@ -299,7 +299,7 @@ const WorkDetailPage = () => {
                     }}>삭제</button>
                   </div>
                 </div>
-                <MarkdownRenderer rawText={activePage.content} onNodeClick={handleBacklink} />
+                <MarkdownRenderer rawText={activePage.content} onNodeClick={handleBacklink} workTitle={data.work.title} charExt={charExt} />
                 <PageMemberList
                   members={sortCharsByProperty(getAffiliationMembers(data.characters, activePage.title), sortKey, sortDir)}
                   work={data.work} charExt={charExt} styles={styles} sortKey={sortKey}
@@ -315,7 +315,7 @@ const WorkDetailPage = () => {
                   </div>
                   <div style={{ marginBottom: '20px' }}>
                     <p style={{ margin: '0 0 12px 0', lineHeight: 1.6, color: 'var(--text-secondary)' }}>제작자: <strong>{data.work.creator || '미상'}</strong> | 상태: <strong>[{data.work.status || '진행 중'}]</strong></p>
-                    {parsedDesc.meta.overview && <MarkdownRenderer rawText={parsedDesc.meta.overview} onNodeClick={handleBacklink} />}
+                    {parsedDesc.meta.overview && <MarkdownRenderer rawText={parsedDesc.meta.overview} onNodeClick={handleBacklink} workTitle={data.work.title} charExt={charExt} />}
                   </div>
                 </section>
 
@@ -324,7 +324,7 @@ const WorkDetailPage = () => {
                     <h2 id="sec-worldview" className={`${styles.sectionHeaderTitle} gt-section-title auto-toc-target`}>2. 설정</h2>
                     <button className="wiki-btn gt-btn-edit" style={{ padding: '4px 10px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }} onClick={() => data.navigate(`/edit?type=work&action=edit&id=${data.work.id}`)}><IconPen size={13} /> 편집</button>
                   </div>
-                  <MarkdownRenderer rawText={parsedDesc.clean} startH1={3} onNodeClick={handleBacklink} />
+                  <MarkdownRenderer rawText={parsedDesc.clean} startH1={3} onNodeClick={handleBacklink} workTitle={data.work.title} charExt={charExt} />
                 </section>
 
                 <RatingScaleTable axes={ratingAxes} scale={ratingScale} styles={styles} />
@@ -376,7 +376,7 @@ const WorkDetailPage = () => {
 
             {/* 현재 활성화된 캐릭터의 상세 프로필 설정 문서 출력 */}
             {!activePage && activeChar && (
-              <CharacterDetailSection activeChar={activeChar} charSectionNum={data.charSectionNum} styles={styles} onBacklink={handleBacklink} onBackToGrid={scrollToCharCard} />
+              <CharacterDetailSection activeChar={activeChar} charSectionNum={data.charSectionNum} styles={styles} onBacklink={handleBacklink} onBackToGrid={scrollToCharCard} workTitle={data.work.title} charExt={charExt} />
             )}
 
             {/* 캐릭터 하단 스크롤 트랙용 퀵 네비게이터 바 조립 */}

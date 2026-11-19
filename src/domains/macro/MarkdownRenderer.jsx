@@ -4,10 +4,11 @@ import { renderMarkdownHtml } from './utils/renderMarkdownHtml';
 import { useFootnoteTooltip } from './hooks/useFootnoteTooltip';
 import { useHeadingFold } from './hooks/useHeadingFold';
 
-const MarkdownRenderer = ({ rawText, onNodeClick, startH1 = 1 }) => {
+// workTitle, charExt: 대화 매크로가 캐릭터 이미지를 찾을 때 쓴다(없으면 이미지 없이 그린다).
+const MarkdownRenderer = ({ rawText, onNodeClick, startH1 = 1, workTitle, charExt }) => {
   const containerRef = useRef(null);
 
-  const renderedHtml = useMemo(() => renderMarkdownHtml(rawText, startH1), [rawText, startH1]);
+  const renderedHtml = useMemo(() => renderMarkdownHtml(rawText, startH1, { workTitle, charExt }), [rawText, startH1, workTitle, charExt]);
 
   useFootnoteTooltip();
   useHeadingFold(containerRef, [renderedHtml]);

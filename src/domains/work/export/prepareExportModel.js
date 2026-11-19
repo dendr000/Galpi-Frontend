@@ -50,7 +50,7 @@ export const prepareExportModel = async ({
   const imageLoader = withImages ? loadImage : async () => '';
 
   // 마크다운 -> HTML -> 정화 -> 로컬 이미지 처리(포함이면 데이터 주소, 아니면 제거)
-  const renderBody = async (md, startH1 = 1) => inlineLocalImages(sanitizeExportHtml(renderMarkdownHtml(md, startH1)), imageLoader);
+  const renderBody = async (md, startH1 = 1) => inlineLocalImages(sanitizeExportHtml(renderMarkdownHtml(md, startH1, { workTitle: work.title || '작품', charExt })), imageLoader);
 
   const axes = parseRatingAxes(meta.ratingAxes);
   const scale = parseRatingScale(meta.ratingScale);
