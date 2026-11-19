@@ -69,3 +69,21 @@ describe('FloatingToc 접힌(손잡이) 모드', () => {
     expect(screen.getByTitle('목차 열기')).toBeTruthy();
   });
 });
+
+describe('FloatingToc 모두 접기/펼치기', () => {
+  it('두 버튼이 각각 접기, 펼치기 신호를 보낸다', () => {
+    const got = [];
+    const on = (e) => got.push(e.detail.collapsed);
+    window.addEventListener('galpi-fold-all', on);
+    renderToc({ docked: true, onCollapse: () => {} });
+    fireEvent.click(screen.getByRole('button', { name: '모두 접기' }));
+    fireEvent.click(screen.getByRole('button', { name: '모두 펼치기' }));
+    window.removeEventListener('galpi-fold-all', on);
+    expect(got).toEqual([true, false]);
+  });
+
+  it('목차 항목이 없으면 두 버튼을 보이지 않는다', () => {
+    renderToc({ docked: true, onCollapse: () => {}, tocList: [] });
+    expect(screen.queryByRole('button', { name: '모두 접기' })).toBeNull();
+  });
+});

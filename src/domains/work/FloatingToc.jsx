@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { Menu, Edit3 } from 'lucide-react';
 import styles from '../../pages/WorkDetail/WorkDetail.module.css';
 import Icon from '../../components/common/icons/Icon';
+import { requestFoldAll } from '../macro/hooks/foldEvents';
+
+const foldBtnStyle = { padding: '3px 8px', fontSize: '11px', fontWeight: 900, whiteSpace: 'nowrap', background: 'var(--table-bg-alt)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer' };
 
 // docked: 본문 옆에 붙은 고정 열로 그린다(onCollapse 로 접음). 아니면 접힌 손잡이 모드(onDock 이 있으면 손잡이를 눌러 다시 붙임).
 const FloatingToc = ({ workId, pageId, activePage, tocList = [], docked = false, onCollapse, onDock }) => {
@@ -54,6 +57,13 @@ const FloatingToc = ({ workId, pageId, activePage, tocList = [], docked = false,
           </span>
         </div>
         
+        {safeTocList.length > 0 && (
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+            <button type="button" className="wiki-btn" style={foldBtnStyle} onClick={() => requestFoldAll(true)}>모두 접기</button>
+            <button type="button" className="wiki-btn" style={foldBtnStyle} onClick={() => requestFoldAll(false)}>모두 펼치기</button>
+          </div>
+        )}
+
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
           <ul className={styles.tocList}>
             {safeTocList.length > 0 ? (

@@ -153,6 +153,9 @@ src/
  │   │   ├── Timeline.jsx                       # 연도 및 사건 데이터셋을 하향식 일직선 타임라인 레이아웃으로 그리는 모듈
  │   │   ├── TimelineViewer.jsx                 # 연대기 스크립트 감지 시 그래픽스 타임라인 패널로 트랜스파일해주는 위젯
  │   │   ├── hooks/
+ │   │   │   ├── foldEvents.js                      # 문단 모두 접기/펼치기 신호 이름과 보내는 함수
+ │   │   │   ├── useHeadingFold.js                  # 제목 옆 접기 버튼, 접힌 하위 문단 유지, 모두 접기/펼치기 받기
+ │   │   │   ├── useHeadingFold.test.jsx            # 접기, 하위 유지, 모두 접기 시험
  │   │   │   ├── useFootnoteTooltip.js              # 각주 말풍선: 마우스를 올리면 뜨고, 누르면 고정, 바깥 클릭이나 Esc 로 닫음
  │   │   │   └── useFootnoteTooltip.test.jsx        # 각주 올림, 고정, 해제 시험
  │   │   └── utils/
