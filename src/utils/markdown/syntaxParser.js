@@ -28,10 +28,14 @@ const applyCellStyle = (cell) => cell
     .replace(ITALIC_CELL, '<em>$1</em>')
     .replace(STRIKE, STRIKE_HTML);
 
+// 표의 행: ||칸||칸|| 형태. 맨 끝의 || 를 빼먹어도(||칸||칸) 칸 구분이 있으면 행으로 본다.
 const isTableRow = (line) => {
     const t = line.trim();
-    return t.length >= 4 && t.startsWith('||') && t.endsWith('||');
+    if (!t.startsWith('||')) return false;
+    if (t.length >= 4 && t.endsWith('||')) return true;
+    return t.slice(2).includes('||');
 };
+const closeRow = (t) => (t.endsWith('||') ? t : `${t}||`);
 
 // 색 문법에 쓸 수 있는 이름. 그 밖의 [영문:내용] 은 [HP: 100/100] 같은 일반 글자라 건드리지 않는다.
 const COLOR_NAMES = new Set(['red', 'blue', 'black', 'white', 'green', 'yellow', 'orange', 'purple', 'pink', 'gray', 'grey', 'brown', 'cyan',
@@ -106,7 +110,8 @@ export const parseWikiText = (text) => {
                 inTable = true;
                 tableBuffer.push('<div style="overflow-x:auto; margin: 15px 0;"><table class="gt-table" style="width:100%; border-collapse:collapse; background:var(--surface-color); font-size:13px; border-radius:8px; border-style:hidden; box-shadow:0 0 0 1px var(--border-color), 0 2px 8px rgba(0,0,0,0.02);"><tbody>');
             }
-            let cells = trimmed.substring(2, trimmed.length - 2).split('||');
+            const closed = closeRow(trimmed);
+            let cells = closed.substring(2, closed.length - 2).split('||');
             let isHeaderRow = tableBuffer.length === 1;
             tableBuffer.push('<tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;">');
 
@@ -169,7 +174,13 @@ export const parseWikiText = (text) => {
     preText = preText.replace(/▤META_START▤:/g, '[META_DATA:');
 
     // ★ 누락되었던 백링크 [[문서명]] 파싱 정규식 추가
-    preText = preText.replace(/\[\[(.*?)\]\]/g, '<span class="wiki-backlink">$1</span>');
+    // [[이름|표시글]] 은 표시글을 보여 주고 이동은 이름으로 한다.
+    preText = preText.replace(/\[\[(.*?)\]\]/g, (m, inner) => {
+        const bar = inner.indexOf('|');
+        if (bar <= 0 || bar === inner.length - 1) return `<span class="wiki-backlink">${inner}</span>`;
+        const target = inner.slice(0, bar).trim().replace(/"/g, '&quot;');
+        return `<span class="wiki-backlink" data-target="${target}">${inner.slice(bar + 1).trim()}</span>`;
+    });
 
     // ★ 각주 [* 내용] 파서 강화 (멀티라인 감지 및 br 태그 치환으로 팝오버 줄바꿈 허용)
     let fnCount = 1;

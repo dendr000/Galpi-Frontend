@@ -207,3 +207,30 @@ describe('스포일러 열기', () => {
     expect(el.hasAttribute('onmouseout')).toBe(false);
   });
 });
+
+describe('백링크 별칭', () => {
+  it('[[이름|표시글]] 은 표시글만 보이고 이동 대상은 이름이다', () => {
+    const el = dom(renderMarkdownHtml('만난 사람 [[리안|그 소년]] 이다')).querySelector('.wiki-backlink');
+    expect(el.textContent).toBe('그 소년');
+    expect(el.getAttribute('data-target')).toBe('리안');
+  });
+
+  it('별칭이 없는 [[이름]] 은 그대로 동작한다', () => {
+    const el = dom(renderMarkdownHtml('[[리안]]')).querySelector('.wiki-backlink');
+    expect(el.textContent).toBe('리안');
+    expect(el.hasAttribute('data-target')).toBe(false);
+  });
+});
+
+describe('줄 끝 || 가 없는 표 행', () => {
+  it('마지막 || 를 빼먹어도 표의 행이 된다', () => {
+    const html = renderMarkdownHtml('||이름||설명||\n||리안||주인공');
+    expect(html).not.toContain('||');
+    expect(cellsOf(html).map((c) => c.textContent)).toEqual(['이름', '설명', '리안', '주인공']);
+  });
+
+  it('||로 시작하지만 칸 구분이 없는 글은 표가 아니다', () => {
+    const d = dom(renderMarkdownHtml('||그냥 글'));
+    expect(d.querySelector('table')).toBeNull();
+  });
+});

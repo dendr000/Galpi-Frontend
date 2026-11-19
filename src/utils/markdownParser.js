@@ -10,8 +10,3 @@ export { extractMeta, buildMetaStr } from './markdown/metaUtils';
 // 기능: 갈피 전용 특수 마크다운 문법(폰트, 크기, 정렬, 색상, 커스텀 표 등)을 HTML 뼈대 및 예약어로 변환
 // (실행 시 styleInjector를 호출하여 매크로용 글로벌 CSS를 DOM에 안전하게 자동 주입)
 export { parseWikiText } from './markdown/syntaxParser';
-
-// 3. 마크다운 매크로 코어 렌더러 모듈
-// 기능: marked.js 표준 파싱을 거친 HTML 문자열 내부의 예약어(스탯, 게이지, 로그탭, 타임라인, 관계망)를 탐지하고,
-// macroBuilders.js의 팩토리 함수들을 호출하여 최종 시각화된 HTML/SVG 위젯으로 치환
-export { renderMarkdown } from './markdown/coreRenderer';
