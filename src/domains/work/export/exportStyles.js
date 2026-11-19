@@ -2,6 +2,7 @@
 // 공개용 내보내기 HTML 에 넣는 스타일. 앱의 전역 CSS 변수에 기대던 매크로 위젯이 단독 파일에서도 보이도록
 // 같은 이름의 변수를 정의하고, 라이트/다크는 브라우저 설정(prefers-color-scheme)을 따른다.
 import { MACRO_STYLE_CSS } from '../../../utils/markdown/styleInjector';
+import { ICON_CSS } from '../../../components/common/icons/iconRegistry';
 
 const BASE_CSS = `
 :root {
@@ -64,4 +65,4 @@ table.plain th { background: var(--table-bg-alt); }
 footer.foot { color: var(--text-secondary); font-size: 12.5px; text-align: center; margin-top: 28px; }
 `;
 
-export const EXPORT_CSS = `${BASE_CSS}\n${MACRO_STYLE_CSS}`;
+export const EXPORT_CSS = `${BASE_CSS}\n${MACRO_STYLE_CSS}\n${ICON_CSS}`;

@@ -1,6 +1,7 @@
 // 파일 위치: src/domains/macro/utils/macroGenerators.js
 // 기능 요약: 마크다운 예약어를 감지하여 시각화 HTML/SVG 위젯을 문자열로 즉시 조립하는 순수 렌더링 함수 모음
 // 버전: v2.3.1 (createRelationGraphHtml 누락 함수 복구 통합본)
+import { iconHtml } from '../../../components/common/icons/iconRegistry';
 import { sanitizeFilenameTitle } from '../../../utils/filenameSanitizer';
 
 const parseRankValue = (valStr) => {
@@ -55,12 +56,12 @@ export const createRadarChartHtml = (dataStr) => {
       labelHtml += `<text class="gt-macro-ink" x="${lx}" y="${ly-6}" fill="var(--text-primary)" font-size="12" font-weight="900" text-anchor="${anchor}" dominant-baseline="middle">${labels[i]}</text>`;
       labelHtml += `<text class="gt-macro-ink-soft" x="${lx}" y="${ly+8}" fill="var(--text-secondary)" font-size="11" font-weight="bold" text-anchor="${anchor}" dominant-baseline="middle">${originalValues[i]}</text>`;
     }
-    return `<div class="galpi-ext-radar gt-macro-box" style="display:flex; flex-direction:column; align-items:center; margin: 25px 0; background: var(--surface-color); padding: 25px 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);"><div class="gt-macro-ink" style="font-weight:900; font-size:14px; margin-bottom:15px; color:var(--text-primary); letter-spacing: 1px;">📊 스탯 분석 차트</div><svg width="100%" height="100%" viewBox="0 0 ${size} ${size}" style="max-width: 320px; overflow:visible; font-family:inherit;">${bgPolygons}<polygon class="gt-macro-accent" points="${polygonPoints.trim()}" fill="var(--primary-color)" fill-opacity="0.3" stroke="var(--primary-color)" stroke-width="2" stroke-linejoin="round"/>${pointsHtml}${labelHtml}</svg></div>`;
+    return `<div class="galpi-ext-radar gt-macro-box" style="display:flex; flex-direction:column; align-items:center; margin: 25px 0; background: var(--surface-color); padding: 25px 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);"><div class="gt-macro-ink" style="font-weight:900; font-size:14px; margin-bottom:15px; color:var(--text-primary); letter-spacing: 1px;">${iconHtml('bar-chart', 'gi-lead')}스탯 분석 차트</div><svg width="100%" height="100%" viewBox="0 0 ${size} ${size}" style="max-width: 320px; overflow:visible; font-family:inherit;">${bgPolygons}<polygon class="gt-macro-accent" points="${polygonPoints.trim()}" fill="var(--primary-color)" fill-opacity="0.3" stroke="var(--primary-color)" stroke-width="2" stroke-linejoin="round"/>${pointsHtml}${labelHtml}</svg></div>`;
   } catch(e) { return `<div style="color:#e53e3e; font-size:12px;">[레이더 차트 오류]</div>`; }
 };
 
 export const createRadarCompareHtml = (dataStr) => {
-  return `<div class="galpi-ext-placeholder gt-macro-box gt-macro-accent" style="padding:15px; background:var(--surface-color); border:1px solid var(--primary-color); border-radius:8px; color:var(--primary-color); font-weight:bold; font-size:13px; text-align:center; margin:15px 0;">📊 다중 스탯 비교 위젯은 React Viewer 전용 모드에서 렌더링됩니다.</div>`;
+  return `<div class="galpi-ext-placeholder gt-macro-box gt-macro-accent" style="padding:15px; background:var(--surface-color); border:1px solid var(--primary-color); border-radius:8px; color:var(--primary-color); font-weight:bold; font-size:13px; text-align:center; margin:15px 0;">${iconHtml('bar-chart', 'gi-lead')}다중 스탯 비교 위젯은 React Viewer 전용 모드에서 렌더링됩니다.</div>`;
 };
 
 export const createAlignmentChartHtml = (dataStr) => {
@@ -73,7 +74,7 @@ export const createAlignmentChartHtml = (dataStr) => {
     const size = 260; const center = size / 2;
     const px = (xVal / 100) * size; const py = size - ((yVal / 100) * size);
     
-    return `<div class="galpi-ext-alignment gt-macro-box" style="display:flex; flex-direction:column; align-items:center; margin: 25px 0; background: var(--surface-color); padding: 25px 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);"><div class="gt-macro-ink" style="font-weight:900; font-size:14px; margin-bottom:15px; color:var(--text-primary); letter-spacing: 1px;">🧭 2D 성향 매트릭스</div><svg width="100%" height="100%" viewBox="-30 -30 ${size+60} ${size+60}" style="max-width:300px; overflow:visible; font-family:inherit;"><rect class="gt-macro-box gt-macro-line" x="0" y="0" width="${size}" height="${size}" fill="var(--bg-color)" stroke="var(--border-color)" stroke-width="1"/><line class="gt-macro-line" x1="${center}" y1="0" x2="${center}" y2="${size}" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="4,4"/><line class="gt-macro-line" x1="0" y1="${center}" x2="${size}" y2="${center}" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="4,4"/><circle class="gt-macro-accent-dot" cx="${px}" cy="${py}" r="6" fill="var(--primary-color)" stroke="#fff" stroke-width="2"/><text class="gt-macro-ink" x="${center}" y="-10" fill="var(--text-primary)" font-size="12" font-weight="bold" text-anchor="middle">${yLabel}</text><text class="gt-macro-ink" x="${size+10}" y="${center+4}" fill="var(--text-primary)" font-size="12" font-weight="bold" text-anchor="start">${xLabel}</text><text class="gt-macro-accent" x="${px}" y="${py - 12}" fill="var(--primary-color)" font-size="12" font-weight="900" text-anchor="middle">현재 위치</text></svg></div>`;
+    return `<div class="galpi-ext-alignment gt-macro-box" style="display:flex; flex-direction:column; align-items:center; margin: 25px 0; background: var(--surface-color); padding: 25px 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);"><div class="gt-macro-ink" style="font-weight:900; font-size:14px; margin-bottom:15px; color:var(--text-primary); letter-spacing: 1px;">${iconHtml('compass', 'gi-lead')}2D 성향 매트릭스</div><svg width="100%" height="100%" viewBox="-30 -30 ${size+60} ${size+60}" style="max-width:300px; overflow:visible; font-family:inherit;"><rect class="gt-macro-box gt-macro-line" x="0" y="0" width="${size}" height="${size}" fill="var(--bg-color)" stroke="var(--border-color)" stroke-width="1"/><line class="gt-macro-line" x1="${center}" y1="0" x2="${center}" y2="${size}" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="4,4"/><line class="gt-macro-line" x1="0" y1="${center}" x2="${size}" y2="${center}" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="4,4"/><circle class="gt-macro-accent-dot" cx="${px}" cy="${py}" r="6" fill="var(--primary-color)" stroke="#fff" stroke-width="2"/><text class="gt-macro-ink" x="${center}" y="-10" fill="var(--text-primary)" font-size="12" font-weight="bold" text-anchor="middle">${yLabel}</text><text class="gt-macro-ink" x="${size+10}" y="${center+4}" fill="var(--text-primary)" font-size="12" font-weight="bold" text-anchor="start">${xLabel}</text><text class="gt-macro-accent" x="${px}" y="${py - 12}" fill="var(--primary-color)" font-size="12" font-weight="900" text-anchor="middle">현재 위치</text></svg></div>`;
   } catch(e) { return `<div style="color:#e53e3e; font-size:12px;">[성향 매트릭스 렌더링 오류]</div>`; }
 };
 
@@ -129,7 +130,7 @@ export const createSpoilerHtml = (content) => {
 };
 
 export const createTabHtml = (innerText) => {
-  return `<div class="galpi-ext-placeholder gt-macro-box gt-macro-accent" style="padding:15px; background:var(--surface-color); border:1px solid var(--primary-color); border-radius:8px; color:var(--primary-color); font-weight:bold; font-size:13px; text-align:center; margin:15px 0;">📑 인라인 탭 컨테이너는 React Viewer 전용 모드에서 렌더링됩니다.</div>`;
+  return `<div class="galpi-ext-placeholder gt-macro-box gt-macro-accent" style="padding:15px; background:var(--surface-color); border:1px solid var(--primary-color); border-radius:8px; color:var(--primary-color); font-weight:bold; font-size:13px; text-align:center; margin:15px 0;">${iconHtml('list', 'gi-lead')}인라인 탭 컨테이너는 React Viewer 전용 모드에서 렌더링됩니다.</div>`;
 };
 
 export const createTimelineHtml = (innerText) => {
@@ -198,21 +199,24 @@ export const createLogTabHtml = (activeTab, innerText, isHtml = false) => {
   return `<div class="galpi-log-tab-wrapper" style="margin: 25px 0;">${tabsHtml}${contentHtml}</div>`;
 };
 
+// 관계도는 칸 폭에 맞춰 줄어들고, 이보다 좁아지면(폰) 그때만 좌우 스크롤이 생긴다. 분할 화면에서 세로 스크롤이 걸리지 않게 한다.
+const RELATION_MIN_WIDTH = 480;
+
 export const createRelationGraphHtml = (innerText) => {
   let graphData = { nodes: [], edges: [] };
   try {
     let cleanJson = innerText.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
     graphData = JSON.parse(cleanJson);
   } catch(e) {
-    return `<div style="color:#e53e3e; padding:10px; font-weight:bold; background:rgba(229,62,62,0.1); border:1px solid #e53e3e; border-radius:8px;">⚠️ 관계도 데이터가 손상되었습니다. 코드를 확인하십시오.</div>`;
+    return `<div style="color:#e53e3e; padding:10px; font-weight:bold; background:rgba(229,62,62,0.1); border:1px solid #e53e3e; border-radius:8px;">${iconHtml('warning', 'gi-lead')}관계도 데이터가 손상되었습니다. 코드를 확인하십시오.</div>`;
   }
 
-  let width = graphData.width || 800;
-  let height = graphData.height || 450;
+  let width = Number(graphData.width) || 800;
+  let height = Number(graphData.height) || 450;
   
   let html = `<div class="galpi-ext-relation gt-macro-box" style="margin:20px 0; background:var(--bg-color); border:1px solid var(--border-color); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.03); overflow:hidden; display:flex; flex-direction:column;">`;
-  html += '<div class="gt-macro-subheader gt-macro-accent" style="padding:12px 20px; background:var(--surface-color); border-bottom:1px solid var(--border-color); font-weight:900; color:var(--primary-color); font-size:15px;">📊 인물 관계도</div>';
-  html += `<div style="width:100%; overflow-x:auto; overflow-y:hidden; padding:20px 0;"><svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="min-width:${width}px; display:block; margin:0 auto; user-select:none; overflow:visible; font-family:inherit;">`;
+  html += `<div class="gt-macro-subheader gt-macro-accent" style="padding:12px 20px; background:var(--surface-color); border-bottom:1px solid var(--border-color); font-weight:900; color:var(--primary-color); font-size:15px;">${iconHtml('link', 'gi-lead')}인물 관계도</div>`;
+  html += `<div class="galpi-relation-scroll" style="width:100%; overflow-x:auto; overflow-y:hidden; padding:20px 0;"><svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="width:100%; max-width:${width}px; min-width:${Math.min(width, RELATION_MIN_WIDTH)}px; height:auto; display:block; margin:0 auto; user-select:none; overflow:visible; font-family:inherit;">`;
 
   html += '<defs>';
   html += '<marker id="diag-arr-normal" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse"><path class="gt-macro-ink-soft" d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)"/></marker>';

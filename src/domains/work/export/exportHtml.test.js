@@ -206,3 +206,9 @@ describe('공개용 스포일러 열기', () => {
     expect(EXPORT_CSS).toContain('.galpi-spoiler:focus');
   });
 });
+
+describe('공개용 아이콘 칸', () => {
+  it('SVG 아이콘이 글자 크기에 맞게 나오도록 아이콘 규칙이 들어 있다', () => {
+    expect(EXPORT_CSS).toContain('.gi > svg');
+  });
+});

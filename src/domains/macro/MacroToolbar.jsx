@@ -68,7 +68,7 @@ const MacroToolbar = ({ editorRef, rawText, onInsert }) => {
 
   return (
     <>
-      {/* 🌟 화면 좌측 투명 센서 래퍼 (Hover 감지 구역) */}
+      {/* 화면 좌측 투명 센서 래퍼 (Hover 감지 구역) */}
       <div className={styles.toolbarWrapper}>
         <div className={styles.sidebarToolbar}>
           {MACRO_TOOLS.map(tool => (

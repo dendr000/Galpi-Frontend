@@ -10,6 +10,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import styles from '../../domains/macro/MacroToolbar.module.css';
+import Icon from '../../components/common/icons/Icon';
 
 // 1. 커스텀 인물 노드 (핸들을 정중앙으로 이동시켜 바닐라 공식과 호환)
 const CustomNode = ({ data, selected }) => {
@@ -79,10 +80,10 @@ const RelationEdge = ({ id, sourceX, sourceY, targetX, targetY, selected, data, 
 
   if (isBi) {
     let gap = 12; // 평행선 간격
-    // 정방향 선 (➔)
+    // 정방향 선
     let l1x1 = sx + nx * gap; let l1y1 = sy + ny * gap;
     let l1x2 = tx + nx * gap; let l1y2 = ty + ny * gap;
-    // 역방향 선 (⬅) 화살표 방향을 위해 tx->sx 방향으로 그음
+    // 역방향 선: 화살표 방향을 위해 tx->sx 방향으로 그음
     let l2x1 = tx - nx * gap; let l2y1 = ty - ny * gap;
     let l2x2 = sx - nx * gap; let l2y2 = sy - ny * gap;
 
@@ -99,12 +100,12 @@ const RelationEdge = ({ id, sourceX, sourceY, targetX, targetY, selected, data, 
         <EdgeLabelRenderer>
           {label && (
             <div style={{ position: 'absolute', transform: `translate(-50%, -50%) translate(${c1x}px,${c1y}px) rotate(${textAngle}deg)`, pointerEvents: 'all' }} className="nodrag nopan">
-              <div style={{ ...labelBoxStyle, color: 'var(--primary-color)' }}>➔ {label}</div>
+              <div style={{ ...labelBoxStyle, color: 'var(--primary-color)' }}>{label}</div>
             </div>
           )}
           {data?.descRev && (
             <div style={{ position: 'absolute', transform: `translate(-50%, -50%) translate(${c2x}px,${c2y}px) rotate(${textAngle}deg)`, pointerEvents: 'all' }} className="nodrag nopan">
-              <div style={{ ...labelBoxStyle, borderColor: '#e53e3e', color: '#e53e3e' }}>⬅ {data.descRev}</div>
+              <div style={{ ...labelBoxStyle, borderColor: '#e53e3e', color: '#e53e3e' }}>{data.descRev}</div>
             </div>
           )}
         </EdgeLabelRenderer>
@@ -236,9 +237,9 @@ const RelationEditor = ({ selectedText, onInsert, onCancel }) => {
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--table-bg-alt)', padding: '8px 12px', borderRadius: '6px' }}>
               <input className={styles.toolInput} style={{ width: '160px', flex: 'none', padding: '6px', height: '32px', boxSizing: 'border-box' }} placeholder="명칭 입력" value={diagInputName} onChange={e => setDiagInputName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addDiagNode('circle')} />
-              <button className="wiki-btn" style={{ background: 'var(--primary-color)', color: 'white', height: '32px' }} onClick={() => addDiagNode('circle')}>○ 원형 추가</button>
-              <button className="wiki-btn" style={{ background: 'var(--text-secondary)', color: 'white', height: '32px' }} onClick={() => addDiagNode('rect')}>□ 사각형 추가</button>
-              <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: 'auto', fontWeight: 'bold' }}>💡 도형 중심을 드래그하여 연결</span>
+              <button className="wiki-btn" style={{ background: 'var(--primary-color)', color: 'white', height: '32px' }} onClick={() => addDiagNode('circle')}><Icon name="circle" lead />원형 추가</button>
+              <button className="wiki-btn" style={{ background: 'var(--text-secondary)', color: 'white', height: '32px' }} onClick={() => addDiagNode('rect')}><Icon name="square" lead />사각형 추가</button>
+              <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginLeft: 'auto', fontWeight: 'bold' }}><Icon name="lightbulb" lead />도형 중심을 드래그하여 연결</span>
             </div>
             
             <div className={styles.diagramBoard} style={{ border: '2px dashed var(--border-color)', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
@@ -271,32 +272,32 @@ const RelationEditor = ({ selectedText, onInsert, onCancel }) => {
           <div className={styles.diagPanel} style={{ width: '220px', padding: '12px', background: 'var(--table-bg-alt)', border: '1px solid var(--border-color)', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '8px', height: 'fit-content' }}>
             {activeNode ? (
               <>
-                <div style={{ fontWeight: 900, color: 'var(--primary-color)', borderBottom: '1px dashed var(--border-color)', paddingBottom: '6px', fontSize: '13px' }}>📝 도형 속성 변경</div>
+                <div style={{ fontWeight: 900, color: 'var(--primary-color)', borderBottom: '1px dashed var(--border-color)', paddingBottom: '6px', fontSize: '13px' }}><Icon name="edit" lead />도형 속성 변경</div>
                 <label style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '4px' }}>명칭 수정</label>
                 <input className={styles.toolInput} style={{ padding: '6px 8px', fontSize: '12px', height: '32px', boxSizing: 'border-box' }} value={activeNode.data.label} onChange={e => setNodes(nds => nds.map(n => n.id === activeNode.id ? { ...n, data: { ...n.data, label: e.target.value } } : n))} />
-                <button className="wiki-btn" style={{ background: '#e53e3e', color: 'white', marginTop: '10px', padding: '8px', height: '32px' }} onClick={() => { setNodes(nds => nds.filter(n => n.id !== activeNode.id)); setSelectedNodeId(null); }}>🗑️ 도형 삭제</button>
+                <button className="wiki-btn" style={{ background: '#e53e3e', color: 'white', marginTop: '10px', padding: '8px', height: '32px' }} onClick={() => { setNodes(nds => nds.filter(n => n.id !== activeNode.id)); setSelectedNodeId(null); }}><Icon name="trash" lead />도형 삭제</button>
               </>
             ) : activeEdge ? (
               <>
-                <div style={{ fontWeight: 900, color: 'var(--primary-color)', borderBottom: '1px dashed var(--border-color)', paddingBottom: '6px', fontSize: '13px' }}>⚙️ 연결선 설정</div>
+                <div style={{ fontWeight: 900, color: 'var(--primary-color)', borderBottom: '1px dashed var(--border-color)', paddingBottom: '6px', fontSize: '13px' }}><Icon name="settings" lead />연결선 설정</div>
                 
-                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--primary-color)', marginTop: '4px' }}>관계 기술 (정방향 ➔)</label>
+                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--primary-color)', marginTop: '4px' }}>관계 기술 (정방향)</label>
                 <input className={styles.toolInput} style={{ padding: '6px 8px', fontSize: '12px', height: '32px', boxSizing: 'border-box' }} value={activeEdge.label || ''} onChange={e => setEdges(eds => eds.map(edge => edge.id === activeEdge.id ? { ...edge, label: e.target.value } : edge))} />
 
                 {activeEdge.data?.type === '<->' && (
                   <>
-                    <label style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '8px', color: '#e53e3e' }}>관계 기술 (역방향 ⬅)</label>
+                    <label style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '8px', color: '#e53e3e' }}>관계 기술 (역방향)</label>
                     <input className={styles.toolInput} style={{ borderColor: '#e53e3e', padding: '6px 8px', fontSize: '12px', height: '32px', boxSizing: 'border-box' }} value={activeEdge.data?.descRev || ''} onChange={e => setEdges(eds => eds.map(edge => edge.id === activeEdge.id ? { ...edge, data: { ...edge.data, descRev: e.target.value } } : edge))} />
                   </>
                 )}
 
                 <label style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '8px' }}>선 종류 결정</label>
                 <select className={styles.toolInput} style={{ padding: '6px 8px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', height: '32px', boxSizing: 'border-box' }} value={activeEdge.data?.type || '->'} onChange={e => updateEdgeStyle(activeEdge.id, e.target.value)}>
-                  <option value="->">단방향 화살표 (➔)</option>
-                  <option value="<->">양방향 화살표 (⇄)</option>
-                  <option value="--">종속/연결 점선 (╌)</option>
+                  <option value="->">단방향 화살표</option>
+                  <option value="<->">양방향 화살표</option>
+                  <option value="--">종속/연결 점선</option>
                 </select>
-                <button className="wiki-btn" style={{ background: '#e53e3e', color: 'white', marginTop: '10px', padding: '8px', height: '32px' }} onClick={() => { setEdges(eds => eds.filter(e => e.id !== activeEdge.id)); setSelectedEdgeId(null); }}>✖ 연결선 제거</button>
+                <button className="wiki-btn" style={{ background: '#e53e3e', color: 'white', marginTop: '10px', padding: '8px', height: '32px' }} onClick={() => { setEdges(eds => eds.filter(e => e.id !== activeEdge.id)); setSelectedEdgeId(null); }}><Icon name="close" lead />연결선 제거</button>
               </>
             ) : (
               <div style={{ color: 'var(--text-secondary)', textAlign: 'center', paddingTop: '40px', fontWeight: 'bold', fontSize: '12px', lineHeight: 1.6 }}>도형이나 연결선을<br/>클릭하면 이곳에<br/>설정창이 활성화됩니다.</div>

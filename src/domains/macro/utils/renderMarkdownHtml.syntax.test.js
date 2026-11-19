@@ -329,3 +329,40 @@ describe('긴 표', () => {
     expect(d.querySelector('.gt-table-long')).toBeNull();
   });
 });
+
+describe('인물 관계도 모양', () => {
+  const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}️]/u;
+  const graph = (extra = '') => `[RELATION_GRAPH]\n{"width":1400,"height":600,"nodes":[{"id":"a","label":"가","x":100,"y":100},{"id":"b","label":"나","x":300,"y":100}],"edges":[{"source":"a","target":"b","type":"->","desc":"친구"}]${extra}}\n[/RELATION_GRAPH]`;
+
+  it('머리글과 위젯 어디에도 이모지를 쓰지 않고 SVG 아이콘을 쓴다', () => {
+    const html = renderMarkdownHtml(graph());
+    expect(EMOJI.test(html)).toBe(false);
+    expect(dom(html).querySelector('.gt-macro-subheader .gi svg')).not.toBeNull();
+  });
+
+  it('데이터가 깨졌을 때 나오는 경고에도 이모지가 없다', () => {
+    const html = renderMarkdownHtml('[RELATION_GRAPH]\n{깨진\n[/RELATION_GRAPH]');
+    expect(html).toContain('손상');
+    expect(EMOJI.test(html)).toBe(false);
+  });
+
+  it('그래프는 칸 폭에 맞춰 줄어들어 넓은 그래프도 좌우 스크롤을 강제하지 않는다', () => {
+    const svg = dom(renderMarkdownHtml(graph())).querySelector('.galpi-relation-scroll > svg');
+    expect(svg.style.width).toBe('100%');
+    expect(svg.style.maxWidth).toBe('1400px');
+    expect(parseInt(svg.style.minWidth, 10)).toBeLessThan(1400);
+  });
+
+  it('다른 위젯의 머리글에도 이모지가 없다', () => {
+    const html = renderMarkdownHtml('[스탯:힘=5,민첩=7,지능=3]\n\n[성향:3,4]\n\n[스탯비교:가=1,2,3|나=4,5,6]');
+    expect(EMOJI.test(html)).toBe(false);
+  });
+});
+
+describe('인물 관계도 작은 그래프', () => {
+  it('원래 폭이 좁은 그래프는 키우지 않는다', () => {
+    const json = '{"width":300,"height":200,"nodes":[{"id":"a","label":"가","x":50,"y":50}],"edges":[]}';
+    const svg = new DOMParser().parseFromString(renderMarkdownHtml(`[RELATION_GRAPH]\n${json}\n[/RELATION_GRAPH]`), 'text/html').querySelector('.galpi-relation-scroll > svg');
+    expect(svg.style.minWidth).toBe('300px');
+  });
+});
