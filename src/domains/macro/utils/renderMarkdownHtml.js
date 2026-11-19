@@ -1,6 +1,7 @@
 // Copyright (c) dendr000. MIT License.
 // 갈피 마크다운(전용 문법 + 매크로)을 화면에 그릴 HTML 문자열로 바꾸는 순수 파이프라인.
 // MarkdownRenderer(화면)와 공개용 내보내기가 같은 결과를 쓰도록 한 곳에 둔다. DOMParser 가 필요한 브라우저 환경용.
+import { sanitizeExportHtml } from '../../work/export/sanitizeExportHtml';
 import { Marked } from 'marked';
 import { parseWikiText } from '../../../utils/markdownParser';
 import {
@@ -74,5 +75,6 @@ ${REL_OPEN}${relations.length - 1}${REL_CLOSE}
 
   rawHtml = rawHtml.replace(REL_RE, (m, i) => createRelationGraphHtml(relations[Number(i)].trim()));
 
-  return processMarkdownHtml(rawHtml, startH1);
+  // 본문에 직접 쓴 HTML 의 스크립트와 이벤트 속성은 화면에서도 실행되지 않게 지운다.
+  return sanitizeExportHtml(processMarkdownHtml(rawHtml, startH1));
 };

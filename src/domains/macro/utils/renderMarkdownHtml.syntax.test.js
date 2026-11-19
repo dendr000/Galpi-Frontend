@@ -234,3 +234,20 @@ describe('줄 끝 || 가 없는 표 행', () => {
     expect(d.querySelector('table')).toBeNull();
   });
 });
+
+describe('본문에 직접 쓴 위험한 HTML', () => {
+  it('이벤트 속성, script, javascript: 주소는 화면용 결과에서도 제거된다', () => {
+    const html = renderMarkdownHtml('<img src="x" onerror="alert(1)">\n\n<script>alert(2)</script>\n\n<a href="javascript:alert(3)">누르기</a>');
+    const d = dom(html);
+    expect(d.querySelector('img').hasAttribute('onerror')).toBe(false);
+    expect(d.querySelector('script')).toBeNull();
+    expect(d.querySelector('a').hasAttribute('href')).toBe(false);
+  });
+
+  it('갈피 문법이 만든 서식과 스포일러, 각주는 그대로 남는다', () => {
+    const d = dom(renderMarkdownHtml('[red:빨강] [스포일러]비밀[/스포일러] 끝[* 뜻]'));
+    expect(d.querySelector('span[style*="color"]')).not.toBeNull();
+    expect(d.querySelector('.galpi-spoiler').getAttribute('tabindex')).toBe('0');
+    expect(d.querySelector('.wiki-footnote').getAttribute('data-content')).toBe('뜻');
+  });
+});
