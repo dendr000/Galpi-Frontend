@@ -22,7 +22,7 @@ const MarkdownRenderer = ({ rawText, onNodeClick, startH1 = 1, workTitle, charEx
         .markdown-body h3, .markdown-body h4 { border-bottom: 1px dashed var(--border-color); padding-bottom: 4px; margin-bottom: 12px; margin-top: 20px; }
         .markdown-body h2:first-child, .markdown-body h3:first-child { margin-top: 0; }
         .galpi-spoiler { background-color: #111; color: #111; cursor: pointer; padding: 2px 6px; border-radius: 4px; font-weight: bold; transition: color 0.3s ease; }
-        .galpi-spoiler:hover { color: #fff; }
+        .galpi-spoiler:hover, .galpi-spoiler:focus { color: #fff !important; outline: none; }
         
         /* ★ 백링크(하이퍼링크) 텍스트 강제 제어 (밑줄 삭제, 순수 파란 텍스트) */
         .wiki-backlink { 

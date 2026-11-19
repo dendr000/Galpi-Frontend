@@ -152,6 +152,9 @@ src/
  │   │   ├── RelationGraph.jsx                  # SVG 오비탈 궤도 연산을 통해 전체 등장인물 상호 관계망을 그리는 엔진
  │   │   ├── Timeline.jsx                       # 연도 및 사건 데이터셋을 하향식 일직선 타임라인 레이아웃으로 그리는 모듈
  │   │   ├── TimelineViewer.jsx                 # 연대기 스크립트 감지 시 그래픽스 타임라인 패널로 트랜스파일해주는 위젯
+ │   │   ├── hooks/
+ │   │   │   ├── useFootnoteTooltip.js              # 각주 말풍선: 마우스를 올리면 뜨고, 누르면 고정, 바깥 클릭이나 Esc 로 닫음
+ │   │   │   └── useFootnoteTooltip.test.jsx        # 각주 올림, 고정, 해제 시험
  │   │   └── utils/
  │   │       ├── renderMarkdownHtml.js              # 본문 문법을 화면용 HTML 로 바꾸는 파이프라인(로그탭, 관계도 보관 포함)
  │   │       └── renderMarkdownHtml.syntax.test.js  # 본문 문법 오류 재현 시험(물결표, 표 칸, 코드, 색, 로그탭, 제목 번호, 대화)

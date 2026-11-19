@@ -60,7 +60,7 @@ table.plain th { background: var(--table-bg-alt); }
 .markdown-body h3, .markdown-body h4 { border-bottom: 1px dashed var(--border-color); padding-bottom: 4px; margin-top: 20px; }
 .wiki-backlink { color: var(--primary-color); font-weight: 900; }
 /* 스포일러: 인라인 마우스 이벤트는 안전을 위해 제거하므로 CSS 호버로 내용을 보여 준다 */
-.galpi-spoiler:hover { color: #ffffff !important; }
+.galpi-spoiler:hover, .galpi-spoiler:focus { color: #ffffff !important; outline: none; }
 footer.foot { color: var(--text-secondary); font-size: 12.5px; text-align: center; margin-top: 28px; }
 `;
 

@@ -197,3 +197,13 @@ describe('대화 매크로', () => {
     expect(html).not.toMatch(/<\/div>\s*<br\s*\/?>\s*<div/);
   });
 });
+
+describe('스포일러 열기', () => {
+  it('마우스 올림 속성 대신 키보드 포커스를 받아 누르면(터치) 열린다', () => {
+    const el = dom(renderMarkdownHtml('[스포일러]비밀[/스포일러]')).querySelector('.galpi-spoiler');
+    expect(el.getAttribute('tabindex')).toBe('0');
+    expect(el.getAttribute('role')).toBe('button');
+    expect(el.hasAttribute('onmouseover')).toBe(false);
+    expect(el.hasAttribute('onmouseout')).toBe(false);
+  });
+});

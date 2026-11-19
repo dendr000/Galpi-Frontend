@@ -1,6 +1,7 @@
 // Copyright (c) dendr000. MIT License.
 import { describe, it, expect } from 'vitest';
 import { escapeHtml, buildExportHtml } from './exportHtml';
+import { EXPORT_CSS } from './exportStyles';
 
 const model = (over = {}) => ({
   title: '시험 작품', creator: '작가', genre: '판타지', status: '연재 중', coverSrc: '',
@@ -197,5 +198,11 @@ describe('buildExportHtml 하위 문서', () => {
 
   it('하위 문서가 없으면 문서 구역이 없다', () => {
     expect(buildExportHtml(model())).not.toContain('id="pages"');
+  });
+});
+
+describe('공개용 스포일러 열기', () => {
+  it('포커스(터치) 로도 열리는 규칙이 들어 있다', () => {
+    expect(EXPORT_CSS).toContain('.galpi-spoiler:focus');
   });
 });

@@ -125,7 +125,7 @@ export const createChatHtml = (type, name, expr, msg, options = {}) => {
 };
 
 export const createSpoilerHtml = (content) => {
-  return `<span class="galpi-spoiler" style="background:#111111; color:#111111; cursor:pointer; padding:2px 6px; border-radius:4px; font-weight:bold; transition:color 0.3s ease;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#111111'" title="마우스를 올려 스포일러 확인">${content}</span>`;
+  return `<span class="galpi-spoiler" style="background:#111111; color:#111111; cursor:pointer; padding:2px 6px; border-radius:4px; font-weight:bold; transition:color 0.3s ease;" tabindex="0" role="button" title="마우스를 올리거나 눌러서 스포일러 확인">${content}</span>`;
 };
 
 export const createTabHtml = (innerText) => {
