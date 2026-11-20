@@ -122,3 +122,32 @@ export const buildCharacterGroups = ({ chars, allCharacters, groupCriteria, grou
 const DEFAULT_GROUP_ORDER = { 관계: ['연인', '친구', '일반'] };
 export const getGroupOrderArray = (meta, groupCriteria) =>
   meta?._groupOrder?.[groupCriteria] || DEFAULT_GROUP_ORDER[groupCriteria] || [];
+
+// SHIFT+클릭 폼 전환의 다음 상태. char 는 지금 화면에 보이는 캐릭터(본체 또는 이미 바뀐 폼).
+// - 본체 자리(_baseCharId, 없으면 보이는 폼을 가진 본체)를 기준으로 formSwaps 를 한 칸씩 이어서 바꾼다.
+//   예) 헬퍼피 -> 헬독 -> 헬가드 로 이어 가려면 헬퍼피, 헬독의 스위칭 대상을 각각 다음 폼으로 정한다.
+// - 스위칭 대상이 없는 폼(체인의 끝)에서는 본체로 돌아가 처음부터 다시 돈다.
+// - 전환할 것이 없으면 null(호출한 쪽이 바리에이션 순환 등 다른 동작을 한다). 원본 formSwaps 는 바꾸지 않는다.
+export const resolveFormSwitch = (char, characters, formSwaps) => {
+  const all = Array.isArray(characters) ? characters : [];
+  const swaps = formSwaps || {};
+  let baseId = char._baseCharId;
+  if (baseId === undefined || baseId === null) {
+    baseId = Object.keys(swaps).find((k) => swaps[k] === char.id);
+    if (baseId === undefined) baseId = char.id;
+    else baseId = all.find((c) => String(c.id) === String(baseId))?.id ?? char.id;
+  }
+  let dp = {};
+  try { dp = parseDp(char); } catch (e) { dp = {}; }
+  const target = dp._switchTarget ? all.find((c) => c.name === dp._switchTarget && c.id !== char.id) : null;
+  const next = { ...swaps };
+  if (target) {
+    if (target.id === baseId) delete next[baseId]; else next[baseId] = target.id;
+    return { swaps: next, activeId: target.id };
+  }
+  if (char.id !== baseId && all.some((c) => c.id === baseId)) {
+    delete next[baseId];
+    return { swaps: next, activeId: baseId };
+  }
+  return null;
+};

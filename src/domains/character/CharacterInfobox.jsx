@@ -12,6 +12,7 @@ import RatingBadges from './RatingBadges';
 import { getRatings } from './ratings';
 import ClassifiedStamp from './ClassifiedStamp';
 import { NO_CLASSIFIED } from './classified';
+import { resolveFormSwitch } from './characterGroups';
 
 const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], setCharacters, setActiveCharId, characters, cardVariants, setCardVariants, formSwaps, setFormSwaps, wikiPages = [], onOpenPage, ratingAxes = [], ratingScale = [], classified = NO_CLASSIFIED }) => {
   const navigate = useNavigate();
@@ -101,33 +102,14 @@ const CharacterInfobox = ({ char, workId, workTitle, charExt, imgVariants = [], 
   const handleImageClick = async (e) => {
     if (e.shiftKey) {
       e.preventDefault();
-      // ★ 이중인격 폼 체인지(스위칭) 로직 적용
-      // 1. 현재 캐릭터가 스위칭 타겟을 가지고 있는지 확인 (본체 -> 서브폼)
-      if (dp._switchTarget) {
-         const targetChar = characters.find(c => c.name === dp._switchTarget);
-         if(targetChar) {
-            console.log(`[CharacterInfobox] 이중인격 스위칭 발동 (본체 -> 서브폼): ${char.name} -> ${targetChar.name}`);
-            setFormSwaps(prev => ({ ...prev, [char.id]: targetChar.id }));
-            setActiveCharId(targetChar.id);
-            return; 
-         }
-      } 
-      // 2. 현재 캐릭터가 누군가의 서브폼으로 렌더링 중인지 확인 (서브폼 -> 본체 복귀)
-      const baseId = Object.keys(formSwaps || {}).find(key => formSwaps[key] === char.id);
-      if (baseId) {
-         const baseChar = characters.find(c => String(c.id) === String(baseId));
-         if (baseChar) {
-            console.log(`[CharacterInfobox] 이중인격 스위칭 발동 (서브폼 -> 본체 복귀): ${char.name} -> ${baseChar.name}`);
-            setFormSwaps(prev => {
-              const newSwaps = { ...prev };
-              delete newSwaps[baseId];
-              return newSwaps;
-            });
-            setActiveCharId(baseChar.id);
-            return;
-         }
+      // 폼 전환(이중인격, 진화 체인): 본체 자리를 기준으로 다음 폼으로 한 칸 이동, 체인 끝에서는 본체로 복귀
+      const sw = resolveFormSwitch(char, characters, formSwaps);
+      if (sw) {
+        setFormSwaps(sw.swaps);
+        setActiveCharId(sw.activeId);
+        return;
       }
-      
+
       // 스위칭 대상이 없는 일반 캐릭터라면 기존 바리에이션 순환 로직 수행
       // ★ 작품에 등록된 바리에이션 중 이 캐릭터가 실제로 이미지를 가진 것만 순환 대상으로 삼는다
       // (existingVariants가 아직 확인 전이면 안전하게 기본 이미지만 있는 것으로 취급한다).

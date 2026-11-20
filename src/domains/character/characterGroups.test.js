@@ -1,6 +1,6 @@
 // Copyright (c) dendr000. MIT License.
 import { describe, it, expect } from 'vitest';
-import { getVisibleCharacters, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode, applyMultiGroupMeta, getGroupTags, getGroupCriteriaOptions } from './characterGroups';
+import { getVisibleCharacters, resolveFormSwitch, buildCharacterGroups, getGroupOrderArray, getMultiGroupMode, applyMultiGroupMeta, getGroupTags, getGroupCriteriaOptions } from './characterGroups';
 
 const dp = (obj) => JSON.stringify(obj);
 const ch = (id, over = {}) => ({ id, name: `c${id}`, 관계: '일반', ...over });
@@ -283,5 +283,37 @@ describe('buildCharacterGroups 임의의 속성으로 묶기', () => {
     const { groupedChars } = buildCharacterGroups({ chars: displayChars, allCharacters: chars, groupCriteria: '나이', groupOrderArray: [], sortKey: '', sortDir: 'asc' });
     expect(ids(groupedChars['20'])).toEqual([1, 3]);
     expect(ids(groupedChars['30'])).toEqual([2]);
+  });
+});
+
+describe('resolveFormSwitch (SHIFT+클릭 폼 전환)', () => {
+  const mk = (id, name, target) => ({ id, name, dynamicProperties: JSON.stringify(target ? { _switchTarget: target } : {}) });
+  const chars = [mk(1, '헬퍼피', '헬독'), mk(2, '헬독', '헬가드'), mk(3, '헬가드'), mk(9, '혼자')];
+  const shown = (id, base) => ({ ...chars.find((c) => c.id === id), _baseCharId: base });
+
+  it('본체에서 첫 번째 폼으로 간다', () => {
+    expect(resolveFormSwitch(shown(1, 1), chars, {})).toEqual({ swaps: { 1: 2 }, activeId: 2 });
+  });
+
+  it('바뀐 폼에서 다음 폼으로 이어서 간다(본체 자리를 유지)', () => {
+    expect(resolveFormSwitch(shown(2, 1), chars, { 1: 2 })).toEqual({ swaps: { 1: 3 }, activeId: 3 });
+  });
+
+  it('체인 끝에서는 본체로 돌아가 처음부터 다시 돈다', () => {
+    expect(resolveFormSwitch(shown(3, 1), chars, { 1: 3 })).toEqual({ swaps: {}, activeId: 1 });
+  });
+
+  it('_baseCharId 가 없어도 formSwaps 로 본체를 찾는다', () => {
+    expect(resolveFormSwitch(chars[2], chars, { 1: 3 })).toEqual({ swaps: {}, activeId: 1 });
+  });
+
+  it('스위칭이 없는 캐릭터는 null 이고 원본 formSwaps 는 바뀌지 않는다', () => {
+    const swaps = { 5: 6 };
+    expect(resolveFormSwitch(shown(9, 9), chars, swaps)).toBeNull();
+    expect(swaps).toEqual({ 5: 6 });
+  });
+
+  it('대상 이름이 없는 캐릭터를 가리키면 전환하지 않는다', () => {
+    expect(resolveFormSwitch({ id: 7, name: 'x', dynamicProperties: '{"_switchTarget":"없음"}', _baseCharId: 7 }, chars, {})).toBeNull();
   });
 });
