@@ -132,7 +132,10 @@ export const useBulkStudioData = () => {
           cardImgX: dp.cardImgX !== undefined ? dp.cardImgX : (c.cardImgX !== undefined ? c.cardImgX : 50),
           cardImgY: dp.cardImgY !== undefined ? dp.cardImgY : (c.cardImgY !== undefined ? c.cardImgY : 50),
           cardImgScale: dp.cardImgScale !== undefined ? dp.cardImgScale : (c.cardImgScale !== undefined ? c.cardImgScale : 1),
-          _sortOrderNum: dp.sortOrder !== undefined ? dp.sortOrder : 999
+          _sortOrderNum: dp.sortOrder !== undefined ? dp.sortOrder : 999,
+          // 폼 전환 설정: 목록에서 숨기기, SHIFT+클릭 때 다음에 보일 캐릭터 이름
+          _hidden: !!dp._isHidden,
+          _switchTarget: dp._switchTarget || ''
         };
         colArray.forEach(col => {
           if (col === '나이') rowData[col] = c.age || dp[col] || '';
@@ -167,8 +170,13 @@ export const useBulkStudioData = () => {
     const finalVal = normalizeCellValue(key, val);
 
     setRows(prev => {
-      const newRows = [...prev];
-      newRows[rIdx] = { ...newRows[rIdx], [key]: finalVal };
+      const oldName = key === 'name' ? (prev[rIdx]?.name || '').trim() : '';
+      const newRows = prev.map((r, i) => {
+        if (i === rIdx) return { ...r, [key]: finalVal };
+        // 이름을 바꾸면 그 이름을 "다음 폼"으로 가리키던 캐릭터도 따라 바꾼다(안 그러면 연결이 끊긴다)
+        if (oldName && finalVal.trim() && r._switchTarget === oldName) return { ...r, _switchTarget: finalVal.trim() };
+        return r;
+      });
       return newRows;
     });
 
@@ -225,6 +233,40 @@ export const useBulkStudioData = () => {
       return newRows;
     });
   }, []);
+
+  // 폼 전환 설정: 한 행의 숨김/다음 폼 바꾸기, 체크한 행 한꺼번에 바꾸기, 체크한 행을 진화 체인으로 잇기
+  const setRowHidden = useCallback((rIdx, hidden) => {
+    setRows(prev => prev.map((r, i) => (i === rIdx ? { ...r, _hidden: !!hidden } : r)));
+  }, []);
+
+  const setRowSwitchTarget = useCallback((rIdx, target) => {
+    setRows(prev => prev.map((r, i) => (i === rIdx ? { ...r, _switchTarget: target || '' } : r)));
+  }, []);
+
+  const setCheckedHidden = (hidden) => {
+    setRows(prev => prev.map(r => (r._checked ? { ...r, _hidden: !!hidden } : r)));
+  };
+
+  const clearCheckedSwitch = () => {
+    setRows(prev => prev.map(r => (r._checked ? { ...r, _switchTarget: '' } : r)));
+  };
+
+  // 체크한 행을 표에 보이는 순서대로 이어서 진화 체인으로 만든다: 첫 행만 보이고 나머지는 숨기며,
+  // 각 행의 다음 폼은 바로 다음 행이고 마지막 행은 비운다(마지막에서 SHIFT+클릭하면 첫 행으로 돌아온다).
+  const chainCheckedRows = () => {
+    const picked = rows.map((r, i) => ({ r, i })).filter(({ r }) => r._checked);
+    if (picked.length < 2) return { count: 0, error: '체크한 캐릭터가 2명 이상 있어야 이어 줄 수 있습니다.' };
+    if (picked.some(({ r }) => !r.name.trim())) return { count: 0, error: '이름이 비어 있는 캐릭터가 있습니다.' };
+    const names = picked.map(({ r }) => r.name.trim());
+    if (new Set(names).size !== names.length) return { count: 0, error: '이름이 같은 캐릭터가 섞여 있습니다.' };
+    const pos = new Map(picked.map(({ i }, k) => [i, k]));
+    setRows(prev => prev.map((r, i) => {
+      if (!pos.has(i)) return r;
+      const k = pos.get(i);
+      return { ...r, _hidden: k > 0, _switchTarget: k < names.length - 1 ? names[k + 1] : '' };
+    }));
+    return { count: picked.length };
+  };
 
   const toggleAllChecks = (isChecked) => {
     const newRows = rows.map(r => ({ ...r, _checked: isChecked }));
@@ -552,6 +594,10 @@ export const useBulkStudioData = () => {
           if (k.startsWith('_') && !(k in dp)) dp[k] = originalDp[k];
         });
       }
+      // 숨김과 다음 폼은 이 표에서 직접 고치므로 표의 값이 원본보다 우선한다(비우면 속성을 지운다)
+      dp._isHidden = !!row._hidden;
+      const switchTarget = (row._switchTarget || '').trim();
+      if (switchTarget) dp._switchTarget = switchTarget; else delete dp._switchTarget;
       payload.dynamicProperties = JSON.stringify(dp);
       return String(row.id).startsWith('new_') ? api.post('/api/characters', payload) : api.put(`/api/characters/${row.id}`, payload);
     }));
@@ -591,6 +637,7 @@ export const useBulkStudioData = () => {
     bodyModal, setBodyModal, findReplaceModal, setFindReplaceModal,
     pasteModal, setPasteModal,
     loadCharacters, handleCellChange, toggleRowCheck, toggleAllChecks,
+    setRowHidden, setRowSwitchTarget, setCheckedHidden, clearCheckedSwitch, chainCheckedRows,
     addRow, removeRow, removeCheckedRows, addColumn, removeColumn, changeColOrder, sortTable,
     applyBatchValue, executeFindReplace, importRowsFromText, importRowsFromGrid, handleSaveAll
   };

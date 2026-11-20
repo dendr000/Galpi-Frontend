@@ -16,6 +16,7 @@ import { getGroupCriteriaOptions } from './characterGroups';
 import { getCharViewSettings } from './charViewSettings';
 import Icon from '../../components/common/icons/Icon';
 import CharViewSettingsMenu from './CharViewSettingsMenu';
+import HiddenCharsPanel from './HiddenCharsPanel';
 
 const CharacterGrid = ({
   styles = {}, 
@@ -51,6 +52,8 @@ const CharacterGrid = ({
   onFilterClear = () => {},
   filterShown = 0,            // 필터를 거친 뒤 보이는 인원과 전체 인원
   filterTotal = 0,
+  hiddenChars = [],           // 숨김 캐릭터 목록과 복구 동작(있을 때만 "숨김 캐릭터" 띠가 나온다)
+  onRestoreHidden = async () => ({ done: 0, failed: 0 }),
   onOpenModal = null          // 있으면 카드에 "큰 창으로 보기" 버튼과 더블클릭 열기를 둔다
 }) => {
   console.log("[CharacterGrid] 등장인물 갤러리 그리드 컴포넌트 렌더링 개시");
@@ -147,6 +150,8 @@ const CharacterGrid = ({
           </button>
         </div>
       </div>
+
+      <HiddenCharsPanel hidden={hiddenChars} onRestore={onRestoreHidden} />
 
       <FilterChips groups={filterGroups} selection={filterSelection} onToggle={onFilterToggle} onClear={onFilterClear} shown={filterShown} total={filterTotal} />
       {hasActiveFilter(filterSelection) && filterShown === 0 && (

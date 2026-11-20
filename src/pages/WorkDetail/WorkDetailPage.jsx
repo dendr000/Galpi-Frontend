@@ -57,6 +57,8 @@ import { useWindowWidth } from '../../hooks/useWindowWidth';
 import { getPanelState } from '../../domains/work/panelLayout';
 import { useWorkDetailData } from '../../domains/work/useWorkDetailData';
 import { useCharacterDrag } from '../../domains/character/useCharacterDrag';
+import { useRestoreHidden } from '../../domains/character/useRestoreHidden';
+import { getHiddenCharacters } from '../../domains/character/formVisibility';
 import { useWorkBacklink } from '../../domains/work/useWorkBacklink';
 import { useSelectCharFromUrl } from '../../domains/work/useSelectCharFromUrl';
 import { useGridSelectScroll, scrollToCharCard } from '../../domains/character/useGridSelectScroll';
@@ -85,6 +87,9 @@ const WorkDetailPage = () => {
   const multiGroupMode = getMultiGroupMode(workMetaForGroups);
   const hiddenGroupValues = getGroupHideValues(workMetaForGroups, data.groupCriteria);
   const { handleCharDragStart, handleCharDragOver, handleCharDragEnd } = useCharacterDrag(data.characters, data.setCharacters, data.groupCriteria, multiGroupMode, hiddenGroupValues);
+
+  // 숨김 캐릭터를 목록으로 되돌리는 동작(작품 페이지의 "숨김 캐릭터" 띠)
+  const restoreHidden = useRestoreHidden({ setCharacters: data.setCharacters });
 
   // 본문의 [[이름]] 파란 링크: 같은 작품 캐릭터면 선택+스크롤, 다른 작품 제목이면 그 작품으로 이동
   const handleBacklink = useWorkBacklink({
@@ -371,6 +376,8 @@ const WorkDetailPage = () => {
                 onFilterClear={handleFilterClear}
                 filterShown={visibleChars.length}
                 filterTotal={displayChars.length}
+                hiddenChars={getHiddenCharacters(data.characters)}
+                onRestoreHidden={restoreHidden}
               />
             )}
 

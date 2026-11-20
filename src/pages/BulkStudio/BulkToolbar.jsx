@@ -11,10 +11,13 @@ const BulkToolbar = ({
   works, selectedWorkId, loadCharacters, addRow, addColumn, columns,
   tabMode, setTabMode, sortTable, applyBatchValue, setFindReplaceModal, setPasteModal,
   labels, setLabels, isPreviewOpen, setIsPreviewOpen,
-  rows = [], removeCheckedRows
+  rows = [], removeCheckedRows,
+  setCheckedHidden, clearCheckedSwitch, chainCheckedRows
 }) => {
   const navigate = useNavigate();
   const checkedCount = rows.filter(r => r._checked).length;
+  const hiddenCount = rows.filter(r => r._hidden).length;
+  const linkedCount = rows.filter(r => r._switchTarget).length;
   const [addCount, setAddCount] = useState(1);
   const [batchCol, setBatchCol] = useState('');
   const [batchVal, setBatchVal] = useState('');
@@ -22,6 +25,11 @@ const BulkToolbar = ({
   const handleAddRow = () => {
     addRow(Number(addCount) || 1);
     setAddCount(1);
+  };
+
+  const handleChain = () => {
+    const res = chainCheckedRows();
+    if (res.error) alert(res.error);
   };
 
   const handleAddCol = async () => {
@@ -119,6 +127,29 @@ const BulkToolbar = ({
             선택 삭제{checkedCount > 0 ? ` (${checkedCount})` : ''}
           </button>
         </div>
+      </div>
+
+      <div className="bulk-toolbar form-toolbar" style={{ borderBottom: '1px solid var(--border-color)', padding: '8px 20px', background: 'var(--surface-color)', display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>[폼 전환 설정]</span>
+        <span className="form-summary" title="표에서 숨김으로 둔 캐릭터 수와 다음 폼이 연결된 캐릭터 수">
+          <Icon name="eye-off" size={12} /> 숨김 {hiddenCount}
+          <span className="form-summary-sep" />
+          <Icon name="link" size={12} /> 연결 {linkedCount}
+        </span>
+        <div className="toolbar-divider"></div>
+        <button className="icon-btn" disabled={checkedCount === 0} onClick={() => setCheckedHidden(true)} title="체크한 캐릭터를 작품 페이지 목록에서 숨깁니다" style={checkedCount === 0 ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
+          <Icon name="eye-off" size={14} /> 선택 숨기기
+        </button>
+        <button className="icon-btn" disabled={checkedCount === 0} onClick={() => setCheckedHidden(false)} title="체크한 캐릭터를 목록에 다시 보이게 합니다" style={checkedCount === 0 ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
+          <Icon name="eye" size={14} /> 선택 보이기
+        </button>
+        <button className="icon-btn chain-btn" disabled={checkedCount < 2} onClick={handleChain} title="체크한 캐릭터를 표 순서대로 이어 줍니다: 첫 캐릭터만 보이고 나머지는 숨기며, SHIFT+클릭할 때마다 다음 모습으로 바뀝니다" style={checkedCount < 2 ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
+          <Icon name="swap" size={14} /> 진화 체인으로 연결{checkedCount >= 2 ? ` (${checkedCount})` : ''}
+        </button>
+        <button className="icon-btn" disabled={checkedCount === 0} onClick={() => clearCheckedSwitch()} title="체크한 캐릭터의 다음 폼 연결을 지웁니다" style={checkedCount === 0 ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}>
+          <Icon name="close" size={14} /> 연결 해제
+        </button>
+        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>체크한 행에 적용 · 마지막 폼에서 SHIFT+클릭하면 처음으로 돌아옵니다</span>
       </div>
 
       <div className="bulk-toolbar" style={{ borderBottom: '1px solid var(--border-color)', padding: '8px 20px', background: 'var(--surface-color)', display: 'flex', gap: '15px', alignItems: 'center' }}>

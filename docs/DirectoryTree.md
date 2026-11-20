@@ -116,6 +116,9 @@ src/
  │   │   ├── CharacterInfobox.jsx               # 우측 영역에 상시 밀착하여 캐릭터 핵심 프로필 정보를 요약 표출하는 인포박스
  │   │   ├── CharacterQuickNav.jsx              # 상세 정보 하단에 배치되어 해당 캐릭터 카드로 초점을 강제 이동시키는 바
  │   │   ├── characterGroups.js                 # 숨김/폼 스왑 반영과 분류 그룹 묶기, 그룹 안 정렬을 계산하는 순수 로직
+ │   │   ├── formVisibility.js                  # 숨김 캐릭터 목록 뽑기, 숨김 켜고 끄기(복구) 계산
+ │   │   ├── HiddenCharsPanel.jsx               # 작품 페이지의 "숨김 캐릭터" 띠(펼쳐서 하나씩 또는 모두 복구)
+ │   │   ├── useRestoreHidden.js                # 숨김 캐릭터를 서버에 저장하며 목록으로 되돌리는 훅
  │   │   ├── groupHide.js                       # 작품 설정 "그룹에서 숨길 값"을 읽고 저장하는 로직
  │   │   ├── characterFilter.js                 # 소속, 등급 칩 필터의 칩 모으기와 걸러내기 순수 로직(그룹 안 OR, 그룹 사이 AND)
  │   │   ├── FilterChips.jsx                    # 캐릭터 목록 위의 소속, 등급 칩 필터 UI
@@ -180,6 +183,7 @@ src/
      │   ├── BulkTable.jsx                      # 가상화(Virtual) 렌더링 엔진과 자동완성 드롭다운이 융합된 데이터 그리드 코어
      │   ├── columnMovePrompt.js                # 속성(열) 이름을 눌렀을 때 몇 번째로 옮길지 묻고 숫자로 돌려주는 함수
      │   ├── BulkTableRow.jsx                   # 재렌더링 부하 격리 및 고정(Sticky) 셀의 시각적 겹침 방지 처리용 단일 행 컴포넌트
+     │   ├── BulkTableRow.test.jsx              # 한 행의 목록 표시(보임/숨김)와 다음 폼 선택 칸 테스트
      │   ├── BulkToolbar.jsx                    # 탭 스위칭, 속성 추가, 일괄 덮어쓰기 등 워크스페이스 상단 데이터 제어 툴바
      │   └── useBulkStudioData.js               # 디바운싱 검색 자동완성, 예약어 필터링, 단축키 이벤트를 관장하는 커스텀 훅
      ├── Category/

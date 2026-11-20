@@ -3,15 +3,21 @@
 
 import React from 'react';
 import { IconPen, IconPlus } from '../../components/common/icons/DomainIcons';
+import Icon from '../../components/common/icons/Icon';
 import { ENUM_COLUMNS } from './useBulkStudioData';
 
 const BulkTableRow = ({ 
   row, rIdx, columns, 
   handleCellChange, toggleRowCheck, removeRow, 
-  setActiveRowIdx, handleKeyDown, setBodyModal 
+  setActiveRowIdx, handleKeyDown, setBodyModal,
+  setRowHidden, setRowSwitchTarget, nameOptions = []
 }) => {
   const isNew = String(row.id).startsWith('new_');
-  const rowClass = row._checked ? 'checked-row' : '';
+  const rowClass = [row._checked ? 'checked-row' : '', row._hidden ? 'hidden-row' : ''].filter(Boolean).join(' ');
+  const switchTarget = row._switchTarget || '';
+  const selfName = (row.name || '').trim();
+  const options = nameOptions.filter((n) => n !== selfName);
+  const targetMissing = switchTarget !== '' && !options.includes(switchTarget);
   
   // ★ 스크롤 시 글자가 비쳐 보이는 것을 막기 위해 Sticky 셀 전용 불투명 배경색 추출
   const bgCol = row._checked ? 'var(--table-bg-alt)' : 'var(--surface-color)';
@@ -42,6 +48,32 @@ const BulkTableRow = ({
         />
       </td>
       
+      <td className="form-cell">
+        <button
+          type="button"
+          className={`vis-toggle ${row._hidden ? 'is-hidden' : 'is-shown'}`}
+          aria-pressed={!!row._hidden}
+          onClick={() => setRowHidden(rIdx, !row._hidden)}
+          title={row._hidden ? '지금은 작품 페이지 목록에 안 보입니다. 누르면 다시 보입니다' : '작품 페이지 목록에 보입니다. 누르면 숨깁니다'}
+        >
+          <Icon name={row._hidden ? 'eye-off' : 'eye'} size={13} />
+          {row._hidden ? '숨김' : '보임'}
+        </button>
+      </td>
+      <td className="form-cell">
+        <select
+          className={`input form-select${switchTarget ? ' has-target' : ''}`}
+          value={switchTarget}
+          onChange={e => setRowSwitchTarget(rIdx, e.target.value)}
+          onFocus={() => setActiveRowIdx(rIdx)}
+          title="이 캐릭터를 SHIFT+클릭했을 때 다음에 보일 캐릭터"
+        >
+          <option value="">- 없음 -</option>
+          {targetMissing && <option value={switchTarget}>{switchTarget} (없는 캐릭터)</option>}
+          {options.map(n => <option key={n} value={n}>{n}</option>)}
+        </select>
+      </td>
+
       {columns.map(col => {
         const enumConf = ENUM_COLUMNS[col];
         if (enumConf) {

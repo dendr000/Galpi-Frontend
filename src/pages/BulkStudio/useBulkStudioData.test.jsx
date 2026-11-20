@@ -150,3 +150,78 @@ describe('useBulkStudioData 선택 삭제(removeCheckedRows)', () => {
     expect(apiMock.post).not.toHaveBeenCalled();
   });
 });
+
+describe('useBulkStudioData 폼 전환(숨김, 다음 폼)', () => {
+  const FORMS = [
+    { id: 1, name: '헬퍼피', dynamicProperties: JSON.stringify({ sortOrder: 1, _switchTarget: '헬독' }) },
+    { id: 2, name: '헬독', dynamicProperties: JSON.stringify({ sortOrder: 2, _isHidden: true, _switchTarget: '헬가드' }) },
+    { id: 3, name: '헬가드', dynamicProperties: JSON.stringify({ sortOrder: 3, _isHidden: true }) },
+    { id: 4, name: '혼자', dynamicProperties: JSON.stringify({ sortOrder: 4, 종족: '인간' }) },
+  ];
+  const load = async () => {
+    const hook = await setup(FORMS);
+    await waitFor(() => expect(hook.result.current.rows).toHaveLength(4));
+    return hook;
+  };
+  const savedDp = (id) => JSON.parse(apiMock.put.mock.calls.find((c) => c[0] === `/api/characters/${id}`)[1].dynamicProperties);
+
+  it('불러올 때 숨김과 다음 폼이 행에 채워진다', async () => {
+    const { result } = await load();
+    expect(result.current.rows.map((r) => [r._hidden, r._switchTarget])).toEqual([[false, '헬독'], [true, '헬가드'], [true, ''], [false, '']]);
+  });
+
+  it('한 행의 숨김과 다음 폼을 바꿀 수 있다', async () => {
+    const hook = await load();
+    act(() => { hook.result.current.setRowHidden(3, true); hook.result.current.setRowSwitchTarget(3, '헬퍼피'); });
+    expect(hook.result.current.rows[3]._hidden).toBe(true);
+    expect(hook.result.current.rows[3]._switchTarget).toBe('헬퍼피');
+  });
+
+  it('이름을 바꾸면 그 이름을 다음 폼으로 가리키던 행도 따라 바뀐다', async () => {
+    const hook = await load();
+    act(() => { hook.result.current.handleCellChange(1, 'name', '헬도그'); });
+    expect(hook.result.current.rows[0]._switchTarget).toBe('헬도그');
+  });
+
+  it('체크한 행을 표 순서대로 체인으로 잇는다(첫 행만 보이고 마지막은 연결 없음)', async () => {
+    const hook = await load();
+    act(() => { [3, 0, 1].forEach((i) => hook.result.current.toggleRowCheck({ shiftKey: false }, i)); });
+    let res;
+    act(() => { res = hook.result.current.chainCheckedRows(); });
+    expect(res.count).toBe(3);
+    expect(hook.result.current.rows.map((r) => [r.name, r._hidden, r._switchTarget])).toEqual([
+      ['헬퍼피', false, '헬독'], ['헬독', true, '혼자'], ['헬가드', true, ''], ['혼자', true, ''],
+    ]);
+  });
+
+  it('체크가 1명뿐이면 잇지 않고 안내를 돌려준다', async () => {
+    const hook = await load();
+    act(() => { hook.result.current.toggleRowCheck({ shiftKey: false }, 0); });
+    let res;
+    act(() => { res = hook.result.current.chainCheckedRows(); });
+    expect(res.count).toBe(0);
+    expect(res.error).toContain('2명');
+  });
+
+  it('체크한 행을 한꺼번에 숨기고 보이게 하고, 다음 폼을 비울 수 있다', async () => {
+    const hook = await load();
+    act(() => { hook.result.current.toggleRowCheck({ shiftKey: false }, 1); hook.result.current.toggleRowCheck({ shiftKey: false }, 2); });
+    act(() => { hook.result.current.setCheckedHidden(false); });
+    expect(hook.result.current.rows.map((r) => r._hidden)).toEqual([false, false, false, false]);
+    act(() => { hook.result.current.clearCheckedSwitch(); });
+    expect(hook.result.current.rows.map((r) => r._switchTarget)).toEqual(['헬독', '', '', '']);
+  });
+
+  it('저장하면 표의 숨김과 다음 폼이 서버 속성으로 간다(비우면 속성이 지워진다)', async () => {
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+    apiMock.put.mockResolvedValue({ data: {} });
+    const hook = await load();
+    act(() => { hook.result.current.setRowHidden(2, false); hook.result.current.setRowSwitchTarget(0, ''); });
+    await act(async () => { await hook.result.current.handleSaveAll(); });
+    expect(savedDp(1)._switchTarget).toBeUndefined();
+    expect(savedDp(1)._isHidden).toBe(false);
+    expect(savedDp(2)._isHidden).toBe(true);
+    expect(savedDp(2)._switchTarget).toBe('헬가드');
+    expect(savedDp(3)._isHidden).toBe(false);
+  });
+});

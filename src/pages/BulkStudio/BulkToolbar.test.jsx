@@ -67,3 +67,39 @@ describe('BulkToolbar 선택 삭제', () => {
     expect(props.removeCheckedRows).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('BulkToolbar - 폼 전환 설정', () => {
+  const mkRows = (n, extra = {}) => Array.from({ length: n }, (_, i) => ({ id: i + 1, name: `캐릭${i + 1}`, _checked: i < (extra.checked ?? 0), _hidden: false, _switchTarget: '' }));
+
+  it('체크가 없으면 선택 숨기기, 선택 보이기, 연결 해제가 눌리지 않는다', () => {
+    const { getByText } = renderToolbar({ rows: mkRows(3), setCheckedHidden: vi.fn(), clearCheckedSwitch: vi.fn(), chainCheckedRows: vi.fn() });
+    expect(getByText('선택 숨기기').closest('button').disabled).toBe(true);
+    expect(getByText('선택 보이기').closest('button').disabled).toBe(true);
+    expect(getByText('연결 해제').closest('button').disabled).toBe(true);
+  });
+
+  it('체크가 1명이면 체인 연결은 막히고 2명 이상이면 인원 수와 함께 눌린다', () => {
+    const chainCheckedRows = vi.fn().mockReturnValue({ count: 2 });
+    const one = renderToolbar({ rows: mkRows(3, { checked: 1 }), setCheckedHidden: vi.fn(), clearCheckedSwitch: vi.fn(), chainCheckedRows });
+    expect(one.container.querySelector('.chain-btn').disabled).toBe(true);
+    cleanup();
+    const two = renderToolbar({ rows: mkRows(3, { checked: 2 }), setCheckedHidden: vi.fn(), clearCheckedSwitch: vi.fn(), chainCheckedRows });
+    const btn = two.getByText(/진화 체인으로 연결 \(2\)/).closest('button');
+    fireEvent.click(btn);
+    expect(chainCheckedRows).toHaveBeenCalledTimes(1);
+  });
+
+  it('체인 연결이 실패 안내를 돌려주면 알림으로 보여 준다', () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    const chainCheckedRows = vi.fn().mockReturnValue({ count: 0, error: '이름이 같은 캐릭터가 섞여 있습니다.' });
+    const { container } = renderToolbar({ rows: mkRows(3, { checked: 3 }), setCheckedHidden: vi.fn(), clearCheckedSwitch: vi.fn(), chainCheckedRows });
+    fireEvent.click(container.querySelector('.chain-btn'));
+    expect(alertSpy).toHaveBeenCalledWith('이름이 같은 캐릭터가 섞여 있습니다.');
+  });
+
+  it('숨김 수와 연결 수를 요약해서 보여 준다', () => {
+    const rows = [{ id: 1, name: 'a', _hidden: true, _switchTarget: 'b' }, { id: 2, name: 'b', _hidden: true, _switchTarget: '' }, { id: 3, name: 'c' }];
+    const { container } = renderToolbar({ rows, setCheckedHidden: vi.fn(), clearCheckedSwitch: vi.fn(), chainCheckedRows: vi.fn() });
+    expect(container.querySelector('.form-summary').textContent).toMatch(/숨김 2[\s\S]*연결 1/);
+  });
+});

@@ -205,3 +205,34 @@
   border-top: 1px solid var(--border-color); 
   flex-shrink: 0; 
 }
+
+/* ---- 폼 전환 설정(목록 표시, 다음 폼) ---- */
+:global(.form-th) { background: var(--table-bg-alt); border-left: 2px solid var(--border-color); }
+:global(.table td.form-cell) { padding: 4px 6px; min-width: 96px; }
+:global(.table td.form-cell + td.form-cell) { min-width: 170px; }
+
+:global(.vis-toggle) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-width: 70px; padding: 5px 10px; border-radius: 14px; cursor: pointer; white-space: nowrap;
+  font-size: 12px; font-weight: 900; border: 1px solid var(--border-color);
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+:global(.vis-toggle.is-shown) { background: var(--surface-color); color: var(--text-secondary); }
+:global(.vis-toggle.is-shown:hover) { border-color: var(--primary-color); color: var(--primary-color); }
+:global(.vis-toggle.is-hidden) { background: var(--text-secondary); color: var(--surface-color); border-color: var(--text-secondary); }
+:global(.vis-toggle.is-hidden:hover) { opacity: .85; }
+
+:global(.form-select) { text-overflow: ellipsis; cursor: pointer; color: var(--text-secondary); }
+:global(.form-select.has-target) { color: var(--primary-color); }
+
+/* 숨김 행은 한눈에 구분되도록 흐리게 하고 왼쪽에 띠를 둔다 */
+:global(.table tr.hidden-row td:not(.form-cell) .input) { opacity: .6; }
+:global(.table tr.hidden-row td.sticky-check) { box-shadow: inset 4px 0 0 var(--text-secondary); }
+
+:global(.form-summary) {
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+  font-size: 12px; font-weight: bold; color: var(--text-secondary);
+  padding: 3px 10px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--table-bg-alt);
+}
+:global(.form-summary-sep) { width: 1px; height: 12px; background: var(--border-color); margin: 0 4px; }
+:global(.icon-btn.chain-btn:not(:disabled)) { border-color: var(--primary-color); color: var(--primary-color); }

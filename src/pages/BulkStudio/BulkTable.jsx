@@ -10,7 +10,8 @@ import { IconChevronLeft, IconChevronRight } from '../../components/common/icons
 const BulkTable = ({ 
   columns, rows, loading, tabMode, suggestions, selectedWorkId,
   handleCellChange, toggleRowCheck, toggleAllChecks, removeRow, removeColumn, 
-  changeColOrder, setActiveRowIdx, setBodyModal 
+  changeColOrder, setActiveRowIdx, setBodyModal,
+  setRowHidden, setRowSwitchTarget
 }) => {
   const tableWrapRef = useRef(null);
 
@@ -66,6 +67,10 @@ const BulkTable = ({
     }
   }, [tabMode]);
 
+  // 다음 폼으로 고를 수 있는 이름들. 이름이 안 바뀌면 같은 배열을 유지해 행이 불필요하게 다시 그려지지 않게 한다.
+  const namesKey = rows.map(r => (r.name || '').trim()).join('\u0001');
+  const nameOptions = useMemo(() => namesKey.split('\u0001').filter(Boolean), [namesKey]);
+
   const allChecked = rows.length > 0 && rows.every(r => r._checked);
 
   if (loading) return <div style={{ padding: '40px', textAlign: 'center', fontWeight: 'bold' }}>로딩 중...</div>;
@@ -87,6 +92,8 @@ const BulkTable = ({
               </th>
               <th className="sticky-delete">삭제</th>
               <th className="sticky-name">이름 (필수)</th>
+              <th className="form-th" style={{ width: '96px', minWidth: '96px' }} title="작품 페이지 목록에 보일지 정합니다">목록 표시</th>
+              <th className="form-th" style={{ width: '170px', minWidth: '170px' }} title="SHIFT+클릭하면 이 캐릭터 대신 보일 캐릭터. 체인의 마지막은 비워 두면 처음으로 돌아옵니다">다음 폼 (SHIFT+클릭)</th>
               {columns.map((col, i) => {
                 const isFirst = col === '부제목';
                 const atLeft = i <= 1;
@@ -142,6 +149,9 @@ const BulkTable = ({
                   setActiveRowIdx={setActiveRowIdx}
                   handleKeyDown={handleKeyDown}
                   setBodyModal={setBodyModal}
+                  setRowHidden={setRowHidden}
+                  setRowSwitchTarget={setRowSwitchTarget}
+                  nameOptions={nameOptions}
                 />
               );
             })}
